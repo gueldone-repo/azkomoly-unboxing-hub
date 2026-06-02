@@ -148,17 +148,7 @@ function Footer() {
   );
 }
 
-      <button
-        onClick={() => setOpen(true)}
-        className="bg-fire text-primary-foreground font-display text-2xl md:text-3xl px-10 py-5 graffiti-border hover:translate-y-[-2px] transition-transform animate-fade-up"
-      >
-        FELIRATKOZOM
-      </button>
 
-      <SignupDialog open={open} onOpenChange={setOpen} />
-    </main>
-  );
-}
 
 function SignupDialog({
   open,
