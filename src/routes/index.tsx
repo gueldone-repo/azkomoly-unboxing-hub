@@ -96,7 +96,7 @@ function Landing() {
           onClick={() => setOpen(true)}
           className="bg-fire text-primary-foreground font-display text-2xl md:text-3xl px-10 py-5 graffiti-border hover:translate-y-[-2px] transition-transform animate-fade-up"
         >
-          FELIRATKOZOM
+          Légy az első, aki felfedi a titkot
         </button>
       </section>
 
@@ -220,7 +220,7 @@ function SignupDialog({
               value={name}
               onChange={(e) => setName(e.target.value)}
               maxLength={120}
-              placeholder="Teljes név"
+              placeholder="Név"
               className="w-full bg-background border-2 border-cardboard/60 focus:border-fire text-white px-4 py-3 font-sans focus:outline-none transition-colors"
             />
           </div>
