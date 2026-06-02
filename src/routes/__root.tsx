@@ -77,14 +77,18 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
+      { title: "Azkomoly" },
+      { name: "description", content: "Hamarosan itt van. Készülj fel." },
       { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { property: "og:title", content: "Azkomoly" },
+      { property: "og:description", content: "Hamarosan itt van. Készülj fel." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:title", content: "Azkomoly" },
+      { name: "twitter:description", content: "Hamarosan itt van. Készülj fel." },
+      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/2n40GwZrOOUihC1CB3n178mNI2g2/social-images/social-1780421041588-photo_5832647317360676478_y.webp" },
+      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/2n40GwZrOOUihC1CB3n178mNI2g2/social-images/social-1780421041588-photo_5832647317360676478_y.webp" },
     ],
     links: [
       {
