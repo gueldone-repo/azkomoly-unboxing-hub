@@ -9,7 +9,6 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogDescription,
 } from "@/components/ui/dialog";
 import {
   Select,
@@ -208,9 +207,6 @@ function SignupDialog({
           <DialogTitle className="font-display text-3xl text-fire text-fire-glow">
             FELIRATKOZÁS
           </DialogTitle>
-          <DialogDescription className="font-sans text-muted-foreground">
-            Legyél az első, aki megnyitja a dobozt.
-          </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={onSubmit} className="flex flex-col gap-4 mt-2">
