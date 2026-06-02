@@ -1,8 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState, type FormEvent } from "react";
+import { useServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
+import { appendLeadToSheet } from "@/lib/leads.functions";
 import { Instagram, Facebook, Youtube } from "lucide-react";
+
 import logoAsset from "@/assets/azkomoly-logo.png.asset.json";
 import {
   Dialog,
@@ -162,6 +165,7 @@ function SignupDialog({
   const [phone, setPhone] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [message, setMessage] = useState("");
+  const appendToSheet = useServerFn(appendLeadToSheet);
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
@@ -175,22 +179,34 @@ function SignupDialog({
     setMessage("");
 
     const phoneTrim = parsed.data.phone?.trim();
+    const emailLower = parsed.data.email.toLowerCase();
     const { error } = await supabase.from("azkomoly_leads").insert({
       name: parsed.data.name,
-      email: parsed.data.email.toLowerCase(),
+      email: emailLower,
       phone: phoneTrim ? phoneTrim : null,
       phone_country_code: phoneTrim ? countryCode : null,
       source: "landing",
     });
 
-    if (error) {
-      if (error.code === "23505") {
-        setStatus("success");
-        setMessage("✅ Már fent vagy a listán!");
-      } else {
-        setStatus("error");
-        setMessage("Hiba történt. Próbáld újra.");
-      }
+    if (error && error.code !== "23505") {
+      setStatus("error");
+      setMessage("Hiba történt. Próbáld újra.");
+      return;
+    }
+
+    // Append to Google Sheet (fire and forget — don't block UX on sheet failure)
+    appendToSheet({
+      data: {
+        name: parsed.data.name,
+        email: emailLower,
+        countryCode: phoneTrim ? countryCode : null,
+        phone: phoneTrim || null,
+      },
+    }).catch((err) => console.error("Sheet append error", err));
+
+    if (error?.code === "23505") {
+      setStatus("success");
+      setMessage("✅ Már fent vagy a listán!");
       return;
     }
     setStatus("success");
@@ -199,6 +215,7 @@ function SignupDialog({
     setEmail("");
     setPhone("");
   }
+
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
