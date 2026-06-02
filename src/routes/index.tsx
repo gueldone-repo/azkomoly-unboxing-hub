@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState, type FormEvent } from "react";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
+import { Instagram, Facebook, Youtube } from "lucide-react";
 import logoAsset from "@/assets/azkomoly-logo.png.asset.json";
 import {
   Dialog,
