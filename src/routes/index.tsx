@@ -1,8 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState, type FormEvent } from "react";
+import { useServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
+import { appendLeadToSheet } from "@/lib/leads.functions";
 import { Instagram, Facebook, Youtube } from "lucide-react";
+
 import logoAsset from "@/assets/azkomoly-logo.png.asset.json";
 import {
   Dialog,
