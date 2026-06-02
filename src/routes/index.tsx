@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState, type FormEvent } from "react";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
+import { Instagram, Facebook, Youtube } from "lucide-react";
 import logoAsset from "@/assets/azkomoly-logo.png.asset.json";
 import {
   Dialog,
@@ -82,26 +83,72 @@ function Landing() {
   const [open, setOpen] = useState(false);
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-background text-foreground flex flex-col items-center justify-center px-6 py-16">
-      <div className="animate-pulse-glow mb-10">
-        <img
-          src={logoAsset.url}
-          alt="AZKOMOLY mystery box logo"
-          className="mx-auto h-64 w-64 sm:h-80 sm:w-80 md:h-[28rem] md:w-[28rem] object-contain drop-shadow-2xl"
-        />
-      </div>
+    <main className="relative min-h-screen overflow-hidden bg-background text-foreground flex flex-col px-6 py-12">
+      <section className="flex-1 flex flex-col items-center justify-center">
+        <div className="animate-pulse-glow mb-10">
+          <img
+            src={logoAsset.url}
+            alt="AZKOMOLY mystery box logo"
+            className="mx-auto h-64 w-64 sm:h-80 sm:w-80 md:h-[28rem] md:w-[28rem] object-contain drop-shadow-2xl"
+          />
+        </div>
 
-      <button
-        onClick={() => setOpen(true)}
-        className="bg-fire text-primary-foreground font-display text-2xl md:text-3xl px-10 py-5 graffiti-border hover:translate-y-[-2px] transition-transform animate-fade-up"
-      >
-        FELIRATKOZOM
-      </button>
+        <button
+          onClick={() => setOpen(true)}
+          className="bg-fire text-primary-foreground font-display text-2xl md:text-3xl px-10 py-5 graffiti-border hover:translate-y-[-2px] transition-transform animate-fade-up"
+        >
+          FELIRATKOZOM
+        </button>
+      </section>
+
+      <Footer />
 
       <SignupDialog open={open} onOpenChange={setOpen} />
     </main>
   );
 }
+
+function TikTokIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} fill="currentColor" aria-hidden>
+      <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5.8 20.1a6.34 6.34 0 0 0 10.86-4.43V9.01a8.16 8.16 0 0 0 4.77 1.52V7.08a4.85 4.85 0 0 1-1.84-.39z" />
+    </svg>
+  );
+}
+
+const SOCIALS = [
+  { label: "Instagram", href: "https://www.instagram.com/azkomoly.hu/", Icon: Instagram },
+  { label: "TikTok", href: "https://www.tiktok.com/@azkomoly.hu", Icon: TikTokIcon },
+  { label: "YouTube", href: "https://www.youtube.com/@AzKomolyHungary", Icon: Youtube },
+  { label: "Facebook", href: "https://www.facebook.com/profile.php?id=61590505527795", Icon: Facebook },
+];
+
+function Footer() {
+  return (
+    <footer className="mt-16 pt-8 border-t border-cardboard/30 flex flex-col items-center gap-4">
+      <p className="font-display text-fire text-lg tracking-wider">KÖVESS MINKET</p>
+      <div className="flex gap-4 flex-wrap justify-center">
+        {SOCIALS.map(({ label, href, Icon }) => (
+          <a
+            key={label}
+            href={href}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={label}
+            className="h-12 w-12 grid place-items-center border-2 border-cardboard/60 text-cardboard hover:text-fire hover:border-fire hover:-translate-y-0.5 transition-all"
+          >
+            <Icon className="h-6 w-6" />
+          </a>
+        ))}
+      </div>
+      <p className="font-sans text-xs text-muted-foreground mt-2">
+        © 2025 <span className="font-display text-fire">AZKOMOLY</span>
+      </p>
+    </footer>
+  );
+}
+
+
 
 function SignupDialog({
   open,
