@@ -2,8 +2,21 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState, type FormEvent } from "react";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
-import logo from "@/assets/azkomoly-logo.png";
-import { Instagram } from "lucide-react";
+import logoAsset from "@/assets/azkomoly-logo.png.asset.json";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -33,141 +46,101 @@ export const Route = createFileRoute("/")({
   component: Landing,
 });
 
-const emailSchema = z
-  .string()
-  .trim()
-  .min(3, { message: "Adj meg egy érvényes email címet." })
-  .max(255)
-  .email({ message: "Adj meg egy érvényes email címet." });
+const COUNTRY_CODES: { code: string; label: string; flag: string }[] = [
+  { code: "+36", label: "Magyarország", flag: "🇭🇺" },
+  { code: "+52", label: "México", flag: "🇲🇽" },
+  { code: "+1", label: "USA / Canada", flag: "🇺🇸" },
+  { code: "+34", label: "España", flag: "🇪🇸" },
+  { code: "+44", label: "United Kingdom", flag: "🇬🇧" },
+  { code: "+49", label: "Deutschland", flag: "🇩🇪" },
+  { code: "+33", label: "France", flag: "🇫🇷" },
+  { code: "+39", label: "Italia", flag: "🇮🇹" },
+  { code: "+43", label: "Österreich", flag: "🇦🇹" },
+  { code: "+40", label: "România", flag: "🇷🇴" },
+  { code: "+421", label: "Slovensko", flag: "🇸🇰" },
+  { code: "+420", label: "Česko", flag: "🇨🇿" },
+  { code: "+48", label: "Polska", flag: "🇵🇱" },
+  { code: "+385", label: "Hrvatska", flag: "🇭🇷" },
+  { code: "+31", label: "Nederland", flag: "🇳🇱" },
+  { code: "+32", label: "België", flag: "🇧🇪" },
+  { code: "+41", label: "Schweiz", flag: "🇨🇭" },
+];
+
+const signupSchema = z.object({
+  name: z.string().trim().min(1, "Add meg a neved.").max(120),
+  email: z.string().trim().email("Érvénytelen email cím.").max(255),
+  phone: z
+    .string()
+    .trim()
+    .max(32)
+    .regex(/^[0-9 ()\-]*$/, "Csak számok megengedettek.")
+    .optional()
+    .or(z.literal("")),
+});
 
 function Landing() {
+  const [open, setOpen] = useState(false);
+
   return (
-    <main className="relative overflow-hidden bg-background text-foreground">
-      <FloatingPieces />
-      <Hero />
-      <HowItWorks />
-      <EmailCapture />
-      <MysteryTeaser />
-      <Footer />
+    <main className="relative min-h-screen overflow-hidden bg-background text-foreground flex flex-col items-center justify-center px-6 py-16">
+      <div className="animate-pulse-glow mb-10">
+        <img
+          src={logoAsset.url}
+          alt="AZKOMOLY mystery box logo"
+          className="mx-auto h-64 w-64 sm:h-80 sm:w-80 md:h-[28rem] md:w-[28rem] object-contain drop-shadow-2xl"
+        />
+      </div>
+
+      <button
+        onClick={() => setOpen(true)}
+        className="bg-fire text-primary-foreground font-display text-2xl md:text-3xl px-10 py-5 graffiti-border hover:translate-y-[-2px] transition-transform animate-fade-up"
+      >
+        FELIRATKOZOM
+      </button>
+
+      <SignupDialog open={open} onOpenChange={setOpen} />
     </main>
   );
 }
 
-function FloatingPieces() {
-  const pieces = [
-    { top: "8%", left: "6%", size: 32, rot: -15, delay: "0s" },
-    { top: "20%", right: "8%", size: 22, rot: 24, delay: "1.2s" },
-    { top: "55%", left: "4%", size: 28, rot: 12, delay: "0.6s" },
-    { top: "72%", right: "10%", size: 36, rot: -22, delay: "2.1s" },
-    { top: "40%", left: "48%", size: 18, rot: 8, delay: "1.8s" },
-  ];
-  return (
-    <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
-      {pieces.map((p, i) => (
-        <div
-          key={i}
-          className="animate-float-piece absolute"
-          style={{
-            top: p.top,
-            left: p.left as string | undefined,
-            right: p.right as string | undefined,
-            width: p.size,
-            height: p.size * 0.75,
-            background: "var(--cardboard)",
-            opacity: 0.35,
-            ["--rot" as never]: `${p.rot}deg`,
-            animationDelay: p.delay,
-            clipPath:
-              "polygon(8% 0, 100% 12%, 92% 100%, 0 88%)",
-          }}
-        />
-      ))}
-    </div>
-  );
-}
-
-function Hero() {
-  return (
-    <section className="relative flex min-h-screen flex-col items-center justify-center px-6 py-24 text-center">
-      <div className="animate-pulse-glow mb-8">
-        <img
-          src={logo}
-          alt="AZKOMOLY exploding mystery box logo"
-          width={1024}
-          height={1024}
-          className="mx-auto h-44 w-44 sm:h-56 sm:w-56 md:h-72 md:w-72 object-contain"
-        />
-      </div>
-      <h1 className="font-display text-fire-glow text-5xl sm:text-6xl md:text-8xl text-fire animate-fade-up">
-        MI VAN A DOBOZBAN?
-      </h1>
-      <p className="mt-6 max-w-2xl text-base sm:text-lg md:text-xl text-muted-foreground animate-fade-up" style={{ animationDelay: "0.15s" }}>
-        Márkás ruhák. Véletlenszerű tartalom.{" "}
-        <span className="text-white font-bold">Nevetséges áron.</span>
-      </p>
-      <a
-        href="#feliratkozas"
-        className="mt-10 inline-block bg-fire text-primary-foreground font-display text-xl px-8 py-4 graffiti-border hover:translate-y-[-2px] transition-transform animate-fade-up"
-        style={{ animationDelay: "0.3s" }}
-      >
-        FELIRATKOZOM
-      </a>
-    </section>
-  );
-}
-
-function HowItWorks() {
-  const items = [
-    { icon: "🎲", title: "Véletlenszerű termékek", desc: "Sosem tudod, mi lapul a dobozban. Ez a játék lényege." },
-    { icon: "👕", title: "Márkás ruhák", desc: "Streetwear darabok a kínai konténer overstockból." },
-    { icon: "💰", title: "Olcsó árak", desc: "Hype árcédula nélkül. Komolyan." },
-  ];
-  return (
-    <section className="relative px-6 py-24">
-      <div className="mx-auto max-w-6xl">
-        <h2 className="font-display text-4xl md:text-6xl text-center text-white mb-16">
-          HOGYAN <span className="text-fire text-fire-glow">MŰKÖDIK?</span>
-        </h2>
-        <div className="grid gap-10 md:grid-cols-3">
-          {items.map((it) => (
-            <div
-              key={it.title}
-              className="torn-card p-8 text-center transition-transform hover:scale-[1.03] hover:rotate-[-1deg]"
-            >
-              <div className="text-6xl mb-4" aria-hidden>{it.icon}</div>
-              <h3 className="font-display text-2xl mb-3">{it.title}</h3>
-              <p className="font-sans text-sm leading-relaxed text-[#1a1a1a]">{it.desc}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function EmailCapture() {
+function SignupDialog({
+  open,
+  onOpenChange,
+}: {
+  open: boolean;
+  onOpenChange: (v: boolean) => void;
+}) {
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [countryCode, setCountryCode] = useState("+36");
+  const [phone, setPhone] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
-  const [message, setMessage] = useState<string>("");
+  const [message, setMessage] = useState("");
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
-    const parsed = emailSchema.safeParse(email);
+    const parsed = signupSchema.safeParse({ name, email, phone });
     if (!parsed.success) {
       setStatus("error");
-      setMessage(parsed.error.issues[0]?.message ?? "Érvénytelen email.");
+      setMessage(parsed.error.issues[0]?.message ?? "Érvénytelen adat.");
       return;
     }
     setStatus("loading");
     setMessage("");
-    const { error } = await supabase
-      .from("azkomoly_leads")
-      .insert({ email: parsed.data.toLowerCase(), source: "landing" });
+
+    const phoneTrim = parsed.data.phone?.trim();
+    const { error } = await supabase.from("azkomoly_leads").insert({
+      name: parsed.data.name,
+      email: parsed.data.email.toLowerCase(),
+      phone: phoneTrim ? phoneTrim : null,
+      phone_country_code: phoneTrim ? countryCode : null,
+      source: "landing",
+    });
 
     if (error) {
       if (error.code === "23505") {
         setStatus("success");
-        setMessage("✅ Már fent vagy a listán! Hamarosan nyílik a doboz.");
+        setMessage("✅ Már fent vagy a listán!");
       } else {
         setStatus("error");
         setMessage("Hiba történt. Próbáld újra.");
@@ -176,115 +149,105 @@ function EmailCapture() {
     }
     setStatus("success");
     setMessage("✅ Bent vagy! Hamarosan nyílik a doboz.");
+    setName("");
     setEmail("");
+    setPhone("");
   }
 
   return (
-    <section id="feliratkozas" className="relative px-6 py-28">
-      <div className="mx-auto max-w-3xl text-center">
-        <h2 className="font-display text-5xl md:text-7xl text-fire text-fire-glow">
-          ÉRTESÜLJ ELSŐNEK!
-        </h2>
-        <p className="mt-5 text-lg text-muted-foreground">
-          Legyél az első, aki megnyitja a dobozt.
-        </p>
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="bg-dark-bg border-fire/60 graffiti-border max-w-md">
+        <DialogHeader>
+          <DialogTitle className="font-display text-3xl text-fire text-fire-glow">
+            FELIRATKOZÁS
+          </DialogTitle>
+          <DialogDescription className="font-sans text-muted-foreground">
+            Legyél az első, aki megnyitja a dobozt.
+          </DialogDescription>
+        </DialogHeader>
 
-        <form
-          onSubmit={onSubmit}
-          className="mt-10 flex flex-col sm:flex-row gap-4 items-stretch justify-center"
-        >
-          <label htmlFor="email" className="sr-only">Email cím</label>
-          <input
-            id="email"
-            type="email"
-            required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="te@email.hu"
-            maxLength={255}
-            className="graffiti-border bg-dark-bg text-white font-sans text-lg px-5 py-4 flex-1 min-w-0 placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-fire"
-          />
+        <form onSubmit={onSubmit} className="flex flex-col gap-4 mt-2">
+          <div>
+            <label htmlFor="name" className="block font-sans text-sm text-white mb-1">
+              Név
+            </label>
+            <input
+              id="name"
+              required
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              maxLength={120}
+              placeholder="Teljes név"
+              className="w-full bg-background border-2 border-cardboard/60 focus:border-fire text-white px-4 py-3 font-sans focus:outline-none transition-colors"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="email" className="block font-sans text-sm text-white mb-1">
+              Email
+            </label>
+            <input
+              id="email"
+              type="email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              maxLength={255}
+              placeholder="te@email.hu"
+              className="w-full bg-background border-2 border-cardboard/60 focus:border-fire text-white px-4 py-3 font-sans focus:outline-none transition-colors"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="phone" className="block font-sans text-sm text-white mb-1">
+              Telefon <span className="text-muted-foreground">(opcionális)</span>
+            </label>
+            <div className="flex gap-2">
+              <Select value={countryCode} onValueChange={setCountryCode}>
+                <SelectTrigger className="w-[120px] bg-background border-2 border-cardboard/60 text-white font-sans h-auto py-3">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="bg-dark-bg border-cardboard/60 text-white max-h-72">
+                  {COUNTRY_CODES.map((c) => (
+                    <SelectItem key={c.code} value={c.code} className="font-sans">
+                      <span className="mr-2">{c.flag}</span>
+                      {c.code}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <input
+                id="phone"
+                type="tel"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                maxLength={32}
+                placeholder="20 123 4567"
+                className="flex-1 min-w-0 bg-background border-2 border-cardboard/60 focus:border-fire text-white px-4 py-3 font-sans focus:outline-none transition-colors"
+              />
+            </div>
+          </div>
+
           <button
             type="submit"
             disabled={status === "loading"}
-            className="bg-fire text-primary-foreground font-display text-xl px-8 py-4 graffiti-border hover:translate-y-[-2px] transition-transform disabled:opacity-60"
+            className="mt-2 bg-fire text-primary-foreground font-display text-xl px-6 py-4 graffiti-border hover:translate-y-[-2px] transition-transform disabled:opacity-60"
           >
-            {status === "loading" ? "..." : "FELIRATKOZOM"}
+            {status === "loading" ? "..." : "KÜLDÉS"}
           </button>
-        </form>
 
-        {message && (
-          <p
-            role="status"
-            className={`mt-6 font-sans text-base ${
-              status === "success" ? "text-fire" : "text-destructive"
-            }`}
-          >
-            {message}
-          </p>
-        )}
-      </div>
-    </section>
-  );
-}
-
-function MysteryTeaser() {
-  return (
-    <section className="relative px-6 py-24">
-      <div className="torn-divider mb-16" aria-hidden />
-      <div className="mx-auto max-w-6xl text-center">
-        <h2 className="font-display text-3xl md:text-5xl text-white mb-12">
-          Ezek lehetnek a következő <span className="text-fire">dobozban...</span>
-        </h2>
-        <div className="grid gap-6 sm:grid-cols-3">
-          {[0, 1, 2].map((i) => (
-            <div
-              key={i}
-              className="relative aspect-square overflow-hidden border-2 border-cardboard/60 bg-dark-bg group"
+          {message && (
+            <p
+              role="status"
+              className={`font-sans text-sm text-center ${
+                status === "success" ? "text-fire" : "text-destructive"
+              }`}
             >
-              <div
-                className="absolute inset-0 blur-xl opacity-60 group-hover:opacity-80 transition-opacity"
-                style={{
-                  background: `radial-gradient(circle at ${30 + i * 20}% ${40 + i * 10}%, var(--cardboard), transparent 65%), linear-gradient(135deg, #2a1a08, #0d0d0d)`,
-                }}
-                aria-hidden
-              />
-              <div className="absolute inset-0 flex items-center justify-center">
-                <span className="font-display text-9xl text-fire text-fire-glow select-none">?</span>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-      <div className="torn-divider mt-16 rotate-180" aria-hidden />
-    </section>
-  );
-}
-
-function Footer() {
-  return (
-    <footer className="relative px-6 py-12 border-t border-border bg-dark-bg">
-      <div className="mx-auto max-w-6xl flex flex-col sm:flex-row items-center justify-between gap-6">
-        <p className="font-sans text-sm text-muted-foreground text-center sm:text-left">
-          © 2025 <span className="font-display text-fire">AZKOMOLY</span> — piensa diferente y punto
-        </p>
-        <div className="flex gap-4">
-          <a
-            href="#"
-            aria-label="Instagram"
-            className="h-10 w-10 grid place-items-center border border-cardboard/50 text-cardboard hover:text-fire hover:border-fire transition-colors"
-          >
-            <Instagram className="h-5 w-5" />
-          </a>
-          <a
-            href="#"
-            aria-label="TikTok"
-            className="h-10 w-10 grid place-items-center border border-cardboard/50 text-cardboard hover:text-fire hover:border-fire transition-colors font-display text-sm"
-          >
-            TT
-          </a>
-        </div>
-      </div>
-    </footer>
+              {message}
+            </p>
+          )}
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 }
