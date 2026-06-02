@@ -264,12 +264,12 @@ function SignupDialog({
             </label>
             <div className="flex gap-2">
               <Select value={countryCode} onValueChange={setCountryCode}>
-                <SelectTrigger className="w-[90px] sm:w-[120px] bg-background border-2 border-cardboard/60 text-white font-sans h-auto py-3 text-base">
+                <SelectTrigger className="w-[110px] sm:w-[130px] shrink-0 bg-background border-2 border-cardboard/60 text-white font-sans py-3 px-3 text-base min-h-[52px]">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent className="bg-dark-bg border-cardboard/60 text-white max-h-72">
+                <SelectContent className="bg-dark-bg border-cardboard/60 text-white max-h-72 min-w-[180px]">
                   {COUNTRY_CODES.map((c) => (
-                    <SelectItem key={c.code} value={c.code} className="font-sans">
+                    <SelectItem key={c.code} value={c.code} className="font-sans text-base">
                       <span className="mr-2">{c.flag}</span>
                       {c.code}
                     </SelectItem>
@@ -283,7 +283,7 @@ function SignupDialog({
                 onChange={(e) => setPhone(e.target.value)}
                 maxLength={32}
                 placeholder="20 123 4567"
-                className="flex-1 min-w-0 bg-background border-2 border-cardboard/60 focus:border-fire text-white px-4 py-3 text-base font-sans focus:outline-none transition-colors"
+                className="flex-1 min-w-0 bg-background border-2 border-cardboard/60 focus:border-fire text-white px-4 py-3 text-base font-sans focus:outline-none transition-colors min-h-[52px]"
               />
             </div>
           </div>
