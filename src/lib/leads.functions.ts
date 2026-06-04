@@ -2,7 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
 const SPREADSHEET_ID = "1Sjiu96kxdSbvGeZM-kWNUd2O9iWl_gdgG-mpqTO2aC8";
-const RANGE = "'Hoja 1'!A:E";
+const RANGE = "Azkomoly_waiting_list!A:E";
 
 const inputSchema = z.object({
   name: z.string().trim().min(1).max(120),
