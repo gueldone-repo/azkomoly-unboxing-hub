@@ -107,6 +107,7 @@ function Landing() {
       <Footer />
 
       <SignupDialog open={open} onOpenChange={setOpen} />
+      <CookieBanner />
     </main>
   );
 }
