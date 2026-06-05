@@ -172,12 +172,18 @@ function SignupDialog({
   const [email, setEmail] = useState("");
   const [countryCode, setCountryCode] = useState("+36");
   const [phone, setPhone] = useState("");
+  const [consent, setConsent] = useState(false);
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [message, setMessage] = useState("");
   const appendToSheet = useServerFn(appendLeadToSheet);
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
+    if (!consent) {
+      setStatus("error");
+      setMessage("El kell fogadnod a feltételeket és az adatvédelmi tájékoztatót.");
+      return;
+    }
     const parsed = signupSchema.safeParse({ name, email, phone });
     if (!parsed.success) {
       setStatus("error");
