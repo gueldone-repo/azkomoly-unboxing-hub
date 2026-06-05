@@ -303,6 +303,27 @@ function SignupDialog({
             </div>
           </div>
 
+          <label className="flex items-start gap-2 text-xs sm:text-sm text-white/90 font-sans">
+            <input
+              type="checkbox"
+              checked={consent}
+              onChange={(e) => setConsent(e.target.checked)}
+              className="mt-0.5 accent-fire"
+              required
+            />
+            <span>
+              Elfogadom a{" "}
+              <Link to="/terms" className="text-fire underline" target="_blank">
+                feltételeket
+              </Link>{" "}
+              és az{" "}
+              <Link to="/privacy" className="text-fire underline" target="_blank">
+                adatvédelmi tájékoztatót
+              </Link>
+              . Hozzájárulok, hogy adataimat <strong>marketing célokra</strong> felhasználjátok.
+            </span>
+          </label>
+
           <button
             type="submit"
             disabled={status === "loading"}
