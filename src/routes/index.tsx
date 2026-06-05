@@ -145,7 +145,14 @@ function Footer() {
           </a>
         ))}
       </div>
-      <p className="font-sans text-xs text-muted-foreground mt-2">
+      <nav className="flex flex-wrap gap-x-4 gap-y-1 justify-center font-sans text-xs text-muted-foreground mt-2">
+        <Link to="/privacy" className="hover:text-fire">Adatvédelem</Link>
+        <span>·</span>
+        <Link to="/terms" className="hover:text-fire">Felhasználási feltételek</Link>
+        <span>·</span>
+        <Link to="/cookies" className="hover:text-fire">Süti szabályzat</Link>
+      </nav>
+      <p className="font-sans text-xs text-muted-foreground">
         © 2025 <span className="font-display text-fire">AZKOMOLY</span>
       </p>
     </footer>
