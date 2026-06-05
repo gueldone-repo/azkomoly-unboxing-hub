@@ -1,10 +1,11 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, type FormEvent } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { appendLeadToSheet } from "@/lib/leads.functions";
 import { Instagram, Facebook, Youtube } from "lucide-react";
+import { CookieBanner } from "@/components/CookieBanner";
 
 import logoAsset from "@/assets/azkomoly-logo.png.asset.json";
 import {
@@ -106,6 +107,7 @@ function Landing() {
       <Footer />
 
       <SignupDialog open={open} onOpenChange={setOpen} />
+      <CookieBanner />
     </main>
   );
 }
@@ -143,7 +145,14 @@ function Footer() {
           </a>
         ))}
       </div>
-      <p className="font-sans text-xs text-muted-foreground mt-2">
+      <nav className="flex flex-wrap gap-x-4 gap-y-1 justify-center font-sans text-xs text-muted-foreground mt-2">
+        <Link to="/privacy" className="hover:text-fire">Adatvédelem</Link>
+        <span>·</span>
+        <Link to="/terms" className="hover:text-fire">Felhasználási feltételek</Link>
+        <span>·</span>
+        <Link to="/cookies" className="hover:text-fire">Süti szabályzat</Link>
+      </nav>
+      <p className="font-sans text-xs text-muted-foreground">
         © 2025 <span className="font-display text-fire">AZKOMOLY</span>
       </p>
     </footer>
@@ -163,12 +172,18 @@ function SignupDialog({
   const [email, setEmail] = useState("");
   const [countryCode, setCountryCode] = useState("+36");
   const [phone, setPhone] = useState("");
+  const [consent, setConsent] = useState(false);
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [message, setMessage] = useState("");
   const appendToSheet = useServerFn(appendLeadToSheet);
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
+    if (!consent) {
+      setStatus("error");
+      setMessage("El kell fogadnod a feltételeket és az adatvédelmi tájékoztatót.");
+      return;
+    }
     const parsed = signupSchema.safeParse({ name, email, phone });
     if (!parsed.success) {
       setStatus("error");
@@ -287,6 +302,27 @@ function SignupDialog({
               />
             </div>
           </div>
+
+          <label className="flex items-start gap-2 text-xs sm:text-sm text-white/90 font-sans">
+            <input
+              type="checkbox"
+              checked={consent}
+              onChange={(e) => setConsent(e.target.checked)}
+              className="mt-0.5 accent-fire"
+              required
+            />
+            <span>
+              Elfogadom a{" "}
+              <Link to="/terms" className="text-fire underline" target="_blank">
+                feltételeket
+              </Link>{" "}
+              és az{" "}
+              <Link to="/privacy" className="text-fire underline" target="_blank">
+                adatvédelmi tájékoztatót
+              </Link>
+              . Hozzájárulok, hogy adataimat <strong>marketing célokra</strong> felhasználjátok.
+            </span>
+          </label>
 
           <button
             type="submit"
