@@ -8,7 +8,7 @@ import { Instagram, Facebook, Youtube } from "lucide-react";
 import { CookieBanner } from "@/components/CookieBanner";
 import { HeroScrollScrub } from "@/components/HeroScrollScrub";
 
-import logoAsset from "@/assets/azkomoly-logo.png.asset.json";
+
 import {
   Dialog,
   DialogContent,
