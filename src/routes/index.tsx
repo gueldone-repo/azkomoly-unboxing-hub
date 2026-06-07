@@ -98,9 +98,9 @@ function Landing() {
       <ScrubBackdrop>
         <HeroOverlay onCta={() => setOpen(true)} />
         <PromoBanner />
+        <ProductsSection />
       </ScrubBackdrop>
 
-      <ProductsSection />
       <ValueProps />
       <SocialProof />
       <HowItWorks />
