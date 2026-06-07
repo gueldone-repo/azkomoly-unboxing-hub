@@ -142,7 +142,7 @@ function TopNav() {
 
 function ProductsSection() {
   return (
-    <section id="termekek" className="relative bg-dark-bg/55 backdrop-blur-sm">
+    <section id="termekek" className="relative bg-dark-bg/15 backdrop-blur-[2px]">
       <div className="mx-auto max-w-7xl px-6 py-20">
         <div className="flex items-end justify-between flex-wrap gap-4 mb-10">
           <div>
