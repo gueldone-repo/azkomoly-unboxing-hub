@@ -106,10 +106,15 @@ export function HeroScrollScrub({ onCta }: { onCta: () => void }) {
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-56 bg-gradient-to-t from-dark-bg/95 via-dark-bg/50 to-transparent" />
 
         {/* Giant brand word — mix-blend-difference */}
-        <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+        <div className="pointer-events-none absolute inset-0 flex items-center justify-center px-2">
           <h1
-            className="font-display text-[22vw] leading-none text-foreground"
-            style={{ mixBlendMode: "difference", transform: py(-60) }}
+            className="font-display leading-none text-foreground"
+            style={{
+              mixBlendMode: "difference",
+              transform: py(-60),
+              fontSize: "clamp(2.8rem, 15vw, 17rem)",
+              whiteSpace: "nowrap",
+            }}
           >
             AZKOMOLY
           </h1>
