@@ -6,8 +6,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { appendLeadToSheet } from "@/lib/leads.functions";
 import { Instagram, Facebook, Youtube } from "lucide-react";
 import { CookieBanner } from "@/components/CookieBanner";
+import { HeroScrollScrub } from "@/components/HeroScrollScrub";
 
-import logoAsset from "@/assets/azkomoly-logo.png.asset.json";
+
 import {
   Dialog,
   DialogContent,
@@ -86,25 +87,12 @@ function Landing() {
   const [open, setOpen] = useState(false);
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-background text-foreground flex flex-col px-6 py-12">
-      <section className="flex-1 flex flex-col items-center justify-center">
-        <div className="animate-pulse-glow mb-10">
-          <img
-            src={logoAsset.url}
-            alt="AZKOMOLY mystery box logo"
-            className="mx-auto h-64 w-64 sm:h-80 sm:w-80 md:h-[28rem] md:w-[28rem] object-contain drop-shadow-2xl"
-          />
-        </div>
+    <main className="relative min-h-screen overflow-hidden bg-background text-foreground">
+      <HeroScrollScrub onCta={() => setOpen(true)} />
 
-        <button
-          onClick={() => setOpen(true)}
-          className="bg-fire text-primary-foreground font-display text-2xl md:text-3xl px-10 py-5 graffiti-border hover:translate-y-[-2px] transition-transform animate-fade-up"
-        >
-          Légy az első, aki felfedi a titkot
-        </button>
-      </section>
-
-      <Footer />
+      <div className="px-6 pt-16 pb-12">
+        <Footer />
+      </div>
 
       <SignupDialog open={open} onOpenChange={setOpen} />
       <CookieBanner />
