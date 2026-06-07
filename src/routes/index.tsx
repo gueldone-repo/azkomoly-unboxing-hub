@@ -4,10 +4,14 @@ import { useServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { appendLeadToSheet } from "@/lib/leads.functions";
-import { Instagram, Facebook, Youtube } from "lucide-react";
+import { Instagram, Facebook, Youtube, ShieldCheck, Truck, Sparkles, RefreshCcw } from "lucide-react";
 import { CookieBanner } from "@/components/CookieBanner";
-import { HeroScrollScrub } from "@/components/HeroScrollScrub";
-
+import { ScrubBackdrop } from "@/components/ScrubBackdrop";
+import { HeroOverlay } from "@/components/HeroOverlay";
+import { PromoBanner } from "@/components/shop/PromoBanner";
+import { ProductCard } from "@/components/shop/ProductCard";
+import { SocialProof } from "@/components/shop/SocialProof";
+import { MOCK_PRODUCTS } from "@/lib/mock-products";
 
 import {
   Dialog,
@@ -30,7 +34,7 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "AZKOMOLY mystery box: márkás ruhák, véletlenszerű tartalom, nevetséges áron. Iratkozz fel és legyél az első, aki megnyitja a dobozt.",
+          "AZKOMOLY mystery box: márkás ruhák, véletlenszerű tartalom, nevetséges áron. Válassz dobozt, fizess, kapd meg, nyisd ki.",
       },
       { property: "og:title", content: "AZKOMOLY — Mi van a dobozban?" },
       {
@@ -87,14 +91,21 @@ function Landing() {
   const [open, setOpen] = useState(false);
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-background text-foreground">
-      <Link
-        to="/shop"
-        className="fixed top-4 right-4 z-50 bg-fire text-primary-foreground font-display text-sm sm:text-base px-4 py-2 graffiti-border hover:translate-y-[-2px] transition-transform"
-      >
-        BOLT →
-      </Link>
-      <HeroScrollScrub onCta={() => setOpen(true)} />
+    <main className="relative min-h-screen bg-background text-foreground">
+      <TopNav />
+
+      {/* Hero + promo banner share the scroll-scrub video as backdrop */}
+      <ScrubBackdrop>
+        <HeroOverlay onCta={() => setOpen(true)} />
+        <PromoBanner />
+      </ScrubBackdrop>
+
+      <ProductsSection />
+      <ValueProps />
+      <SocialProof />
+      <HowItWorks />
+      <BigCTA onCta={() => setOpen(true)} />
+      <FAQSection />
 
       <div className="px-6 pt-16 pb-12">
         <Footer />
@@ -103,6 +114,179 @@ function Landing() {
       <SignupDialog open={open} onOpenChange={setOpen} />
       <CookieBanner />
     </main>
+  );
+}
+
+function TopNav() {
+  return (
+    <nav className="sticky top-0 z-40 bg-dark-bg/85 backdrop-blur border-b-2 border-fire/40">
+      <div className="mx-auto max-w-7xl px-6 py-3 flex items-center justify-between">
+        <a href="#top" className="font-display text-2xl text-fire text-fire-glow">
+          AZKOMOLY
+        </a>
+        <div className="flex items-center gap-5 font-sans text-sm">
+          <a href="#termekek" className="text-foreground hover:text-fire">
+            Bolt
+          </a>
+          <a href="#hogyan" className="text-foreground/80 hover:text-fire hidden sm:inline">
+            Hogyan működik
+          </a>
+          <a href="#gyik" className="text-foreground/80 hover:text-fire hidden sm:inline">
+            GYIK
+          </a>
+        </div>
+      </div>
+    </nav>
+  );
+}
+
+function ProductsSection() {
+  return (
+    <section id="termekek" className="bg-background">
+      <div className="mx-auto max-w-7xl px-6 py-20">
+        <div className="flex items-end justify-between flex-wrap gap-4 mb-10">
+          <div>
+            <p className="font-sans text-xs tracking-[0.35em] text-fire mb-2">
+              VÁLASZD A TÉTEDET
+            </p>
+            <h2 className="font-display text-4xl sm:text-5xl text-foreground">
+              A dobozaink
+            </h2>
+          </div>
+          <p className="font-sans text-sm text-foreground/60 max-w-sm">
+            Minél nagyobb a doboz, annál nagyobb a dobás. Minden tier garantált
+            minimum értékkel.
+          </p>
+        </div>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          {MOCK_PRODUCTS.map((p) => (
+            <ProductCard key={p.id} p={p} />
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function ValueProps() {
+  const items = [
+    { Icon: ShieldCheck, title: "100% MÁRKÁS", text: "Csak igazolt brand cucc. Nincs gagyi, nincs replika." },
+    { Icon: Sparkles, title: "GARANTÁLT ÉRTÉK", text: "Minden doboz tartalmának értéke meghaladja az árát." },
+    { Icon: Truck, title: "GYORS SZÁLLÍTÁS", text: "2–4 munkanap egész Magyarországon. Foxpost / GLS." },
+    { Icon: RefreshCcw, title: "14 NAP GARANCIA", text: "Ha valami sérült érkezik, cseréljük. Egyszerűen." },
+  ];
+  return (
+    <section className="bg-dark-bg border-y border-cardboard/30 py-14">
+      <div className="mx-auto max-w-7xl px-6 grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        {items.map(({ Icon, title, text }) => (
+          <div key={title} className="flex gap-4 items-start">
+            <span className="shrink-0 grid place-items-center h-12 w-12 border-2 border-fire/60 text-fire">
+              <Icon className="h-6 w-6" />
+            </span>
+            <div>
+              <h3 className="font-display text-lg text-foreground tracking-wider">{title}</h3>
+              <p className="font-sans text-sm text-foreground/70 mt-1">{text}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function HowItWorks() {
+  const steps = [
+    { n: "01", title: "VÁLASSZ DOBOZT", text: "Mini, Klasszikus, Prémium vagy Legendás. Te döntöd el a tétet." },
+    { n: "02", title: "FIZESS", text: "Bankkártya, Apple Pay, Google Pay. 2 perc az egész." },
+    { n: "03", title: "VÁRJ 2–4 NAPOT", text: "Becsomagoljuk, elküldjük, jön a postás." },
+    { n: "04", title: "NYISD KI", text: "Vedd fel kamerával. Posztold. Címkézz be minket." },
+  ];
+  return (
+    <section id="hogyan" className="bg-background">
+      <div className="mx-auto max-w-7xl px-6 py-20">
+        <p className="font-sans text-xs tracking-[0.35em] text-fire mb-2 text-center">
+          4 LÉPÉS
+        </p>
+        <h2 className="font-display text-4xl sm:text-5xl text-foreground text-center mb-12">
+          Hogyan működik?
+        </h2>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          {steps.map((s) => (
+            <div key={s.n} className="relative bg-dark-bg border-2 border-cardboard/50 p-6 hover:border-fire transition-colors">
+              <span className="absolute -top-5 -left-2 font-display text-6xl text-fire/30 leading-none">
+                {s.n}
+              </span>
+              <h3 className="font-display text-2xl text-foreground mt-6">{s.title}</h3>
+              <p className="font-sans text-sm text-foreground/70 mt-2 leading-relaxed">{s.text}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function BigCTA({ onCta }: { onCta: () => void }) {
+  return (
+    <section className="relative overflow-hidden">
+      <div className="absolute inset-0 bg-fire" />
+      <div className="absolute inset-0 opacity-20 bg-[repeating-linear-gradient(-45deg,transparent_0_24px,oklch(0.14_0_0/0.4)_24px_26px)]" />
+      <div className="relative mx-auto max-w-7xl px-6 py-20 text-center">
+        <p className="font-display text-primary-foreground text-base sm:text-lg tracking-[0.4em] mb-4">
+          NE OLVASS · NYISS
+        </p>
+        <h2 className="font-display text-5xl sm:text-7xl lg:text-8xl text-primary-foreground text-stroke-black leading-[0.9]">
+          AZ ELSŐ DOBOZ<br />MOST INDUL
+        </h2>
+        <div className="mt-10 flex flex-wrap justify-center gap-4">
+          <a
+            href="#termekek"
+            className="inline-block bg-dark-bg text-fire font-display text-xl sm:text-2xl px-10 py-5 border-4 border-dark-bg hover:bg-foreground hover:text-dark-bg transition-colors"
+          >
+            MUTASD A DOBOZOKAT →
+          </a>
+          <button
+            onClick={onCta}
+            className="inline-block bg-transparent text-primary-foreground font-display text-xl sm:text-2xl px-10 py-5 border-4 border-dark-bg hover:bg-dark-bg hover:text-fire transition-colors"
+          >
+            ÉRTESÍTSETEK
+          </button>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function FAQSection() {
+  const faqs = [
+    { q: "Mi van a dobozban?", a: "Márkás ruhák és kiegészítők. A tartalom véletlenszerű, de minden doboz minimum érték garantált — a tartalom értéke meghaladja a doboz árát." },
+    { q: "Választhatok méretet?", a: "Igen. A vásárlás során megadod a méreted (S/M/L/XL), és csak abban a méretben kapsz ruhát." },
+    { q: "Mi van, ha nem tetszik?", a: "14 napon belül visszaküldheted bontatlanul. Sérült termék esetén cseréljük." },
+    { q: "Mennyi a szállítás?", a: "Foxpost: 1490 Ft. GLS házhoz: 1990 Ft. 20.000 Ft feletti rendelés ingyenes." },
+    { q: "Mikor érkeznek új dobozok?", a: "Minden vasárnap 20:00-kor új drop. Iratkozz fel, hogy elsőként szólj." },
+  ];
+  return (
+    <section id="gyik" className="bg-background">
+      <div className="mx-auto max-w-3xl px-6 py-20">
+        <p className="font-sans text-xs tracking-[0.35em] text-fire mb-2 text-center">
+          GYAKORI KÉRDÉSEK
+        </p>
+        <h2 className="font-display text-4xl sm:text-5xl text-foreground text-center mb-10">
+          Még valami?
+        </h2>
+        <div className="space-y-3">
+          {faqs.map((f) => (
+            <details key={f.q} className="group bg-dark-bg border-2 border-cardboard/40 hover:border-fire/60 transition-colors">
+              <summary className="cursor-pointer list-none flex items-center justify-between p-5">
+                <span className="font-display text-lg text-foreground">{f.q}</span>
+                <span className="font-display text-2xl text-fire group-open:rotate-45 transition-transform">+</span>
+              </summary>
+              <p className="px-5 pb-5 font-sans text-sm text-foreground/80 leading-relaxed">{f.a}</p>
+            </details>
+          ))}
+        </div>
+      </div>
+    </section>
   );
 }
 
@@ -147,13 +331,11 @@ function Footer() {
         <Link to="/cookies" className="hover:text-fire">Süti szabályzat</Link>
       </nav>
       <p className="font-sans text-xs text-muted-foreground">
-        © 2025 <span className="font-display text-fire">AZKOMOLY</span>
+        © 2026 <span className="font-display text-fire">AZKOMOLY</span>
       </p>
     </footer>
   );
 }
-
-
 
 function SignupDialog({
   open,
@@ -203,7 +385,6 @@ function SignupDialog({
       return;
     }
 
-    // Append to Google Sheet (fire and forget — don't block UX on sheet failure)
     appendToSheet({
       data: {
         name: parsed.data.name,
@@ -225,7 +406,6 @@ function SignupDialog({
     setPhone("");
   }
 
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="bg-dark-bg border-fire/60 graffiti-border w-[94vw] max-w-md p-5 sm:p-6">
@@ -237,9 +417,7 @@ function SignupDialog({
 
         <form onSubmit={onSubmit} className="flex flex-col gap-3 sm:gap-4 mt-1">
           <div>
-            <label htmlFor="name" className="block font-sans text-sm text-white mb-1">
-              Név
-            </label>
+            <label htmlFor="name" className="block font-sans text-sm text-white mb-1">Név</label>
             <input
               id="name"
               required
@@ -252,9 +430,7 @@ function SignupDialog({
           </div>
 
           <div>
-            <label htmlFor="email" className="block font-sans text-sm text-white mb-1">
-              Email
-            </label>
+            <label htmlFor="email" className="block font-sans text-sm text-white mb-1">Email</label>
             <input
               id="email"
               type="email"
@@ -307,13 +483,9 @@ function SignupDialog({
             />
             <span>
               Elfogadom a{" "}
-              <Link to="/terms" className="text-fire underline" target="_blank">
-                feltételeket
-              </Link>{" "}
+              <Link to="/terms" className="text-fire underline" target="_blank">feltételeket</Link>{" "}
               és az{" "}
-              <Link to="/privacy" className="text-fire underline" target="_blank">
-                adatvédelmi tájékoztatót
-              </Link>
+              <Link to="/privacy" className="text-fire underline" target="_blank">adatvédelmi tájékoztatót</Link>
               . Hozzájárulok, hogy adataimat <strong>marketing célokra</strong> felhasználjátok.
             </span>
           </label>
@@ -329,9 +501,7 @@ function SignupDialog({
           {message && (
             <p
               role="status"
-              className={`font-sans text-sm text-center ${
-                status === "success" ? "text-fire" : "text-destructive"
-              }`}
+              className={`font-sans text-sm text-center ${status === "success" ? "text-fire" : "text-destructive"}`}
             >
               {message}
             </p>

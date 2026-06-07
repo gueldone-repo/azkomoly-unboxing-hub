@@ -37,7 +37,7 @@ export function PromoBanner() {
   );
 
   return (
-    <section className="relative overflow-hidden bg-dark-bg border-y-2 border-fire/60">
+    <section className="relative overflow-hidden border-y-2 border-fire/60 bg-dark-bg/40 backdrop-blur-sm">
       <div className="absolute inset-0 opacity-20 bg-[repeating-linear-gradient(45deg,transparent_0_18px,oklch(0.78_0.17_70/0.4)_18px_19px)]" />
       <div className="relative mx-auto max-w-7xl px-6 py-10 flex flex-col sm:flex-row items-center justify-between gap-6">
         <div className="text-center sm:text-left">
