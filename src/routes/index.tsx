@@ -6,7 +6,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { appendLeadToSheet } from "@/lib/leads.functions";
 import { Instagram, Facebook, Youtube, ShieldCheck, Truck, Sparkles, RefreshCcw } from "lucide-react";
 import { CookieBanner } from "@/components/CookieBanner";
-import { ScrubBackdrop } from "@/components/ScrubBackdrop";
 import { HeroOverlay } from "@/components/HeroOverlay";
 import { BoxSpinner } from "@/components/BoxSpinner";
 import { PromoBanner } from "@/components/shop/PromoBanner";
@@ -106,15 +105,9 @@ function Landing() {
     <main className="relative min-h-screen bg-background text-foreground">
       <TopNav onCta={() => setOpen(true)} />
 
-      {/* Hero, promo banner AND products share the scroll-scrub video as a
-          single backdrop — the box opens at the top and closes behind the grid. */}
-      <ScrubBackdrop>
-        <HeroOverlay onCta={() => setOpen(true)} />
-        <PromoBanner />
-        <ProductsSection />
-        <RevealOutro />
-      </ScrubBackdrop>
-
+      <HeroOverlay onCta={() => setOpen(true)} />
+      <PromoBanner />
+      <ProductsSection />
       <LifestyleStrip />
       <ValueProps />
       <SocialProof />
@@ -202,21 +195,41 @@ function ProductsSection() {
           </p>
         </div>
         {loading ? (
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            {[...Array(4)].map((_, i) => (
-              <div key={i} className="aspect-square bg-dark-bg/60 border-2 border-cardboard/20 animate-pulse" />
-            ))}
-          </div>
+          <>
+            {/* Mobile skeleton */}
+            <div className="sm:hidden flex gap-4 overflow-x-auto pb-2 -mx-6 px-6">
+              {[...Array(3)].map((_, i) => (
+                <div key={i} className="shrink-0 w-[78vw] aspect-square bg-dark-bg/60 border-2 border-cardboard/20 animate-pulse" />
+              ))}
+            </div>
+            {/* Desktop skeleton */}
+            <div className="hidden sm:grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+              {[...Array(4)].map((_, i) => (
+                <div key={i} className="aspect-square bg-dark-bg/60 border-2 border-cardboard/20 animate-pulse" />
+              ))}
+            </div>
+          </>
         ) : products.length === 0 ? (
           <p className="font-sans text-foreground/50 text-center py-10">
             {t.products.empty}
           </p>
         ) : (
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            {products.map((p) => (
-              <ProductCard key={p.node.id} p={p} />
-            ))}
-          </div>
+          <>
+            {/* Mobile: horizontal snap carousel */}
+            <div className="sm:hidden flex gap-4 overflow-x-auto snap-x snap-mandatory pb-4 -mx-6 px-6 scrollbar-none">
+              {products.map((p) => (
+                <div key={p.node.id} className="snap-start shrink-0 w-[78vw]">
+                  <ProductCard p={p} />
+                </div>
+              ))}
+            </div>
+            {/* Tablet / Desktop: grid */}
+            <div className="hidden sm:grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+              {products.map((p) => (
+                <ProductCard key={p.node.id} p={p} />
+              ))}
+            </div>
+          </>
         )}
       </div>
     </section>

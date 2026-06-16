@@ -90,6 +90,13 @@
 }
 
 @layer utilities {
+  .scrollbar-none {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
   .text-fire-glow {
     text-shadow: 0 0 18px oklch(0.78 0.17 70 / 0.85), 0 0 4px oklch(0.78 0.17 70 / 0.6);
   }

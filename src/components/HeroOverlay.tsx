@@ -3,11 +3,8 @@ import { useT } from "@/lib/i18n";
 
 export function HeroOverlay({ onCta }: { onCta: () => void }) {
   const t = useT();
-
-  // Hero-local parallax: progress 0→1 across the first viewport of scroll.
-  // Decoupled from the scrub canvas so the parallax stays strong no matter
-  // how tall the shared backdrop (hero + products) gets.
   const [hp, setHp] = useState(0);
+
   useEffect(() => {
     let raf: number | null = null;
     const tick = () => {
@@ -26,11 +23,20 @@ export function HeroOverlay({ onCta }: { onCta: () => void }) {
     };
   }, []);
 
-  const py = (mult: number) => `translate3d(0, ${hp * mult}px, 0)`;
-
   return (
-    <section className="relative h-screen w-full overflow-hidden">
-      {/* Center: tagline + CTA */}
+    <section className="relative h-screen w-full overflow-hidden bg-dark-bg">
+      {/* Static hero image with subtle parallax */}
+      <img
+        src="/HERO_1_FRAME.jpeg"
+        alt=""
+        className="absolute inset-0 w-full h-full object-cover"
+        style={{ transform: `translate3d(0, ${hp * 60}px, 0)`, willChange: "transform" }}
+        draggable={false}
+      />
+      {/* Dark overlay for text readability */}
+      <div className="absolute inset-0 bg-gradient-to-b from-dark-bg/40 via-dark-bg/20 to-dark-bg/60" />
+
+      {/* CTA */}
       <div
         className="absolute inset-x-0 top-1/2 flex flex-col items-center gap-4 px-6 text-center z-10"
         style={{ transform: `translateY(calc(-50% + ${hp * 55}px))` }}
