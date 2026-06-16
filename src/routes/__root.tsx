@@ -12,8 +12,8 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { I18nProvider, readLangCookie } from "../lib/i18n";
-import { CartProvider } from "../lib/cart";
 import { CartSheet } from "../components/cart/CartSheet";
+import { useCartSync } from "../hooks/useCartSync";
 
 function NotFoundComponent() {
   return (
@@ -122,15 +122,14 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  useCartSync();
 
   return (
     <QueryClientProvider client={queryClient}>
       <I18nProvider>
-        <CartProvider>
-          {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-          <Outlet />
-          <CartSheet />
-        </CartProvider>
+        {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+        <Outlet />
+        <CartSheet />
       </I18nProvider>
     </QueryClientProvider>
   );

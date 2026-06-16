@@ -259,3 +259,8 @@ export async function removeLineFromShopifyCart(cartId: string, lineId: string) 
 export async function getShopifyCart(cartId: string) {
   return storefrontApiRequest<any>(CART_QUERY, { id: cartId });
 }
+
+export function formatShopifyPrice(money: Money): string {
+  const amount = Math.round(parseFloat(money.amount));
+  return `${amount.toLocaleString("hu-HU")} Ft`;
+}

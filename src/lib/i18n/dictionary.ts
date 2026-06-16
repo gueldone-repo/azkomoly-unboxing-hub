@@ -52,6 +52,8 @@ export type Dict = {
     inStock: string;
     guaranteedValue: string;
     contents: string;
+    soldOut: string;
+    empty: string;
     rarity: { common: string; rare: string; epic: string; legendary: string };
     items: Record<string, ProductCopy>;
   };
@@ -201,6 +203,8 @@ const hu: Dict = {
     inStock: "Készleten",
     guaranteedValue: "Garantált érték",
     contents: "Tartalom",
+    soldOut: "ELFOGYOTT",
+    empty: "Hamarosan új dobozok…",
     rarity: { common: "Sima", rare: "Ritka", epic: "Epikus", legendary: "Legendás" },
     items: {
       mini: {
@@ -405,6 +409,8 @@ const en: Dict = {
     inStock: "In stock",
     guaranteedValue: "Guaranteed value",
     contents: "Contents",
+    soldOut: "SOLD OUT",
+    empty: "New boxes coming soon…",
     rarity: { common: "Common", rare: "Rare", epic: "Epic", legendary: "Legendary" },
     items: {
       mini: {

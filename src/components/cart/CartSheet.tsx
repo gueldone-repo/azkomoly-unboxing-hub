@@ -6,13 +6,13 @@ import {
   SheetTitle,
   SheetFooter,
 } from "@/components/ui/sheet";
-import { useCart, type CartLine } from "@/lib/cart";
+import { useShopifyCart, type CartItem } from "@/lib/shopify/cart-store";
+import { formatShopifyPrice } from "@/lib/shopify/client";
 import { useT } from "@/lib/i18n";
-import { MOCK_PRODUCTS, formatHUF } from "@/lib/mock-products";
 
-/** Cart icon + item-count badge. Place in any header. */
 export function CartButton({ className = "" }: { className?: string }) {
-  const { count, setOpen } = useCart();
+  const count = useShopifyCart((s) => s.items.reduce((n, i) => n + i.quantity, 0));
+  const setOpen = useShopifyCart((s) => s.setOpen);
   const t = useT();
   return (
     <button
@@ -31,34 +31,37 @@ export function CartButton({ className = "" }: { className?: string }) {
   );
 }
 
-function LineItem({ line }: { line: CartLine }) {
-  const { setQty, remove } = useCart();
+function LineItem({ item }: { item: CartItem }) {
+  const updateQuantity = useShopifyCart((s) => s.updateQuantity);
+  const removeItem = useShopifyCart((s) => s.removeItem);
   const t = useT();
-  const product = MOCK_PRODUCTS.find((p) => p.id === line.productId);
-  const copy = t.products.items[line.productId];
-  if (!product || !copy) return null;
+  const image = item.product.node.images.edges[0]?.node.url;
+  const variantLabel = item.variantTitle !== "Default Title" ? item.variantTitle : null;
 
   return (
     <li className="flex gap-3 border-2 border-cardboard/30 bg-dark-bg p-3">
-      {/* Mini box thumb */}
-      <div className="relative h-16 w-16 shrink-0 bg-gradient-to-br from-cardboard/30 to-dark-bg grid place-items-center border border-cardboard/40">
-        <span className="font-display text-fire text-2xl text-fire-glow text-stroke-black select-none">
-          ?
-        </span>
+      <div className="relative h-16 w-16 shrink-0 bg-gradient-to-br from-cardboard/30 to-dark-bg grid place-items-center border border-cardboard/40 overflow-hidden">
+        {image ? (
+          <img src={image} alt={item.product.node.title} className="w-full h-full object-cover" />
+        ) : (
+          <span className="font-display text-fire text-2xl text-fire-glow text-stroke-black select-none">?</span>
+        )}
       </div>
 
       <div className="flex-1 min-w-0">
         <div className="flex items-start justify-between gap-2">
           <div className="min-w-0">
             <p className="font-display text-base text-foreground leading-tight truncate">
-              {copy.name}
+              {item.product.node.title}
             </p>
-            <p className="font-sans text-xs text-foreground/55">
-              {t.cart.size}: <span className="text-fire">{line.size}</span>
-            </p>
+            {variantLabel && (
+              <p className="font-sans text-xs text-foreground/55">
+                {variantLabel}
+              </p>
+            )}
           </div>
           <button
-            onClick={() => remove(line.key)}
+            onClick={() => removeItem(item.variantId)}
             aria-label={t.cart.remove}
             className="shrink-0 text-foreground/40 hover:text-destructive transition-colors"
           >
@@ -69,17 +72,17 @@ function LineItem({ line }: { line: CartLine }) {
         <div className="mt-2 flex items-center justify-between gap-2">
           <div className="flex items-center border-2 border-cardboard/50">
             <button
-              onClick={() => setQty(line.key, line.qty - 1)}
+              onClick={() => updateQuantity(item.variantId, item.quantity - 1)}
               className="h-7 w-7 grid place-items-center text-fire hover:bg-cardboard/10"
               aria-label="−"
             >
               <Minus className="h-3.5 w-3.5" />
             </button>
             <span className="h-7 w-8 grid place-items-center font-display text-sm">
-              {line.qty}
+              {item.quantity}
             </span>
             <button
-              onClick={() => setQty(line.key, line.qty + 1)}
+              onClick={() => updateQuantity(item.variantId, item.quantity + 1)}
               className="h-7 w-7 grid place-items-center text-fire hover:bg-cardboard/10"
               aria-label="+"
             >
@@ -87,7 +90,10 @@ function LineItem({ line }: { line: CartLine }) {
             </button>
           </div>
           <span className="font-display text-lg text-fire leading-none">
-            {formatHUF(product.price * line.qty)}
+            {formatShopifyPrice({
+              amount: String(parseFloat(item.price.amount) * item.quantity),
+              currencyCode: item.price.currencyCode,
+            })}
           </span>
         </div>
       </div>
@@ -95,13 +101,23 @@ function LineItem({ line }: { line: CartLine }) {
   );
 }
 
-/** Controlled cart drawer. Mount once at the app root. */
 export function CartSheet() {
-  const { items, open, setOpen, total, count, clear } = useCart();
+  const items = useShopifyCart((s) => s.items);
+  const isOpen = useShopifyCart((s) => s.isOpen);
+  const setOpen = useShopifyCart((s) => s.setOpen);
+  const clearCart = useShopifyCart((s) => s.clearCart);
+  const checkoutUrl = useShopifyCart((s) => s.checkoutUrl);
   const t = useT();
 
+  const count = items.reduce((n, i) => n + i.quantity, 0);
+  const total = items.reduce((n, i) => n + parseFloat(i.price.amount) * i.quantity, 0);
+
+  function goToCheckout() {
+    if (checkoutUrl) window.location.href = checkoutUrl;
+  }
+
   return (
-    <Sheet open={open} onOpenChange={setOpen}>
+    <Sheet open={isOpen} onOpenChange={setOpen}>
       <SheetContent className="bg-background border-l-2 border-fire/50 w-full sm:max-w-md flex flex-col p-0">
         <SheetHeader className="px-5 py-4 border-b-2 border-cardboard/30">
           <SheetTitle className="font-display text-2xl text-fire text-fire-glow flex items-center gap-2">
@@ -130,11 +146,11 @@ export function CartSheet() {
         ) : (
           <>
             <ul className="flex-1 overflow-y-auto px-5 py-4 space-y-3">
-              {items.map((line) => (
-                <LineItem key={line.key} line={line} />
+              {items.map((item) => (
+                <LineItem key={item.variantId} item={item} />
               ))}
               <button
-                onClick={clear}
+                onClick={clearCart}
                 className="font-sans text-xs text-foreground/40 hover:text-destructive transition-colors underline"
               >
                 {t.cart.clear}
@@ -147,13 +163,17 @@ export function CartSheet() {
                   {t.cart.subtotal}
                 </span>
                 <span className="font-display text-2xl text-fire">
-                  {formatHUF(total)}
+                  {formatShopifyPrice({ amount: String(total), currencyCode: "HUF" })}
                 </span>
               </div>
               <p className="font-sans text-xs text-foreground/45 w-full">
                 {t.cart.shippingNote}
               </p>
-              <button className="w-full bg-fire text-primary-foreground font-display text-xl py-4 graffiti-border hover:translate-y-[-2px] transition-transform">
+              <button
+                onClick={goToCheckout}
+                disabled={!checkoutUrl}
+                className="w-full bg-fire text-primary-foreground font-display text-xl py-4 graffiti-border hover:translate-y-[-2px] transition-transform disabled:opacity-50 disabled:cursor-not-allowed"
+              >
                 {t.cart.checkout} →
               </button>
             </SheetFooter>

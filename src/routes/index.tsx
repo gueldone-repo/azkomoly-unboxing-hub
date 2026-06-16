@@ -14,7 +14,7 @@ import { ProductCard } from "@/components/shop/ProductCard";
 import { SocialProof } from "@/components/shop/SocialProof";
 import { LanguageToggle } from "@/components/LanguageToggle";
 import { CartButton } from "@/components/cart/CartSheet";
-import { MOCK_PRODUCTS } from "@/lib/mock-products";
+import { fetchProducts, type ShopifyProduct } from "@/lib/shopify/client";
 import { useT, readLangCookie } from "@/lib/i18n";
 import { DICTIONARIES } from "@/lib/i18n/dictionary";
 
@@ -172,6 +172,16 @@ function TopNav({ onCta }: { onCta: () => void }) {
 
 function ProductsSection() {
   const t = useT();
+  const [products, setProducts] = useState<ShopifyProduct[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchProducts(20).then((prods) => {
+      setProducts(prods);
+      setLoading(false);
+    }).catch(() => setLoading(false));
+  }, []);
+
   return (
     <section
       id="termekek"
@@ -191,11 +201,23 @@ function ProductsSection() {
             {t.products.sub}
           </p>
         </div>
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
-          {MOCK_PRODUCTS.map((p) => (
-            <ProductCard key={p.id} p={p} />
-          ))}
-        </div>
+        {loading ? (
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="aspect-square bg-dark-bg/60 border-2 border-cardboard/20 animate-pulse" />
+            ))}
+          </div>
+        ) : products.length === 0 ? (
+          <p className="font-sans text-foreground/50 text-center py-10">
+            {t.products.empty}
+          </p>
+        ) : (
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            {products.map((p) => (
+              <ProductCard key={p.node.id} p={p} />
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );

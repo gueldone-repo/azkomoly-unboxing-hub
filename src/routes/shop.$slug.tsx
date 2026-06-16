@@ -1,30 +1,26 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useState } from "react";
-import { MOCK_PRODUCTS, formatHUF } from "@/lib/mock-products";
 import { ShieldCheck, Truck, Sparkles, ChevronLeft } from "lucide-react";
 import { useT, readLangCookie } from "@/lib/i18n";
 import { DICTIONARIES } from "@/lib/i18n/dictionary";
-import { useCart } from "@/lib/cart";
+import { fetchProductByHandle, formatShopifyPrice } from "@/lib/shopify/client";
+import { useShopifyCart } from "@/lib/shopify/cart-store";
 import { CartButton } from "@/components/cart/CartSheet";
 
 export const Route = createFileRoute("/shop/$slug")({
-  head: ({ params }) => {
+  head: () => {
     const t = DICTIONARIES[readLangCookie()];
-    const p = MOCK_PRODUCTS.find((x) => x.slug === params.slug);
-    const copy = p ? t.products.items[p.id] : undefined;
-    const title = copy ? `${copy.name} — AZKOMOLY` : "AZKOMOLY";
-    const desc = copy?.blurb ?? t.meta.ogDescription;
     return {
       meta: [
-        { title },
-        { name: "description", content: desc },
-        { property: "og:title", content: title },
-        { property: "og:description", content: desc },
+        { title: "AZKOMOLY" },
+        { name: "description", content: t.meta.ogDescription },
+        { property: "og:title", content: "AZKOMOLY" },
+        { property: "og:description", content: t.meta.ogDescription },
       ],
     };
   },
-  loader: ({ params }) => {
-    const product = MOCK_PRODUCTS.find((x) => x.slug === params.slug);
+  loader: async ({ params }) => {
+    const product = await fetchProductByHandle(params.slug);
     if (!product) throw notFound();
     return { product };
   },
@@ -32,8 +28,6 @@ export const Route = createFileRoute("/shop/$slug")({
   notFoundComponent: () => <ProductNotFound />,
   component: ProductPage,
 });
-
-const SIZES = ["S", "M", "L", "XL"] as const;
 
 function ProductError({ reset }: { reset: () => void }) {
   const t = useT();
@@ -64,12 +58,37 @@ function ProductNotFound() {
 }
 
 function ProductPage() {
-  const { product: p } = Route.useLoaderData();
+  const { product } = Route.useLoaderData();
   const t = useT();
-  const { add } = useCart();
-  const copy = t.products.items[p.id];
-  const [size, setSize] = useState<(typeof SIZES)[number]>("M");
+  const addItem = useShopifyCart((s) => s.addItem);
+  const checkoutUrl = useShopifyCart((s) => s.checkoutUrl);
+  const isLoading = useShopifyCart((s) => s.isLoading);
+
+  const variants = product.variants.edges.map((e) => e.node);
+  const [selectedVariant, setSelectedVariant] = useState(variants[0]);
   const [qty, setQty] = useState(1);
+
+  const image = product.images.edges[0]?.node;
+  const available = selectedVariant?.availableForSale ?? false;
+  const hasVariants = variants.length > 1 || (variants[0]?.title !== "Default Title");
+
+  async function handleAddToCart() {
+    if (!selectedVariant) return;
+    await addItem({
+      product: { node: product },
+      variantId: selectedVariant.id,
+      variantTitle: selectedVariant.title,
+      price: selectedVariant.price,
+      quantity: qty,
+      selectedOptions: selectedVariant.selectedOptions,
+    });
+  }
+
+  async function handleBuyNow() {
+    await handleAddToCart();
+    const url = useShopifyCart.getState().checkoutUrl;
+    if (url) window.location.href = url;
+  }
 
   return (
     <main className="bg-background text-foreground min-h-screen">
@@ -83,57 +102,57 @@ function ProductPage() {
       <div className="mx-auto max-w-7xl px-6 pb-20 grid lg:grid-cols-2 gap-10">
         {/* Visual */}
         <div className="relative aspect-square bg-dark-bg overflow-hidden border-2 border-cardboard/40">
-          <img
-            src={p.image}
-            alt={copy.name}
-            className="w-full h-full object-cover"
-          />
-          {copy.badge && (
-            <span className="absolute top-4 left-4 bg-fire text-primary-foreground font-display text-sm px-3 py-1 graffiti-border">
-              {copy.badge}
-            </span>
+          {image ? (
+            <img
+              src={image.url}
+              alt={image.altText ?? product.title}
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <div className="w-full h-full grid place-items-center">
+              <span className="font-display text-fire text-8xl text-fire-glow text-stroke-black select-none">?</span>
+            </div>
           )}
         </div>
 
         {/* Info */}
         <div>
-          <p className="font-sans text-xs tracking-[0.3em] text-fire">{copy.tier.toUpperCase()}</p>
-          <h1 className="font-display text-5xl sm:text-6xl text-foreground mt-2 leading-none">{copy.name}</h1>
+          <h1 className="font-display text-5xl sm:text-6xl text-foreground mt-2 leading-none">{product.title}</h1>
           <div className="flex items-baseline gap-3 mt-5">
-            <span className="font-display text-4xl text-fire">{formatHUF(p.price)}</span>
-            {p.compareAt && (
-              <span className="font-sans text-lg text-foreground/40 line-through">
-                {formatHUF(p.compareAt)}
-              </span>
-            )}
+            <span className="font-display text-4xl text-fire">
+              {selectedVariant
+                ? formatShopifyPrice(selectedVariant.price)
+                : formatShopifyPrice(product.priceRange.minVariantPrice)}
+            </span>
           </div>
-          <p className="font-sans text-base text-foreground/80 mt-6 leading-relaxed">{copy.blurb}</p>
+          {product.description && (
+            <p className="font-sans text-base text-foreground/80 mt-6 leading-relaxed">
+              {product.description}
+            </p>
+          )}
 
-          <ul className="mt-6 space-y-2 font-sans text-sm text-foreground/80">
-            <li>📦 {t.product.contents}: <strong className="text-foreground">{copy.pieces}</strong></li>
-            <li>💎 {t.product.guaranteedValueShort}: <strong className="text-foreground">min. {formatHUF(p.price)}</strong></li>
-            <li>🔥 {t.product.inStock}: <strong className={p.stock <= 25 ? "text-destructive" : "text-foreground"}>{p.stock} {t.product.units}</strong></li>
-          </ul>
-
-          {/* Size */}
-          <div className="mt-8">
-            <p className="font-sans text-xs tracking-[0.3em] text-foreground/70 mb-3">{t.product.size}</p>
-            <div className="flex gap-2">
-              {SIZES.map((s) => (
-                <button
-                  key={s}
-                  onClick={() => setSize(s)}
-                  className={`h-12 w-12 font-display text-lg border-2 transition-colors ${
-                    size === s
-                      ? "bg-fire text-primary-foreground border-fire"
-                      : "border-cardboard/60 text-foreground hover:border-fire"
-                  }`}
-                >
-                  {s}
-                </button>
-              ))}
+          {/* Variant selector (shown only when there are real variants) */}
+          {hasVariants && (
+            <div className="mt-8">
+              <p className="font-sans text-xs tracking-[0.3em] text-foreground/70 mb-3">{t.product.size}</p>
+              <div className="flex flex-wrap gap-2">
+                {variants.map((v) => (
+                  <button
+                    key={v.id}
+                    onClick={() => setSelectedVariant(v)}
+                    disabled={!v.availableForSale}
+                    className={`h-12 min-w-12 px-3 font-display text-lg border-2 transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${
+                      selectedVariant?.id === v.id
+                        ? "bg-fire text-primary-foreground border-fire"
+                        : "border-cardboard/60 text-foreground hover:border-fire"
+                    }`}
+                  >
+                    {v.title}
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Qty + Add */}
           <div className="mt-6 flex gap-3 items-stretch">
@@ -143,16 +162,20 @@ function ProductPage() {
               <button onClick={() => setQty(qty + 1)} className="h-14 w-12 font-display text-2xl text-fire">+</button>
             </div>
             <button
-              onClick={() => add(p, size, qty)}
-              className="flex-1 bg-fire text-primary-foreground font-display text-xl graffiti-border hover:translate-y-[-2px] transition-transform"
+              onClick={handleAddToCart}
+              disabled={!available || isLoading}
+              className="flex-1 bg-fire text-primary-foreground font-display text-xl graffiti-border hover:translate-y-[-2px] transition-transform disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {t.product.addToCart} · {formatHUF(p.price * qty)}
+              {t.product.addToCart} · {selectedVariant
+                ? formatShopifyPrice({ amount: String(parseFloat(selectedVariant.price.amount) * qty), currencyCode: selectedVariant.price.currencyCode })
+                : ""}
             </button>
           </div>
 
           <button
-            onClick={() => add(p, size, qty)}
-            className="mt-3 w-full bg-dark-bg border-2 border-foreground/80 text-foreground font-display text-lg py-3 hover:bg-foreground hover:text-dark-bg transition-colors"
+            onClick={handleBuyNow}
+            disabled={!available || isLoading}
+            className="mt-3 w-full bg-dark-bg border-2 border-foreground/80 text-foreground font-display text-lg py-3 hover:bg-foreground hover:text-dark-bg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {t.product.buyNow}
           </button>
