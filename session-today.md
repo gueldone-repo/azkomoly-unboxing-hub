@@ -5,7 +5,7 @@ Claude lo lee al inicio de cada conversación para tener contexto inmediato.
 
 ---
 
-## 2026-06-16 (Sesión 1)
+## 2026-06-16 (Sesión 1) ✅ CERRADA
 
 ### Lo que se hizo
 - **Shopify conectado:** Lovable conectó la tienda `ipqptg-19.myshopify.com` via Storefront API. Infraestructura lista: `client.ts`, `cart-store.ts` (Zustand), `useCartSync.ts`.
