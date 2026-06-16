@@ -1,16 +1,39 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useT } from "@/lib/i18n";
 import { useShopifyCart } from "@/lib/shopify/cart-store";
+import { fetchShopifyDiscountCodes, type DiscountCode } from "@/lib/shopify/discounts.functions";
 
-const DISCOUNT_CODE = "FREE-SHIP";
+const FALLBACK_CODES: DiscountCode[] = [
+  { code: "FREE-SHIP", title: "Ingyenes szállítás" },
+  { code: "FREE-SHIP", title: "Ingyenes szállítás" },
+  { code: "FREE-SHIP", title: "Ingyenes szállítás" },
+];
 
 type Phase = "idle" | "chosen" | "open";
+
+function shuffled<T>(arr: T[]): T[] {
+  return [...arr].sort(() => Math.random() - 0.5);
+}
 
 export function BoxSpinner({ onClose }: { onClose: () => void }) {
   const [phase, setPhase] = useState<Phase>("idle");
   const [chosen, setChosen] = useState<number | null>(null);
+  const [boxCodes, setBoxCodes] = useState<DiscountCode[]>(FALLBACK_CODES);
   const t = useT();
   const setDiscountCode = useShopifyCart((s) => s.setDiscountCode);
+
+  useEffect(() => {
+    fetchShopifyDiscountCodes().then((codes) => {
+      if (!codes.length) return;
+      // Assign one code per box — shuffle so each visit feels different
+      const pool = shuffled(codes);
+      setBoxCodes([
+        pool[0],
+        pool[1 % pool.length],
+        pool[2 % pool.length],
+      ]);
+    });
+  }, []);
 
   function pick(i: number) {
     if (phase !== "idle") return;
@@ -18,9 +41,11 @@ export function BoxSpinner({ onClose }: { onClose: () => void }) {
     setPhase("chosen");
     setTimeout(() => {
       setPhase("open");
-      setDiscountCode(DISCOUNT_CODE);
+      setDiscountCode(boxCodes[i].code);
     }, 680);
   }
+
+  const revealedCode = chosen !== null ? boxCodes[chosen] : null;
 
   return (
     <>
@@ -125,11 +150,16 @@ export function BoxSpinner({ onClose }: { onClose: () => void }) {
               </div>
               <div className="relative border-2 border-fire bg-fire/10 py-3 px-4 mb-3 overflow-hidden">
                 <div className="pointer-events-none absolute inset-0 opacity-10 bg-[repeating-linear-gradient(-45deg,transparent_0_10px,oklch(0.14_0_0/0.5)_10px_11px)]" />
+                {revealedCode?.title && (
+                  <p className="relative font-sans text-[9px] tracking-[0.4em] text-fire/70 mb-1 uppercase">
+                    {revealedCode.title}
+                  </p>
+                )}
                 <p className="relative font-sans text-[9px] tracking-[0.4em] text-fire mb-1">
                   {t.boxSpinner.couponLabel}
                 </p>
                 <p className="relative font-display text-3xl sm:text-4xl text-white tracking-widest">
-                  {DISCOUNT_CODE}
+                  {revealedCode?.code}
                 </p>
                 <p className="relative font-sans text-xs text-fire/80 mt-0.5">
                   {t.boxSpinner.discount}
