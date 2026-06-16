@@ -106,14 +106,15 @@ export function CartSheet() {
   const isOpen = useShopifyCart((s) => s.isOpen);
   const setOpen = useShopifyCart((s) => s.setOpen);
   const clearCart = useShopifyCart((s) => s.clearCart);
-  const checkoutUrl = useShopifyCart((s) => s.checkoutUrl);
+  const getCheckoutUrl = useShopifyCart((s) => s.getCheckoutUrl);
   const t = useT();
 
   const count = items.reduce((n, i) => n + i.quantity, 0);
   const total = items.reduce((n, i) => n + parseFloat(i.price.amount) * i.quantity, 0);
 
   function goToCheckout() {
-    if (checkoutUrl) window.location.href = checkoutUrl;
+    const url = getCheckoutUrl();
+    if (url) window.location.href = url;
   }
 
   return (
@@ -171,7 +172,7 @@ export function CartSheet() {
               </p>
               <button
                 onClick={goToCheckout}
-                disabled={!checkoutUrl}
+                disabled={!getCheckoutUrl()}
                 className="w-full bg-fire text-primary-foreground font-display text-xl py-4 graffiti-border hover:translate-y-[-2px] transition-transform disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {t.cart.checkout} →

@@ -24,10 +24,12 @@ interface CartStore {
   items: CartItem[];
   cartId: string | null;
   checkoutUrl: string | null;
+  discountCode: string | null;
   isLoading: boolean;
   isSyncing: boolean;
   isOpen: boolean;
   setOpen: (v: boolean) => void;
+  setDiscountCode: (code: string) => void;
   addItem: (item: Omit<CartItem, "lineId">) => Promise<void>;
   updateQuantity: (variantId: string, quantity: number) => Promise<void>;
   removeItem: (variantId: string) => Promise<void>;
@@ -42,10 +44,12 @@ export const useShopifyCart = create<CartStore>()(
       items: [],
       cartId: null,
       checkoutUrl: null,
+      discountCode: null,
       isLoading: false,
       isSyncing: false,
       isOpen: false,
       setOpen: (v) => set({ isOpen: v }),
+      setDiscountCode: (code) => set({ discountCode: code }),
 
       addItem: async (item) => {
         const { items, cartId, clearCart } = get();
@@ -130,7 +134,18 @@ export const useShopifyCart = create<CartStore>()(
       clearCart: () =>
         set({ items: [], cartId: null, checkoutUrl: null }),
 
-      getCheckoutUrl: () => get().checkoutUrl,
+      getCheckoutUrl: () => {
+        const { checkoutUrl, discountCode } = get();
+        if (!checkoutUrl) return null;
+        if (!discountCode) return checkoutUrl;
+        try {
+          const u = new URL(checkoutUrl);
+          u.searchParams.set("discount", discountCode);
+          return u.toString();
+        } catch {
+          return checkoutUrl;
+        }
+      },
 
       syncCart: async () => {
         const { cartId, isSyncing, clearCart } = get();
@@ -155,6 +170,7 @@ export const useShopifyCart = create<CartStore>()(
         items: s.items,
         cartId: s.cartId,
         checkoutUrl: s.checkoutUrl,
+        discountCode: s.discountCode,
       }),
     },
   ),

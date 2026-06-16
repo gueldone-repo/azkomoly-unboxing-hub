@@ -86,7 +86,7 @@ function ProductPage() {
 
   async function handleBuyNow() {
     await handleAddToCart();
-    const url = useShopifyCart.getState().checkoutUrl;
+    const url = useShopifyCart.getState().getCheckoutUrl();
     if (url) window.location.href = url;
   }
 
