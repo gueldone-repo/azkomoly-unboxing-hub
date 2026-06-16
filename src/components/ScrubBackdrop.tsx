@@ -7,9 +7,11 @@ import {
   type ReactNode,
 } from "react";
 
-const FRAME_COUNT = 101;
+const START_FRAME = 25; // start scrub at f_025
+const END_FRAME = 101;
+const FRAME_COUNT = END_FRAME - START_FRAME + 1;
 const FRAME_URL = (i: number) =>
-  `/hero-frames/f_${String(i + 1).padStart(3, "0")}.jpg`;
+  `/hero-frames/f_${String(i + START_FRAME).padStart(3, "0")}.jpg`;
 
 const clamp = (min: number, max: number, v: number) =>
   Math.min(max, Math.max(min, v));
