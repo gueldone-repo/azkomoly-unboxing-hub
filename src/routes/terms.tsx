@@ -78,11 +78,15 @@ function TermsPage() {
           </p>
         </Section>
 
-        <Section title="8. Kapcsolat">
+        <Section title="8. A szolgáltató adatai">
           <p>
-            Kérdéseiddel fordulj hozzánk:{" "}
-            <a href="mailto:info@azkomoly.hu" className="text-fire underline">
-              info@azkomoly.hu
+            <strong>Oscar Investments Kft.</strong><br />
+            Székhely: 4029 Debrecen, Csapó utca 26. Fsz. 1. ajtó<br />
+            Adószám: 32331486-2-09<br />
+            Cégjegyzékszám: 09 09 036321<br />
+            Kapcsolat:{" "}
+            <a href="mailto:azkomoly.hu@gmail.com" className="text-fire underline">
+              azkomoly.hu@gmail.com
             </a>
           </p>
         </Section>

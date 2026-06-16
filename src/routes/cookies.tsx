@@ -63,9 +63,12 @@ function CookiesPage() {
 
         <Section title="5. Kapcsolat">
           <p>
-            Kérdéseid?{" "}
-            <a href="mailto:info@azkomoly.hu" className="text-fire underline">
-              info@azkomoly.hu
+            <strong>Oscar Investments Kft.</strong><br />
+            4029 Debrecen, Csapó utca 26. Fsz. 1. ajtó<br />
+            Adószám: 32331486-2-09 · Cégjegyzékszám: 09 09 036321<br />
+            Email:{" "}
+            <a href="mailto:azkomoly.hu@gmail.com" className="text-fire underline">
+              azkomoly.hu@gmail.com
             </a>
           </p>
         </Section>

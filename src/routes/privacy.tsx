@@ -28,9 +28,13 @@ function PrivacyPage() {
 
         <Section title="1. Adatkezelő">
           <p>
-            AZKOMOLY (a továbbiakban: „mi"). Kapcsolat:{" "}
-            <a href="mailto:info@azkomoly.hu" className="text-fire underline">
-              info@azkomoly.hu
+            <strong>Oscar Investments Kft.</strong><br />
+            Székhely: 4029 Debrecen, Csapó utca 26. Fsz. 1. ajtó<br />
+            Adószám: 32331486-2-09<br />
+            Cégjegyzékszám: 09 09 036321<br />
+            (a továbbiakban: „mi", „AZKOMOLY"). Kapcsolat:{" "}
+            <a href="mailto:azkomoly.hu@gmail.com" className="text-fire underline">
+              azkomoly.hu@gmail.com
             </a>
           </p>
         </Section>
@@ -54,8 +58,8 @@ function PrivacyPage() {
               <strong>Marketing kommunikáció</strong> — termékindítás, ajánlatok, hírlevelek
               küldése. Jogalap: <em>kifejezett hozzájárulás</em>. Bármikor visszavonható az
               email-ben található „leiratkozás" linkre kattintva, vagy az{" "}
-              <a href="mailto:info@azkomoly.hu" className="text-fire underline">
-                info@azkomoly.hu
+              <a href="mailto:azkomoly.hu@gmail.com" className="text-fire underline">
+                azkomoly.hu@gmail.com
               </a>{" "}
               címre küldött kéréssel.
             </li>
@@ -111,8 +115,8 @@ function PrivacyPage() {
         <Section title="8. Kapcsolat">
           <p>
             Bármely jogod gyakorlásához írj az{" "}
-            <a href="mailto:info@azkomoly.hu" className="text-fire underline">
-              info@azkomoly.hu
+            <a href="mailto:azkomoly.hu@gmail.com" className="text-fire underline">
+              azkomoly.hu@gmail.com
             </a>{" "}
             címre.
           </p>
