@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { appendLeadToSheet } from "@/lib/leads.functions";
 import { Instagram, Facebook, Youtube, ShieldCheck, Truck, Sparkles, RefreshCcw } from "lucide-react";
 import { CookieBanner } from "@/components/CookieBanner";
+import { ScrubBackdrop } from "@/components/ScrubBackdrop";
 import { HeroOverlay } from "@/components/HeroOverlay";
 import { BoxSpinner } from "@/components/BoxSpinner";
 import { PromoBanner } from "@/components/shop/PromoBanner";
@@ -105,9 +106,11 @@ function Landing() {
     <main className="relative min-h-screen bg-background text-foreground">
       <TopNav onCta={() => setOpen(true)} />
 
-      <HeroOverlay onCta={() => setOpen(true)} />
-      <PromoBanner />
-      <ProductsSection />
+      <ScrubBackdrop>
+        <HeroOverlay onCta={() => setOpen(true)} />
+        <PromoBanner />
+        <ProductsSection />
+      </ScrubBackdrop>
       <LifestyleStrip />
       <ValueProps />
       <SocialProof />

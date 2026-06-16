@@ -24,19 +24,7 @@ export function HeroOverlay({ onCta }: { onCta: () => void }) {
   }, []);
 
   return (
-    <section className="relative h-screen w-full overflow-hidden bg-dark-bg">
-      {/* Static hero image with subtle parallax */}
-      <img
-        src="/HERO_1_FRAME.jpeg"
-        alt=""
-        className="absolute inset-0 w-full h-full object-cover"
-        style={{ transform: `translate3d(0, ${hp * 60}px, 0)`, willChange: "transform" }}
-        draggable={false}
-      />
-      {/* Dark overlay for text readability */}
-      <div className="absolute inset-0 bg-gradient-to-b from-dark-bg/40 via-dark-bg/20 to-dark-bg/60" />
-
-      {/* CTA */}
+    <section className="relative h-screen w-full overflow-hidden">
       <div
         className="absolute inset-x-0 top-1/2 flex flex-col items-center gap-4 px-6 text-center z-10"
         style={{ transform: `translateY(calc(-50% + ${hp * 55}px))` }}
