@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
+import { useT } from "@/lib/i18n";
 
 const STORAGE_KEY = "azkomoly_cookie_consent_v1";
 
@@ -21,6 +22,7 @@ export function getStoredConsent(): CookieConsent | null {
 }
 
 export function CookieBanner() {
+  const t = useT();
   const [visible, setVisible] = useState(false);
   const [showPrefs, setShowPrefs] = useState(false);
   const [analytics, setAnalytics] = useState(true);
@@ -50,17 +52,15 @@ export function CookieBanner() {
       <div className="mx-auto max-w-3xl bg-dark-bg border-2 border-fire/70 graffiti-border p-4 sm:p-5 shadow-2xl">
         {!showPrefs ? (
           <div className="flex flex-col gap-3">
-            <p className="font-display text-fire text-lg sm:text-xl">SÜTIK / COOKIES</p>
+            <p className="font-display text-fire text-lg sm:text-xl">{t.cookie.title}</p>
             <p className="font-sans text-sm text-white">
-              Sütiket használunk a weboldal működéséhez, valamint{" "}
-              <span className="text-fire">marketing és elemzési célokra</span>. Az „Elfogadom"
-              gombra kattintva hozzájárulsz az adataid marketing célú felhasználásához. Részletek:{" "}
+              {t.cookie.body}{" "}
               <Link to="/cookies" className="underline hover:text-fire">
-                Süti szabályzat
+                {t.cookie.cookiePolicy}
               </Link>{" "}
               ·{" "}
               <Link to="/privacy" className="underline hover:text-fire">
-                Adatvédelem
+                {t.cookie.privacy}
               </Link>
               .
             </p>
@@ -69,31 +69,28 @@ export function CookieBanner() {
                 onClick={() => save({ analytics: true, marketing: true })}
                 className="bg-fire text-primary-foreground font-display px-4 py-2 hover:translate-y-[-1px] transition-transform"
               >
-                Elfogadom mindet
+                {t.cookie.acceptAll}
               </button>
               <button
                 onClick={() => save({ analytics: false, marketing: false })}
                 className="border-2 border-cardboard/60 text-white font-sans px-4 py-2 hover:border-fire hover:text-fire transition-colors"
               >
-                Csak szükséges
+                {t.cookie.onlyNecessary}
               </button>
               <button
                 onClick={() => setShowPrefs(true)}
                 className="text-cardboard underline font-sans px-2 py-2 hover:text-fire"
               >
-                Beállítások
+                {t.cookie.settings}
               </button>
             </div>
           </div>
         ) : (
           <div className="flex flex-col gap-3">
-            <p className="font-display text-fire text-lg sm:text-xl">SÜTI BEÁLLÍTÁSOK</p>
+            <p className="font-display text-fire text-lg sm:text-xl">{t.cookie.settingsTitle}</p>
             <label className="flex items-start gap-3 text-sm text-white font-sans">
               <input type="checkbox" checked disabled className="mt-1" />
-              <span>
-                <strong>Szükséges sütik</strong> — az oldal működéséhez nélkülözhetetlen. Mindig
-                aktív.
-              </span>
+              <span>{t.cookie.necessary}</span>
             </label>
             <label className="flex items-start gap-3 text-sm text-white font-sans">
               <input
@@ -102,9 +99,7 @@ export function CookieBanner() {
                 onChange={(e) => setAnalytics(e.target.checked)}
                 className="mt-1"
               />
-              <span>
-                <strong>Elemzési sütik</strong> — segítenek megérteni, hogyan használod az oldalt.
-              </span>
+              <span>{t.cookie.analytics}</span>
             </label>
             <label className="flex items-start gap-3 text-sm text-white font-sans">
               <input
@@ -113,22 +108,20 @@ export function CookieBanner() {
                 onChange={(e) => setMarketing(e.target.checked)}
                 className="mt-1"
               />
-              <span>
-                <strong>Marketing sütik</strong> — személyre szabott ajánlatokhoz és hirdetésekhez.
-              </span>
+              <span>{t.cookie.marketing}</span>
             </label>
             <div className="flex flex-wrap gap-2">
               <button
                 onClick={() => save({ analytics, marketing })}
                 className="bg-fire text-primary-foreground font-display px-4 py-2"
               >
-                Mentés
+                {t.cookie.save}
               </button>
               <button
                 onClick={() => setShowPrefs(false)}
                 className="border-2 border-cardboard/60 text-white font-sans px-4 py-2 hover:border-fire hover:text-fire"
               >
-                Vissza
+                {t.cookie.back}
               </button>
             </div>
           </div>

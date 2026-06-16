@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useT } from "@/lib/i18n";
 
 // Counts down to next Sunday 20:00 local
 function nextDropDate() {
@@ -11,6 +12,7 @@ function nextDropDate() {
 }
 
 export function PromoBanner() {
+  const t = useT();
   const [target] = useState(() => nextDropDate());
   const [now, setNow] = useState(Date.now());
 
@@ -42,23 +44,23 @@ export function PromoBanner() {
       <div className="relative mx-auto max-w-7xl px-6 py-10 flex flex-col sm:flex-row items-center justify-between gap-6">
         <div className="text-center sm:text-left">
           <p className="font-sans text-xs tracking-[0.35em] text-fire">
-            DROP #002 · ÉLŐBEN
+            {t.promo.live}
           </p>
           <h2 className="font-display text-3xl sm:text-4xl text-foreground">
-            Új doboz · vasárnap 20:00
+            {t.promo.heading}
           </h2>
           <p className="font-sans text-sm text-foreground/70 mt-1">
-            Amíg el nem fogy. Limitált darabszám, nincs utánrendelés.
+            {t.promo.sub}
           </p>
         </div>
         <div className="flex items-center gap-5 sm:gap-7">
-          <Cell v={d} l="NAP" />
+          <Cell v={d} l={t.promo.days} />
           <span className="font-display text-3xl text-fire/40">:</span>
-          <Cell v={h} l="ÓRA" />
+          <Cell v={h} l={t.promo.hours} />
           <span className="font-display text-3xl text-fire/40">:</span>
-          <Cell v={m} l="PERC" />
+          <Cell v={m} l={t.promo.mins} />
           <span className="font-display text-3xl text-fire/40">:</span>
-          <Cell v={s} l="MP" />
+          <Cell v={s} l={t.promo.secs} />
         </div>
       </div>
     </section>

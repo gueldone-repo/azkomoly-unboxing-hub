@@ -38,7 +38,9 @@ export function ScrubBackdrop({ children }: { children: ReactNode }) {
     for (let i = 0; i < FRAME_COUNT; i++) {
       const img = new Image();
       img.src = FRAME_URL(i);
-      if (i === 0) img.onload = () => draw(0);
+      // First VISIBLE frame with reversed order is the last file (idx=100 → f_101).
+      // Draw it as soon as it loads so the canvas isn't blank on page load.
+      if (i === FRAME_COUNT - 1) img.onload = () => draw(0);
       imgs.push(img);
     }
     framesRef.current = imgs;
@@ -64,12 +66,20 @@ export function ScrubBackdrop({ children }: { children: ReactNode }) {
   const draw = (p: number) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const idx = clamp(0, FRAME_COUNT - 1, Math.round(p * (FRAME_COUNT - 1)));
+    // Reversed: scroll starts on the LAST frame (box open) and scrubs back to
+    // the FIRST frame (box closed) as you move down through hero → products.
+    const idx = clamp(
+      0,
+      FRAME_COUNT - 1,
+      Math.round((1 - p) * (FRAME_COUNT - 1)),
+    );
     if (idx === currentFrameRef.current) return;
     const img = framesRef.current[idx];
     if (!img || !img.complete || !img.naturalWidth) return;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = "high";
     const cw = canvas.width;
     const ch = canvas.height;
     const scale = Math.max(cw / img.naturalWidth, ch / img.naturalHeight);
@@ -113,10 +123,8 @@ export function ScrubBackdrop({ children }: { children: ReactNode }) {
         <div className="pointer-events-none absolute inset-0">
           <div className="sticky top-0 h-screen w-full overflow-hidden">
             <canvas ref={canvasRef} className="absolute inset-0 h-full w-full" />
-            {/* Dimmer + edge gradients so typography stays readable */}
-            <div className="absolute inset-0 bg-background/40" />
-            <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-dark-bg/80 to-transparent" />
-            <div className="absolute inset-x-0 bottom-0 h-72 bg-gradient-to-t from-dark-bg via-dark-bg/70 to-transparent" />
+            <div className="absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-dark-bg/50 to-transparent" />
+            <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-dark-bg/30 to-transparent" />
           </div>
         </div>
         {/* Children scroll on top of the sticky canvas */}

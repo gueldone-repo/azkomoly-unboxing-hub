@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState, type FormEvent } from "react";
+import { useState, useEffect, type FormEvent } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
@@ -8,10 +8,15 @@ import { Instagram, Facebook, Youtube, ShieldCheck, Truck, Sparkles, RefreshCcw 
 import { CookieBanner } from "@/components/CookieBanner";
 import { ScrubBackdrop } from "@/components/ScrubBackdrop";
 import { HeroOverlay } from "@/components/HeroOverlay";
+import { BoxSpinner } from "@/components/BoxSpinner";
 import { PromoBanner } from "@/components/shop/PromoBanner";
 import { ProductCard } from "@/components/shop/ProductCard";
 import { SocialProof } from "@/components/shop/SocialProof";
+import { LanguageToggle } from "@/components/LanguageToggle";
+import { CartButton } from "@/components/cart/CartSheet";
 import { MOCK_PRODUCTS } from "@/lib/mock-products";
+import { useT, readLangCookie } from "@/lib/i18n";
+import { DICTIONARIES } from "@/lib/i18n/dictionary";
 
 import {
   Dialog,
@@ -28,30 +33,26 @@ import {
 } from "@/components/ui/select";
 
 export const Route = createFileRoute("/")({
-  head: () => ({
-    meta: [
-      { title: "AZKOMOLY — Mi van a dobozban?" },
-      {
-        name: "description",
-        content:
-          "AZKOMOLY mystery box: márkás ruhák, véletlenszerű tartalom, nevetséges áron. Válassz dobozt, fizess, kapd meg, nyisd ki.",
-      },
-      { property: "og:title", content: "AZKOMOLY — Mi van a dobozban?" },
-      {
-        property: "og:description",
-        content: "Márkás ruhák. Véletlenszerű tartalom. Nevetséges áron.",
-      },
-      { property: "og:type", content: "website" },
-    ],
-    links: [
-      { rel: "preconnect", href: "https://fonts.googleapis.com" },
-      { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
-      {
-        rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Space+Grotesk:wght@400;500;700&display=swap",
-      },
-    ],
-  }),
+  head: () => {
+    const t = DICTIONARIES[readLangCookie()];
+    return {
+      meta: [
+        { title: t.meta.title },
+        { name: "description", content: t.meta.description },
+        { property: "og:title", content: t.meta.ogTitle },
+        { property: "og:description", content: t.meta.ogDescription },
+        { property: "og:type", content: "website" },
+      ],
+      links: [
+        { rel: "preconnect", href: "https://fonts.googleapis.com" },
+        { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
+        {
+          rel: "stylesheet",
+          href: "https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Space+Grotesk:wght@400;500;700&display=swap",
+        },
+      ],
+    };
+  },
   component: Landing,
 });
 
@@ -76,31 +77,45 @@ const COUNTRY_CODES: { code: string; label: string; flag: string }[] = [
 ];
 
 const signupSchema = z.object({
-  name: z.string().trim().min(1, "Add meg a neved.").max(120),
-  email: z.string().trim().email("Érvénytelen email cím.").max(255),
+  name: z.string().trim().min(1).max(120),
+  email: z.string().trim().email().max(255),
   phone: z
     .string()
     .trim()
     .max(32)
-    .regex(/^[0-9 ()\-]*$/, "Csak számok megengedettek.")
+    .regex(/^[0-9 ()\-]*$/)
     .optional()
     .or(z.literal("")),
 });
 
 function Landing() {
   const [open, setOpen] = useState(false);
+  const [boxVisible, setBoxVisible] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const t = setTimeout(() => setBoxVisible(true), 1800);
+    return () => clearTimeout(t);
+  }, []);
+
+  function closeBox() {
+    setBoxVisible(false);
+  }
 
   return (
     <main className="relative min-h-screen bg-background text-foreground">
-      <TopNav />
+      <TopNav onCta={() => setOpen(true)} />
 
-      {/* Hero + promo banner share the scroll-scrub video as backdrop */}
+      {/* Hero, promo banner AND products share the scroll-scrub video as a
+          single backdrop — the box opens at the top and closes behind the grid. */}
       <ScrubBackdrop>
         <HeroOverlay onCta={() => setOpen(true)} />
         <PromoBanner />
+        <ProductsSection />
+        <RevealOutro />
       </ScrubBackdrop>
 
-      <ProductsSection />
+      <LifestyleStrip />
       <ValueProps />
       <SocialProof />
       <HowItWorks />
@@ -112,28 +127,43 @@ function Landing() {
       </div>
 
       <SignupDialog open={open} onOpenChange={setOpen} />
+      {boxVisible && <BoxSpinner onClose={closeBox} />}
       <CookieBanner />
     </main>
   );
 }
 
-function TopNav() {
+function TopNav({ onCta }: { onCta: () => void }) {
+  const t = useT();
   return (
     <nav className="sticky top-0 z-40 bg-dark-bg/85 backdrop-blur border-b-2 border-fire/40">
-      <div className="mx-auto max-w-7xl px-6 py-3 flex items-center justify-between">
-        <a href="#top" className="font-display text-2xl text-fire text-fire-glow">
-          AZKOMOLY
+      <div className="mx-auto max-w-7xl px-6 py-3 flex items-center justify-between gap-4">
+        <a href="#top" className="shrink-0">
+          <img
+            src="/azkomoly (1).png"
+            alt="AZKOMOLY"
+            className="h-10 w-auto"
+            style={{ filter: "brightness(0) invert(1)" }}
+          />
         </a>
-        <div className="flex items-center gap-5 font-sans text-sm">
-          <a href="#termekek" className="text-foreground hover:text-fire">
-            Bolt
+        <div className="flex items-center gap-4 sm:gap-5 font-sans text-sm">
+          <a href="#termekek" className="text-foreground hover:text-fire transition-colors">
+            {t.nav.shop}
           </a>
-          <a href="#hogyan" className="text-foreground/80 hover:text-fire hidden sm:inline">
-            Hogyan működik
+          <a href="#hogyan" className="text-foreground/80 hover:text-fire transition-colors hidden sm:inline">
+            {t.nav.how}
           </a>
-          <a href="#gyik" className="text-foreground/80 hover:text-fire hidden sm:inline">
-            GYIK
+          <a href="#gyik" className="text-foreground/80 hover:text-fire transition-colors hidden sm:inline">
+            {t.nav.faq}
           </a>
+          <LanguageToggle />
+          <CartButton />
+          <button
+            onClick={onCta}
+            className="hidden sm:inline-block bg-fire text-primary-foreground font-display text-sm px-4 py-1.5 graffiti-border hover:translate-y-[-2px] transition-transform"
+          >
+            {t.nav.notify}
+          </button>
         </div>
       </div>
     </nav>
@@ -141,21 +171,24 @@ function TopNav() {
 }
 
 function ProductsSection() {
+  const t = useT();
   return (
-    <section id="termekek" className="bg-background">
+    <section
+      id="termekek"
+      className="relative bg-gradient-to-b from-transparent via-background/60 to-background"
+    >
       <div className="mx-auto max-w-7xl px-6 py-20">
         <div className="flex items-end justify-between flex-wrap gap-4 mb-10">
           <div>
             <p className="font-sans text-xs tracking-[0.35em] text-fire mb-2">
-              VÁLASZD A TÉTEDET
+              {t.products.kicker}
             </p>
             <h2 className="font-display text-4xl sm:text-5xl text-foreground">
-              A dobozaink
+              {t.products.heading}
             </h2>
           </div>
           <p className="font-sans text-sm text-foreground/60 max-w-sm">
-            Minél nagyobb a doboz, annál nagyobb a dobás. Minden tier garantált
-            minimum értékkel.
+            {t.products.sub}
           </p>
         </div>
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
@@ -168,50 +201,110 @@ function ProductsSection() {
   );
 }
 
+function RevealOutro() {
+  const t = useT();
+  return (
+    <section className="relative min-h-[90vh] flex items-center justify-center px-6 text-center">
+      {/* Transparent so the now-sealed box (final frame) is fully visible. */}
+      <div className="max-w-xl [text-shadow:0_2px_18px_rgba(0,0,0,0.85)]">
+        <p className="font-sans text-xs tracking-[0.4em] text-fire mb-4">
+          {t.reveal.kicker}
+        </p>
+        <h2 className="font-display text-5xl sm:text-7xl text-white leading-[0.95]">
+          {t.reveal.heading}
+        </h2>
+        <p className="font-sans text-base text-white/85 mt-4">{t.reveal.sub}</p>
+        <a
+          href="#termekek"
+          className="mt-8 inline-block bg-fire text-primary-foreground font-display text-lg sm:text-xl px-8 py-4 graffiti-border hover:translate-y-[-2px] transition-transform"
+        >
+          {t.reveal.cta}
+        </a>
+      </div>
+    </section>
+  );
+}
+
+const LIFESTYLE_PHOTOS = [
+  "/Outfit_reveal_vertical_box_202606092123.jpeg",
+  "/Unboxing_POV_shot_dark_table_202606092122.jpeg",
+  "/Outfit_reveal_oversized_hoodie_box_202606092122.jpeg",
+  "/Unboxing_cardboard_box_with_graphic_202606092122.jpeg",
+  "/Hands_holding_cardboard_box_202606092122.jpeg",
+  "/Hands_holding_AZKOMOLY_box_202606092122.jpeg",
+];
+
+function LifestyleStrip() {
+  const all = [...LIFESTYLE_PHOTOS, ...LIFESTYLE_PHOTOS];
+  return (
+    <>
+      <style>{`@keyframes strip-scroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}`}</style>
+      <section className="py-6 overflow-hidden border-y border-cardboard/20 bg-dark-bg/60">
+        <div
+          className="flex gap-3"
+          style={{
+            width: "max-content",
+            animation: "strip-scroll 38s linear infinite",
+          }}
+        >
+          {all.map((src, i) => (
+            <div
+              key={i}
+              className="shrink-0 h-64 w-48 overflow-hidden border border-cardboard/25 hover:border-fire/60 transition-colors"
+              style={{ aspectRatio: "3/4" }}
+            >
+              <img
+                src={src}
+                alt=""
+                className="w-full h-full object-cover"
+                draggable={false}
+              />
+            </div>
+          ))}
+        </div>
+      </section>
+    </>
+  );
+}
+
 function ValueProps() {
-  const items = [
-    { Icon: ShieldCheck, title: "100% MÁRKÁS", text: "Csak igazolt brand cucc. Nincs gagyi, nincs replika." },
-    { Icon: Sparkles, title: "GARANTÁLT ÉRTÉK", text: "Minden doboz tartalmának értéke meghaladja az árát." },
-    { Icon: Truck, title: "GYORS SZÁLLÍTÁS", text: "2–4 munkanap egész Magyarországon. Foxpost / GLS." },
-    { Icon: RefreshCcw, title: "14 NAP GARANCIA", text: "Ha valami sérült érkezik, cseréljük. Egyszerűen." },
-  ];
+  const t = useT();
+  const icons = [ShieldCheck, Sparkles, Truck, RefreshCcw];
   return (
     <section className="bg-dark-bg border-y border-cardboard/30 py-14">
       <div className="mx-auto max-w-7xl px-6 grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        {items.map(({ Icon, title, text }) => (
-          <div key={title} className="flex gap-4 items-start">
-            <span className="shrink-0 grid place-items-center h-12 w-12 border-2 border-fire/60 text-fire">
-              <Icon className="h-6 w-6" />
-            </span>
-            <div>
-              <h3 className="font-display text-lg text-foreground tracking-wider">{title}</h3>
-              <p className="font-sans text-sm text-foreground/70 mt-1">{text}</p>
+        {t.values.items.map((item, i) => {
+          const Icon = icons[i];
+          return (
+            <div key={item.title} className="flex gap-4 items-start">
+              <span className="shrink-0 grid place-items-center h-12 w-12 border-2 border-fire/60 text-fire">
+                <Icon className="h-6 w-6" />
+              </span>
+              <div>
+                <h3 className="font-display text-lg text-foreground tracking-wider">{item.title}</h3>
+                <p className="font-sans text-sm text-foreground/70 mt-1">{item.text}</p>
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </section>
   );
 }
 
 function HowItWorks() {
-  const steps = [
-    { n: "01", title: "VÁLASSZ DOBOZT", text: "Mini, Klasszikus, Prémium vagy Legendás. Te döntöd el a tétet." },
-    { n: "02", title: "FIZESS", text: "Bankkártya, Apple Pay, Google Pay. 2 perc az egész." },
-    { n: "03", title: "VÁRJ 2–4 NAPOT", text: "Becsomagoljuk, elküldjük, jön a postás." },
-    { n: "04", title: "NYISD KI", text: "Vedd fel kamerával. Posztold. Címkézz be minket." },
-  ];
+  const t = useT();
   return (
     <section id="hogyan" className="bg-background">
       <div className="mx-auto max-w-7xl px-6 py-20">
         <p className="font-sans text-xs tracking-[0.35em] text-fire mb-2 text-center">
-          4 LÉPÉS
+          {t.how.kicker}
         </p>
         <h2 className="font-display text-4xl sm:text-5xl text-foreground text-center mb-12">
-          Hogyan működik?
+          {t.how.heading}
         </h2>
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
-          {steps.map((s) => (
+          {t.how.steps.map((s) => (
             <div key={s.n} className="relative bg-dark-bg border-2 border-cardboard/50 p-6 hover:border-fire transition-colors">
               <span className="absolute -top-5 -left-2 font-display text-6xl text-fire/30 leading-none">
                 {s.n}
@@ -227,29 +320,36 @@ function HowItWorks() {
 }
 
 function BigCTA({ onCta }: { onCta: () => void }) {
+  const t = useT();
+  const lines = t.bigCta.heading.split("\n");
   return (
     <section className="relative overflow-hidden">
       <div className="absolute inset-0 bg-fire" />
       <div className="absolute inset-0 opacity-20 bg-[repeating-linear-gradient(-45deg,transparent_0_24px,oklch(0.14_0_0/0.4)_24px_26px)]" />
       <div className="relative mx-auto max-w-7xl px-6 py-20 text-center">
         <p className="font-display text-primary-foreground text-base sm:text-lg tracking-[0.4em] mb-4">
-          NE OLVASS · NYISS
+          {t.bigCta.kicker}
         </p>
         <h2 className="font-display text-5xl sm:text-7xl lg:text-8xl text-primary-foreground text-stroke-black leading-[0.9]">
-          AZ ELSŐ DOBOZ<br />MOST INDUL
+          {lines.map((line, i) => (
+            <span key={i}>
+              {line}
+              {i < lines.length - 1 && <br />}
+            </span>
+          ))}
         </h2>
         <div className="mt-10 flex flex-wrap justify-center gap-4">
           <a
             href="#termekek"
             className="inline-block bg-dark-bg text-fire font-display text-xl sm:text-2xl px-10 py-5 border-4 border-dark-bg hover:bg-foreground hover:text-dark-bg transition-colors"
           >
-            MUTASD A DOBOZOKAT →
+            {t.bigCta.showBoxes}
           </a>
           <button
             onClick={onCta}
             className="inline-block bg-transparent text-primary-foreground font-display text-xl sm:text-2xl px-10 py-5 border-4 border-dark-bg hover:bg-dark-bg hover:text-fire transition-colors"
           >
-            ÉRTESÍTSETEK
+            {t.bigCta.notify}
           </button>
         </div>
       </div>
@@ -258,24 +358,18 @@ function BigCTA({ onCta }: { onCta: () => void }) {
 }
 
 function FAQSection() {
-  const faqs = [
-    { q: "Mi van a dobozban?", a: "Márkás ruhák és kiegészítők. A tartalom véletlenszerű, de minden doboz minimum érték garantált — a tartalom értéke meghaladja a doboz árát." },
-    { q: "Választhatok méretet?", a: "Igen. A vásárlás során megadod a méreted (S/M/L/XL), és csak abban a méretben kapsz ruhát." },
-    { q: "Mi van, ha nem tetszik?", a: "14 napon belül visszaküldheted bontatlanul. Sérült termék esetén cseréljük." },
-    { q: "Mennyi a szállítás?", a: "Foxpost: 1490 Ft. GLS házhoz: 1990 Ft. 20.000 Ft feletti rendelés ingyenes." },
-    { q: "Mikor érkeznek új dobozok?", a: "Minden vasárnap 20:00-kor új drop. Iratkozz fel, hogy elsőként szólj." },
-  ];
+  const t = useT();
   return (
     <section id="gyik" className="bg-background">
       <div className="mx-auto max-w-3xl px-6 py-20">
         <p className="font-sans text-xs tracking-[0.35em] text-fire mb-2 text-center">
-          GYAKORI KÉRDÉSEK
+          {t.faq.kicker}
         </p>
         <h2 className="font-display text-4xl sm:text-5xl text-foreground text-center mb-10">
-          Még valami?
+          {t.faq.heading}
         </h2>
         <div className="space-y-3">
-          {faqs.map((f) => (
+          {t.faq.items.map((f) => (
             <details key={f.q} className="group bg-dark-bg border-2 border-cardboard/40 hover:border-fire/60 transition-colors">
               <summary className="cursor-pointer list-none flex items-center justify-between p-5">
                 <span className="font-display text-lg text-foreground">{f.q}</span>
@@ -306,9 +400,10 @@ const SOCIALS = [
 ];
 
 function Footer() {
+  const t = useT();
   return (
     <footer className="mt-16 pt-8 border-t border-cardboard/30 flex flex-col items-center gap-4">
-      <p className="font-display text-fire text-lg tracking-wider">KÖVESS MINKET</p>
+      <p className="font-display text-fire text-lg tracking-wider">{t.footer.follow}</p>
       <div className="flex gap-4 flex-wrap justify-center">
         {SOCIALS.map(({ label, href, Icon }) => (
           <a
@@ -324,14 +419,14 @@ function Footer() {
         ))}
       </div>
       <nav className="flex flex-wrap gap-x-4 gap-y-1 justify-center font-sans text-xs text-muted-foreground mt-2">
-        <Link to="/privacy" className="hover:text-fire">Adatvédelem</Link>
+        <Link to="/privacy" className="hover:text-fire">{t.footer.privacy}</Link>
         <span>·</span>
-        <Link to="/terms" className="hover:text-fire">Felhasználási feltételek</Link>
+        <Link to="/terms" className="hover:text-fire">{t.footer.terms}</Link>
         <span>·</span>
-        <Link to="/cookies" className="hover:text-fire">Süti szabályzat</Link>
+        <Link to="/cookies" className="hover:text-fire">{t.footer.cookies}</Link>
       </nav>
       <p className="font-sans text-xs text-muted-foreground">
-        © 2026 <span className="font-display text-fire">AZKOMOLY</span>
+        © 2026 <span className="font-display text-fire">AZKOMOLY</span> · {t.footer.rights}
       </p>
     </footer>
   );
@@ -344,6 +439,7 @@ function SignupDialog({
   open: boolean;
   onOpenChange: (v: boolean) => void;
 }) {
+  const t = useT();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [countryCode, setCountryCode] = useState("+36");
@@ -357,13 +453,13 @@ function SignupDialog({
     e.preventDefault();
     if (!consent) {
       setStatus("error");
-      setMessage("El kell fogadnod a feltételeket és az adatvédelmi tájékoztatót.");
+      setMessage(t.signup.errorConsent);
       return;
     }
     const parsed = signupSchema.safeParse({ name, email, phone });
     if (!parsed.success) {
       setStatus("error");
-      setMessage(parsed.error.issues[0]?.message ?? "Érvénytelen adat.");
+      setMessage(t.signup.errorGeneric);
       return;
     }
     setStatus("loading");
@@ -381,7 +477,7 @@ function SignupDialog({
 
     if (error && error.code !== "23505") {
       setStatus("error");
-      setMessage("Hiba történt. Próbáld újra.");
+      setMessage(t.signup.errorGeneric);
       return;
     }
 
@@ -396,11 +492,11 @@ function SignupDialog({
 
     if (error?.code === "23505") {
       setStatus("success");
-      setMessage("✅ Már fent vagy a listán!");
+      setMessage(t.signup.successExisting);
       return;
     }
     setStatus("success");
-    setMessage("✅ Bent vagy! Hamarosan nyílik a doboz.");
+    setMessage(t.signup.successNew);
     setName("");
     setEmail("");
     setPhone("");
@@ -411,26 +507,26 @@ function SignupDialog({
       <DialogContent className="bg-dark-bg border-fire/60 graffiti-border w-[94vw] max-w-md p-5 sm:p-6">
         <DialogHeader className="pb-1">
           <DialogTitle className="font-display text-2xl sm:text-3xl text-fire text-fire-glow text-center">
-            FELIRATKOZÁS
+            {t.signup.title}
           </DialogTitle>
         </DialogHeader>
 
         <form onSubmit={onSubmit} className="flex flex-col gap-3 sm:gap-4 mt-1">
           <div>
-            <label htmlFor="name" className="block font-sans text-sm text-white mb-1">Név</label>
+            <label htmlFor="name" className="block font-sans text-sm text-white mb-1">{t.signup.name}</label>
             <input
               id="name"
               required
               value={name}
               onChange={(e) => setName(e.target.value)}
               maxLength={120}
-              placeholder="Név"
+              placeholder={t.signup.namePlaceholder}
               className="w-full bg-background border-2 border-cardboard/60 focus:border-fire text-white px-4 py-3 text-base font-sans focus:outline-none transition-colors"
             />
           </div>
 
           <div>
-            <label htmlFor="email" className="block font-sans text-sm text-white mb-1">Email</label>
+            <label htmlFor="email" className="block font-sans text-sm text-white mb-1">{t.signup.email}</label>
             <input
               id="email"
               type="email"
@@ -445,7 +541,7 @@ function SignupDialog({
 
           <div>
             <label htmlFor="phone" className="block font-sans text-sm text-white mb-1">
-              Telefon <span className="text-muted-foreground">(opcionális)</span>
+              {t.signup.phone} <span className="text-muted-foreground">{t.signup.optional}</span>
             </label>
             <div className="flex gap-2">
               <Select value={countryCode} onValueChange={setCountryCode}>
@@ -467,7 +563,7 @@ function SignupDialog({
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 maxLength={32}
-                placeholder="20 123 4567"
+                placeholder={t.signup.phonePlaceholder}
                 className="flex-1 min-w-0 bg-background border-2 border-cardboard/60 focus:border-fire text-white px-4 py-3 text-base font-sans focus:outline-none transition-colors min-h-[52px]"
               />
             </div>
@@ -482,11 +578,11 @@ function SignupDialog({
               required
             />
             <span>
-              Elfogadom a{" "}
-              <Link to="/terms" className="text-fire underline" target="_blank">feltételeket</Link>{" "}
-              és az{" "}
-              <Link to="/privacy" className="text-fire underline" target="_blank">adatvédelmi tájékoztatót</Link>
-              . Hozzájárulok, hogy adataimat <strong>marketing célokra</strong> felhasználjátok.
+              {t.signup.consentPre}
+              <Link to="/terms" className="text-fire underline" target="_blank">{t.signup.consentTerms}</Link>
+              {t.signup.consentMid}
+              <Link to="/privacy" className="text-fire underline" target="_blank">{t.signup.consentPrivacy}</Link>
+              {t.signup.consentPost}
             </span>
           </label>
 
@@ -495,7 +591,7 @@ function SignupDialog({
             disabled={status === "loading"}
             className="mt-1 sm:mt-2 bg-fire text-primary-foreground font-display text-lg sm:text-xl px-6 py-4 graffiti-border hover:translate-y-[-2px] transition-transform disabled:opacity-60"
           >
-            {status === "loading" ? "..." : "KÜLDÉS"}
+            {status === "loading" ? t.signup.sending : t.signup.submit}
           </button>
 
           {message && (

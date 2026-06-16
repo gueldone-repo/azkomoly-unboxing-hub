@@ -11,6 +11,7 @@ export type MockProduct = {
   badge?: string;
   accent: "fire" | "cardboard" | "bone";
   stock: number;
+  image: string;
 };
 
 export const MOCK_PRODUCTS: MockProduct[] = [
@@ -28,6 +29,7 @@ export const MOCK_PRODUCTS: MockProduct[] = [
     badge: "STARTER",
     accent: "cardboard",
     stock: 120,
+    image: "/Floating_cardboard_box_AZKOMOLY_…_202606092122.jpeg",
   },
   {
     id: "klasszik",
@@ -43,6 +45,7 @@ export const MOCK_PRODUCTS: MockProduct[] = [
     badge: "TOP ELADÓ",
     accent: "fire",
     stock: 64,
+    image: "/Floating_cardboard_box_AZKOMOLY_…_202606092122.jpeg",
   },
   {
     id: "premium",
@@ -58,6 +61,7 @@ export const MOCK_PRODUCTS: MockProduct[] = [
     badge: "HOT",
     accent: "fire",
     stock: 24,
+    image: "/Floating_cardboard_box_AZKOMOLY_…_202606092122.jpeg",
   },
   {
     id: "legendas",
@@ -73,6 +77,7 @@ export const MOCK_PRODUCTS: MockProduct[] = [
     badge: "LIMITÁLT",
     accent: "bone",
     stock: 6,
+    image: "/Floating_cardboard_box_AZKOMOLY_…_202606092122.jpeg",
   },
 ];
 

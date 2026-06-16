@@ -1,74 +1,56 @@
-import { useScrubProgress } from "@/components/ScrubBackdrop";
+import { useEffect, useState } from "react";
+import { useT } from "@/lib/i18n";
 
 export function HeroOverlay({ onCta }: { onCta: () => void }) {
-  const p = useScrubProgress();
-  const py = (mult: number) => `translate3d(0, ${p * mult}px, 0)`;
+  const t = useT();
+
+  // Hero-local parallax: progress 0→1 across the first viewport of scroll.
+  // Decoupled from the scrub canvas so the parallax stays strong no matter
+  // how tall the shared backdrop (hero + products) gets.
+  const [hp, setHp] = useState(0);
+  useEffect(() => {
+    let raf: number | null = null;
+    const tick = () => {
+      raf = null;
+      const vh = window.innerHeight || 1;
+      setHp(Math.min(1, Math.max(0, window.scrollY / vh)));
+    };
+    const onScroll = () => {
+      if (raf == null) raf = requestAnimationFrame(tick);
+    };
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      if (raf != null) cancelAnimationFrame(raf);
+    };
+  }, []);
+
+  const py = (mult: number) => `translate3d(0, ${hp * mult}px, 0)`;
 
   return (
     <section className="relative h-screen w-full overflow-hidden">
-      {/* Corner brackets */}
-      <span className="pointer-events-none absolute left-4 top-4 h-8 w-8 border-l-2 border-t-2 border-fire" />
-      <span className="pointer-events-none absolute right-4 top-4 h-8 w-8 border-r-2 border-t-2 border-fire" />
-      <span className="pointer-events-none absolute bottom-4 left-4 h-8 w-8 border-b-2 border-l-2 border-fire" />
-      <span className="pointer-events-none absolute bottom-4 right-4 h-8 w-8 border-b-2 border-r-2 border-fire" />
-
-      {/* Top-left meta */}
+      {/* Center: tagline + CTA */}
       <div
-        className="absolute left-6 top-24 font-sans text-xs tracking-[0.3em] text-foreground/90"
-        style={{ transform: py(-30) }}
+        className="absolute inset-x-0 top-1/2 flex flex-col items-center gap-4 px-6 text-center z-10"
+        style={{ transform: `translateY(calc(-50% + ${hp * 55}px))` }}
       >
-        EST · MMXXVI
-      </div>
-
-      {/* Top-right index */}
-      <div
-        className="absolute right-6 top-24 flex items-center gap-3 font-sans text-xs tracking-[0.3em] text-foreground/90"
-        style={{ transform: py(-45) }}
-      >
-        <span className="text-fire">/01</span>
-        <span>MYSTERY · BOX</span>
-      </div>
-
-      {/* Giant brand word */}
-      <div className="pointer-events-none absolute inset-0 flex items-center justify-center px-2">
-        <h1
-          className="font-display leading-none text-foreground"
-          style={{
-            mixBlendMode: "difference",
-            transform: py(-80),
-            fontSize: "clamp(2.8rem, 15vw, 17rem)",
-            whiteSpace: "nowrap",
-          }}
+        <p
+          className="font-sans text-sm text-white/80 tracking-wide max-w-xs leading-relaxed"
+          style={{ textShadow: "0 1px 8px rgba(0,0,0,0.7)" }}
         >
-          AZKOMOLY
-        </h1>
-      </div>
-
-      {/* Tagline */}
-      <p
-        className="absolute bottom-32 left-6 max-w-xs font-sans text-sm leading-snug text-foreground/90"
-        style={{ transform: py(40) }}
-      >
-        Márkás ruhák. Véletlenszerű tartalom. Nevetséges áron.
-      </p>
-
-      {/* Scroll cue */}
-      <div
-        className="absolute bottom-32 right-6 flex items-center gap-2 font-sans text-xs tracking-[0.3em] text-foreground/90"
-        style={{ transform: py(60) }}
-      >
-        <span className="h-px w-8 bg-foreground" />
-        GÖRGESS
-      </div>
-
-      {/* CTA */}
-      <div className="absolute inset-x-0 bottom-10 z-10 flex justify-center px-6">
+          {t.hero.tagline}
+        </p>
         <button
           onClick={onCta}
-          className="bg-fire text-primary-foreground font-display text-lg sm:text-2xl px-8 py-4 graffiti-border hover:translate-y-[-2px] transition-transform"
+          className="bg-fire text-primary-foreground font-display text-2xl sm:text-3xl px-12 py-4 graffiti-border hover:translate-y-[-2px] transition-transform pulse-glow"
+          style={{ textShadow: "0 0 12px rgba(0,0,0,0.5)" }}
         >
-          Légy az első, aki felfedi a titkot
+          {t.hero.cta}
         </button>
+        <span className="font-sans text-[10px] tracking-[0.45em] text-white/35 mt-1">
+          {t.hero.scroll} ↓
+        </span>
       </div>
     </section>
   );
