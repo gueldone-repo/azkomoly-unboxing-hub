@@ -1,6 +1,6 @@
 # AZKOMOLY — Claude context
 
-Mystery-box streetwear webshop. Pre-launch landing + fake storefront with mock data.
+Mystery-box streetwear webshop. Live storefront connected to Shopify.
 Built for Diego (GUELDONE Agency). Path: `C:\Users\Mariana\Desktop\GUELDOEN\AZKOMOLY`.
 
 ---
@@ -31,6 +31,7 @@ Built for Diego (GUELDONE Agency). Path: `C:\Users\Mariana\Desktop\GUELDOEN\AZKO
 - `.text-fire-glow` — fire text-shadow glow
 - `.text-stroke-black` — black text stroke
 - `.torn-card` / `.torn-divider` — clip-path torn paper edges
+- `.scrollbar-none` — hides scrollbar (used in mobile carousel)
 - Animations: `pulse-glow`, `float-piece`, `fade-up`, `marquee`
 
 ---
@@ -39,74 +40,111 @@ Built for Diego (GUELDONE Agency). Path: `C:\Users\Mariana\Desktop\GUELDOEN\AZKO
 
 ### Routes
 - `/` → `src/routes/index.tsx` — Full landing page
-- `/shop/$slug` → `src/routes/shop.$slug.tsx` — Product detail
-- `/privacy`, `/terms`, `/cookies` — Legal pages
+- `/shop/$slug` → `src/routes/shop.$slug.tsx` — Product detail (loads from Shopify by handle)
+- `/privacy`, `/terms`, `/cookies` — Legal pages (company: Oscar Investments Kft.)
 
 ### Key components
 | File | What it does |
 |---|---|
-| `src/components/ScrubBackdrop.tsx` | Sticky canvas that scrubs 101 JPEG frames on scroll. Frames are **reversed** (f_101 = first visible = box open, f_001 = last = box closed). Initial draw triggers on f_101 load (`i === FRAME_COUNT - 1`). |
-| `src/components/HeroOverlay.tsx` | Text + CTA on top of the scrub canvas. Parallax decoupled from scrub (uses `scrollY / innerHeight`). No corner brackets. Text centered-bottom. |
-| `src/components/BoxSpinner.tsx` | Temu-style popup: 3 floating boxes, pick one, reveals discount code `AZKOMOLY10`. Auto-shows 1.8s after page load. |
-| `src/components/cart/CartSheet.tsx` | `CartButton` (badge) + right-side drawer. Mock checkout (no payment). |
+| `src/components/ScrubBackdrop.tsx` | Sticky image backdrop — `HERO_1_FRAME.jpeg` se queda fija (sticky) mientras el usuario scrollea por hero + productos. Ya NO usa 101 frames ni canvas. |
+| `src/components/HeroOverlay.tsx` | Texto + CTA encima del ScrubBackdrop. Parallax suave con `scrollY / innerHeight`. |
+| `src/components/BoxSpinner.tsx` | Popup con 3 cajas flotantes. Carga códigos de descuento dinámicos desde Shopify Admin API (`fetchShopifyDiscountCodes`). Cada caja recibe un código distinto. Al revelar, aplica el código al checkout URL automáticamente. |
+| `src/components/cart/CartSheet.tsx` | `CartButton` (badge) + drawer lateral. Usa `useShopifyCart` (Zustand). Checkout real de Shopify con descuento incluido en URL. |
 | `src/components/LanguageToggle.tsx` | HU/EN segmented button. |
-| `src/components/shop/ProductCard.tsx` | Product card with real photo (`p.image`), badges, quick-add. |
+| `src/components/shop/ProductCard.tsx` | Tarjeta de producto con datos reales de Shopify (`ShopifyProduct`). Quick-add al carrito de Shopify. Mobile: carrusel snap. |
 
-### Data
-- **Products:** `src/lib/mock-products.ts` — 4 tiers: mini (9990), klasszik (19990), premium (39990), legendas (79990) HUF. Each has an `image` path pointing to `/public/*.jpeg`.
-- **i18n:** `src/lib/i18n/dictionary.ts` — Full typed `Dict` with `hu` and `en`. Always add keys to **both** languages. Use `useT()` hook in components. Cookie `azkomoly_lang`, default `hu`.
-- **Cart:** `src/lib/cart.tsx` — localStorage `azkomoly_cart_v1`, keyed by `productId-size`. `add()` auto-opens drawer.
-
-### Hero frames
-- 101 JPEGs in `public/hero-frames/f_001.jpg` → `f_101.jpg` (1280×698 source)
-- `f_101.jpg` was replaced with `HERO_1_FRAME.jpeg` (high-quality exploding box shot)
-- Reversed order: `idx = (1 - p) * (FRAME_COUNT - 1)` — box opens on load, closes as you scroll
-
-### Images in `public/`
-| File | Used where |
-|---|---|
-| `1_box_cerrada.png` | BoxSpinner closed boxes, `2_box_abierta.png` for open |
-| `Floating_cardboard_box_AZKOMOLY_….jpeg` | All 4 product cards + product detail pages |
-| `azkomoly (1).png` | Navbar logo (white graffiti, `filter: brightness(0) invert(1)`) |
-| `Outfit_reveal_vertical_box_…`, `Unboxing_…`, `Hands_…` | LifestyleStrip marquee (index.tsx) |
-
-> Filenames with `…` (U+2026) are literal — use the character as-is in `src` attributes.
+### Data / State
+- **Productos:** `src/lib/shopify/client.ts` — Storefront API. `fetchProducts()` y `fetchProductByHandle()`. NO hay mock-products activos.
+- **Carrito:** `src/lib/shopify/cart-store.ts` — Zustand + localStorage `azkomoly-shopify-cart-v1`. Incluye `discountCode` que se adjunta al `checkoutUrl`. NO usar el viejo `src/lib/cart.tsx`.
+- **Descuentos:** `src/lib/shopify/discounts.functions.ts` — Server fn que lee `price_rules` del Admin API. Requiere `SHOPIFY_ADMIN_TOKEN` en `.env`.
+- **i18n:** `src/lib/i18n/dictionary.ts` — Full typed `Dict` con `hu` y `en`. Siempre agregar keys a **ambos** idiomas. Hook `useT()`. Cookie `azkomoly_lang`, default `hu`.
+- **Leads:** Supabase `azkomoly_leads` + Google Sheet mirror via `appendLeadToSheet` server fn.
 
 ---
 
-## Backend (do NOT touch unless asked)
+## Shopify
 
-- **Supabase:** Only `azkomoly_leads` table (email signups/waitlist). Lead insert + Google Sheet mirror via `appendLeadToSheet` server fn.
-- **Shopify:** Planned for checkout — not implemented yet. Do NOT add Stripe.
-- Everything else is mock data. No products/orders/cart tables in Supabase.
+| Dato | Valor |
+|---|---|
+| Store domain | `ipqptg-19.myshopify.com` |
+| Storefront token | `88a7bc92a4e3b38691a12713f4a7ac34` (público, read-only) |
+| API version | `2025-07` |
+| Admin token | `SHOPIFY_ADMIN_TOKEN` en `.env` — **pendiente** (necesita `read_price_rules` scope) |
+| Envíos | PeakShip / Kvikk — pendiente de instalar |
+| Pagos | Pendiente: Stripe o SimplePay (Shopify Payments no disponible en HU) |
+| Impuestos | ÁFA 27% — pendiente de configurar en Shopify Settings |
+
+### Empresa (datos legales en /privacy, /terms, /cookies)
+- **Oscar Investments Kft.**
+- Székhely: 4029 Debrecen, Csapó utca 26. Fsz. 1. ajtó
+- Adószám: 32331486-2-09 · Cégjegyzékszám: 09 09 036321
+- Email: azkomoly.hu@gmail.com
+
+---
+
+## Hero
+
+- `ScrubBackdrop` envuelve hero + PromoBanner + ProductsSection en `index.tsx`
+- La imagen `public/HERO_1_FRAME.jpeg` se mantiene sticky mientras scrolleas
+- Los 101 frames de `public/hero-frames/` ya NO se usan — no borrar pero no cargar
+- `HeroOverlay` solo tiene texto/CTA, el fondo lo provee `ScrubBackdrop`
+
+## Products (mobile)
+
+- Mobile (`< sm`): carrusel horizontal snap, cards de `78vw`
+- Tablet/Desktop: grid `sm:grid-cols-2 lg:grid-cols-4`
+
+---
+
+## Images en `public/`
+| File | Usado donde |
+|---|---|
+| `HERO_1_FRAME.jpeg` | ScrubBackdrop — hero sticky background |
+| `1_box_cerrada.png` | BoxSpinner cajas cerradas |
+| `2_box_abierta.png` | BoxSpinner caja abierta (reveal) |
+| `azkomoly (1).png` | Navbar logo (`filter: brightness(0) invert(1)`) |
+| `Outfit_reveal_vertical_box_…`, `Unboxing_…`, `Hands_…` | LifestyleStrip marquee |
+
+> Filenames con `…` (U+2026) son literales.
+
+---
+
+## Backend
+
+- **Supabase:** Solo tabla `azkomoly_leads`. Schema congelado salvo pedido explícito.
+- **Shopify:** Storefront API activo. Admin API pendiente de token.
+- **No Stripe** — checkout será Shopify nativo.
 
 ---
 
 ## Known gotchas
 
-### TS false positive on `shop.$slug.tsx`
-Running the dev server regenerates `routeTree.gen.ts` with a `Register` block causing a cyclic type error on `Route.useLoaderData()`. **It's a dev-server artifact, not real.** Fix if needed:
+### TS false positive en `shop.$slug.tsx`
+El dev server regenera `routeTree.gen.ts` con un bloque `Register` que causa error cíclico. Es un artefacto del dev server, no real. Fix:
 ```
 git checkout -- src/routeTree.gen.ts
 ```
-`tsc --noEmit` exits 0 with the committed file.
+`tsc --noEmit` sale 0 con el archivo commiteado.
 
 ### npm install
-Always use:
+Siempre usar:
 ```
 npm install --legacy-peer-deps --no-package-lock
 ```
-Plain `npm install` fails due to a nitro ↔ `@lovable.dev/vite-tanstack-config` peer-dep conflict.
 
 ### BoxSpinner
-Shows on every page load (no sessionStorage gate — intentional for demo). When going to production, add back a `localStorage` check with a timestamp for once-per-day behavior.
+Muestra en cada page load (sin gate de sessionStorage — intencional para demo). En producción, agregar check de `localStorage` con timestamp para mostrar una vez al día.
+
+### Carrito viejo
+`src/lib/cart.tsx` y `src/lib/cart.ts` son el carrito mock original. Ya no se usan. NO importar en componentes nuevos — usar `useShopifyCart` de `src/lib/shopify/cart-store.ts`.
 
 ---
 
 ## Rules
 
-1. **Visual/design only** — Diego guides all work. Don't run ahead or build features unprompted.
-2. **No backend changes** — Supabase schema and server functions are frozen unless explicitly requested.
-3. **No Stripe** — future checkout is Shopify only.
-4. **Don't commit `routeTree.gen.ts`** if it has a `Register` block added by the dev server.
-5. When adding copy, always add to **both** `hu` and `en` in `dictionary.ts` and the `Dict` type.
+1. **Visual/design only** — Diego guía todo el trabajo. No adelantarse ni construir features sin pedirlo.
+2. **No backend changes** — Supabase schema y server functions congelados salvo pedido explícito.
+3. **No Stripe** — checkout es Shopify únicamente.
+4. **No commitear `routeTree.gen.ts`** si tiene bloque `Register` del dev server.
+5. Al agregar copy, siempre agregar a **ambos** `hu` y `en` en `dictionary.ts` y el tipo `Dict`.
+6. El carrito usa Shopify Storefront API + Zustand — nunca el mock de `src/lib/cart.tsx`.
