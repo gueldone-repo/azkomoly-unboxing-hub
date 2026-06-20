@@ -268,7 +268,7 @@ const hu: Dict = {
   },
   bigCta: {
     kicker: "NE OLVASS · NYISS",
-    heading: "AZ ELSŐ DOBOZ\nMOST INDUL",
+    heading: "A DOBOZ\nMOST INDUL",
     showBoxes: "MUTASD A DOBOZOKAT →",
     notify: "ÉRTESÍTSETEK",
   },
@@ -276,9 +276,9 @@ const hu: Dict = {
     kicker: "GYAKORI KÉRDÉSEK",
     heading: "Még valami?",
     items: [
-      { q: "Mi van a dobozban?", a: "Márkás ruhák és kiegészítők. A tartalom véletlenszerű, de minden doboz minimum érték garantált — a tartalom értéke meghaladja a doboz árát." },
-      { q: "Választhatok méretet?", a: "Igen. A vásárlás során megadod a méreted (S/M/L/XL), és csak abban a méretben kapsz ruhát." },
-      { q: "Mi van, ha nem tetszik?", a: "14 napon belül visszaküldheted bontatlanul. Sérült termék esetén cseréljük." },
+      { q: "Mi van a dobozban?", a: "Ezt nem tudhatod előre — ez a lényeg. Ruhák, kiegészítők, kütyük, meglepetések. Bármi lehet. A titok nem spoilerezhető." },
+      { q: "Választhatok méretet?", a: "Ruháknál igen — a vásárlás során megadod a méreted (S–XL). Más termékek esetén a méret nem releváns." },
+      { q: "Mi van, ha sérülten érkezik?", a: "Ha valami sérülten érkezik, cseréljük. Egyébként a meglepetés nem visszaváltható — tudtad, hogy random. Ez a játék." },
       { q: "Mennyi a szállítás?", a: "Foxpost: 1490 Ft. GLS házhoz: 1990 Ft. 20.000 Ft feletti rendelés ingyenes." },
       { q: "Mikor érkeznek új dobozok?", a: "Minden vasárnap 20:00-kor új drop. Iratkozz fel, hogy elsőként szólj." },
     ],
@@ -474,7 +474,7 @@ const en: Dict = {
   },
   bigCta: {
     kicker: "DON'T READ · OPEN",
-    heading: "THE FIRST BOX\nDROPS NOW",
+    heading: "THE BOX\nDROPS NOW",
     showBoxes: "SHOW ME THE BOXES →",
     notify: "NOTIFY ME",
   },
@@ -482,9 +482,9 @@ const en: Dict = {
     kicker: "FREQUENT QUESTIONS",
     heading: "Anything else?",
     items: [
-      { q: "What's in the box?", a: "Branded clothing and accessories. The contents are random, but every box has a guaranteed minimum value — the contents are worth more than the box price." },
-      { q: "Can I choose my size?", a: "Yes. During checkout you pick your size (S/M/L/XL), and you only get clothes in that size." },
-      { q: "What if I don't like it?", a: "You can return it unopened within 14 days. Damaged items get replaced." },
+      { q: "What's in the box?", a: "That's exactly what you can't know upfront. Clothes, accessories, gadgets, random finds — anything goes. The unknown is the whole point." },
+      { q: "Can I choose my size?", a: "For clothing items, yes — you pick your size (S–XL) during checkout. For other items, size isn't a factor." },
+      { q: "What if something arrives damaged?", a: "Damaged on arrival? We replace it. Otherwise, the mystery is non-refundable — you knew it was random. That's the game." },
       { q: "How much is shipping?", a: "Foxpost: 1490 HUF. GLS to your door: 1990 HUF. Free over 20,000 HUF." },
       { q: "When do new boxes drop?", a: "New drop every Sunday at 8 PM. Subscribe to be the first to know." },
     ],
