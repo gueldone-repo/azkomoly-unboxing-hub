@@ -29,12 +29,6 @@ export function HeroOverlay({ onCta }: { onCta: () => void }) {
         className="absolute inset-x-0 top-1/2 flex flex-col items-center gap-4 px-6 text-center z-10"
         style={{ transform: `translateY(calc(-50% + ${hp * 55}px))` }}
       >
-        <p
-          className="font-sans text-sm text-white/80 tracking-wide max-w-xs leading-relaxed"
-          style={{ textShadow: "0 1px 8px rgba(0,0,0,0.7)" }}
-        >
-          {t.hero.tagline}
-        </p>
         <button
           onClick={onCta}
           className="bg-fire text-primary-foreground font-display text-2xl sm:text-3xl px-12 py-4 graffiti-border hover:translate-y-[-2px] transition-transform pulse-glow"

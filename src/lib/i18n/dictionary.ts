@@ -172,9 +172,9 @@ const hu: Dict = {
   meta: {
     title: "AZKOMOLY — Mi van a dobozban?",
     description:
-      "AZKOMOLY mystery box: márkás ruhák, véletlenszerű tartalom, nevetséges áron. Válassz dobozt, fizess, kapd meg, nyisd ki.",
+      "AZKOMOLY mystery box: nem tudod mi van benne — és ez a lényeg. Válassz dobozt, fizess, kapd meg, nyisd ki.",
     ogTitle: "AZKOMOLY — Mi van a dobozban?",
-    ogDescription: "Márkás ruhák. Véletlenszerű tartalom. Nevetséges áron.",
+    ogDescription: "Nem tudod mi van benne. Ez a lényeg.",
   },
   nav: { shop: "Bolt", how: "Hogyan működik", faq: "GYIK", notify: "Értesíts" },
   hero: {
@@ -243,10 +243,10 @@ const hu: Dict = {
   },
   values: {
     items: [
-      { title: "100% MÁRKÁS", text: "Csak igazolt brand cucc. Nincs gagyi, nincs replika." },
-      { title: "GARANTÁLT ÉRTÉK", text: "Minden doboz tartalmának értéke meghaladja az árát." },
+      { title: "TOTÁLIS TITOK", text: "Nem tudod, mi van benne. Ez a lényeg. Amit kapsz, azt kapsz." },
+      { title: "BÁRMI LEHET", text: "Ruhák, kiegészítők, kütyük, különlegességek. Nem csak ruha." },
       { title: "GYORS SZÁLLÍTÁS", text: "2–4 munkanap egész Magyarországon. Foxpost / GLS." },
-      { title: "14 NAP GARANCIA", text: "Ha valami sérült érkezik, cseréljük. Egyszerűen." },
+      { title: "14 NAP GARANCIA", text: "Ha sérülten érkezik, cseréljük. A meglepetés viszont marad." },
     ],
   },
   reviews: [
@@ -378,9 +378,9 @@ const en: Dict = {
   meta: {
     title: "AZKOMOLY — What's in the box?",
     description:
-      "AZKOMOLY mystery box: branded clothing, random contents, ridiculous prices. Pick a box, pay, get it, open it.",
+      "AZKOMOLY mystery box: you don't know what's inside — and that's the point. Pick a box, pay, get it, open it.",
     ogTitle: "AZKOMOLY — What's in the box?",
-    ogDescription: "Branded clothing. Random contents. Ridiculous prices.",
+    ogDescription: "You don't know what's inside. That's the point.",
   },
   nav: { shop: "Shop", how: "How it works", faq: "FAQ", notify: "Notify me" },
   hero: {
@@ -449,10 +449,10 @@ const en: Dict = {
   },
   values: {
     items: [
-      { title: "100% BRANDED", text: "Verified brand gear only. No junk, no replicas." },
-      { title: "GUARANTEED VALUE", text: "Every box's contents are worth more than its price." },
+      { title: "TOTAL MYSTERY", text: "You don't know what's inside. That's the whole point. What you get, you get." },
+      { title: "ANYTHING INSIDE", text: "Clothes, accessories, gadgets, collectibles. All kinds of stuff." },
       { title: "FAST SHIPPING", text: "2–4 business days across Hungary. Foxpost / GLS." },
-      { title: "14-DAY GUARANTEE", text: "If something arrives damaged, we replace it. Simple." },
+      { title: "14-DAY GUARANTEE", text: "Damaged on arrival? We replace it. The surprise, however, stays." },
     ],
   },
   reviews: [
