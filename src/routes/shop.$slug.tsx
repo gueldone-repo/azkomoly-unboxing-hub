@@ -3,7 +3,7 @@ import { useState } from "react";
 import { ShieldCheck, Truck, Sparkles, ChevronLeft } from "lucide-react";
 import { useT, readLangCookie } from "@/lib/i18n";
 import { DICTIONARIES } from "@/lib/i18n/dictionary";
-import { fetchProductByHandle, formatShopifyPrice } from "@/lib/shopify/client";
+import { fetchProductByHandle, formatShopifyPrice, type ShopifyProduct } from "@/lib/shopify/client";
 import { useShopifyCart } from "@/lib/shopify/cart-store";
 import { CartButton } from "@/components/cart/CartSheet";
 
@@ -64,7 +64,8 @@ function ProductPage() {
   const checkoutUrl = useShopifyCart((s) => s.checkoutUrl);
   const isLoading = useShopifyCart((s) => s.isLoading);
 
-  const variants = product.variants.edges.map((e) => e.node);
+  type ProductVariant = ShopifyProduct["node"]["variants"]["edges"][number]["node"];
+  const variants = product.variants.edges.map((e: { node: ProductVariant }) => e.node);
   const [selectedVariant, setSelectedVariant] = useState(variants[0]);
   const [qty, setQty] = useState(1);
 
@@ -136,7 +137,7 @@ function ProductPage() {
             <div className="mt-8">
               <p className="font-sans text-xs tracking-[0.3em] text-foreground/70 mb-3">{t.product.size}</p>
               <div className="flex flex-wrap gap-2">
-                {variants.map((v) => (
+                {variants.map((v: ProductVariant) => (
                   <button
                     key={v.id}
                     onClick={() => setSelectedVariant(v)}
