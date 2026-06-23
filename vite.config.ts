@@ -12,4 +12,10 @@ export default defineConfig({
     // nitro/vite builds from this
     server: { entry: "server" },
   },
+  vite: {
+    server: {
+      // Allow the remote-control / tunnel host to reach the dev server.
+      allowedHosts: ["azkomoly.borat.hu"],
+    },
+  },
 });
