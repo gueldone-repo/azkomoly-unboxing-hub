@@ -1,7 +1,9 @@
 import { useState, useEffect, type FormEvent } from "react";
+import { useServerFn } from "@tanstack/react-start";
 import { useT } from "@/lib/i18n";
 import { useShopifyCart } from "@/lib/shopify/cart-store";
 import { fetchShopifyDiscountCodes, type DiscountCode } from "@/lib/shopify/discounts.functions";
+import { appendLeadToSheet } from "@/lib/leads.functions";
 import { supabase } from "@/integrations/supabase/client";
 
 const FALLBACK_CODES: DiscountCode[] = [
