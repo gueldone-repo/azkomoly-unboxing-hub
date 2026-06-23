@@ -48,15 +48,25 @@ export function BoxSpinner({ onClose }: { onClose: () => void }) {
     e.preventDefault();
     if (!name.trim() || !email.trim() || submitting) return;
     setSubmitting(true);
+    const trimmedName = name.trim();
+    const loweredEmail = email.trim().toLowerCase();
     try {
       await supabase.from("azkomoly_leads").insert({
-        name: name.trim(),
-        email: email.trim().toLowerCase(),
+        name: trimmedName,
+        email: loweredEmail,
         source: "box_spinner",
       });
     } catch {
       // non-blocking — reveal code even if save fails
     }
+    appendToSheet({
+      data: {
+        name: trimmedName,
+        email: loweredEmail,
+        countryCode: null,
+        phone: null,
+      },
+    }).catch((err) => console.error("Sheet append error", err));
     if (chosen !== null) setDiscountCode(boxCodes[chosen].code);
     setPhase("revealed");
     setSubmitting(false);
