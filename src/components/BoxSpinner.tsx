@@ -27,6 +27,7 @@ export function BoxSpinner({ onClose }: { onClose: () => void }) {
   const [submitting, setSubmitting] = useState(false);
   const t = useT();
   const setDiscountCode = useShopifyCart((s) => s.setDiscountCode);
+  const appendToSheet = useServerFn(appendLeadToSheet);
 
   useEffect(() => {
     fetchShopifyDiscountCodes().then((codes) => {
