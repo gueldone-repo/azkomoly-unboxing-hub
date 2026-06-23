@@ -29,6 +29,23 @@ export function HeroOverlay({ onCta }: { onCta: () => void }) {
 
   return (
     <section className="relative h-screen w-full overflow-hidden">
+      {/* ? as background texture — huge, off-center, mostly transparent */}
+      <div
+        className="absolute pointer-events-none select-none"
+        style={{
+          right: "-8vw",
+          top: "50%",
+          transform: "translateY(-50%)",
+          fontSize: "clamp(18rem, 55vw, 42rem)",
+          lineHeight: 1,
+          fontFamily: "var(--font-display)",
+          color: "transparent",
+          WebkitTextStroke: "1.5px oklch(0.78 0.17 70 / 0.12)",
+        }}
+      >
+        ?
+      </div>
+
       <div
         className="absolute inset-x-0 top-1/2 flex flex-col items-center gap-5 px-6 text-center z-10"
         style={{ transform: `translateY(calc(-50% + ${hp * 55}px))` }}
@@ -37,21 +54,6 @@ export function HeroOverlay({ onCta }: { onCta: () => void }) {
         <p className="font-sans text-[9px] tracking-[0.55em] text-white/40 uppercase">
           {t.hero.est} · {t.hero.mysteryBox}
         </p>
-
-        {/* Giant outline question mark — the brand icon */}
-        <div
-          className="font-display leading-[0.85] select-none pointer-events-none"
-          style={{
-            fontSize: "clamp(7rem, 25vw, 15rem)",
-            color: "transparent",
-            WebkitTextStroke: "2px oklch(0.78 0.17 70 / 0.85)",
-            filter:
-              "drop-shadow(0 0 40px oklch(0.78 0.17 70 / 0.5)) drop-shadow(0 0 80px oklch(0.78 0.17 70 / 0.2))",
-            animation: "pulse-glow 3s ease-in-out infinite",
-          }}
-        >
-          ?
-        </div>
 
         {/* CTA */}
         <button

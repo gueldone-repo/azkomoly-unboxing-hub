@@ -129,7 +129,6 @@ function Landing() {
         <ProductsSection />
       </ScrubBackdrop>
       <LifestyleStrip />
-      <ValueProps />
       <SocialProof />
       <HowItWorks />
       <BigCTA onCta={() => setOpen(true)} />
