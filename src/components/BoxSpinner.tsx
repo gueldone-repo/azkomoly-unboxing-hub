@@ -1,7 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, type FormEvent } from "react";
 import { useT } from "@/lib/i18n";
 import { useShopifyCart } from "@/lib/shopify/cart-store";
 import { fetchShopifyDiscountCodes, type DiscountCode } from "@/lib/shopify/discounts.functions";
+import { supabase } from "@/integrations/supabase/client";
 
 const FALLBACK_CODES: DiscountCode[] = [
   { code: "FREE-SHIP", title: "Ingyenes szállítás" },
@@ -9,7 +10,7 @@ const FALLBACK_CODES: DiscountCode[] = [
   { code: "FREE-SHIP", title: "Ingyenes szállítás" },
 ];
 
-type Phase = "idle" | "chosen" | "open";
+type Phase = "idle" | "chosen" | "gate" | "revealed";
 
 function shuffled<T>(arr: T[]): T[] {
   return [...arr].sort(() => Math.random() - 0.5);
@@ -19,19 +20,17 @@ export function BoxSpinner({ onClose }: { onClose: () => void }) {
   const [phase, setPhase] = useState<Phase>("idle");
   const [chosen, setChosen] = useState<number | null>(null);
   const [boxCodes, setBoxCodes] = useState<DiscountCode[]>(FALLBACK_CODES);
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [submitting, setSubmitting] = useState(false);
   const t = useT();
   const setDiscountCode = useShopifyCart((s) => s.setDiscountCode);
 
   useEffect(() => {
     fetchShopifyDiscountCodes().then((codes) => {
       if (!codes.length) return;
-      // Assign one code per box — shuffle so each visit feels different
       const pool = shuffled(codes);
-      setBoxCodes([
-        pool[0],
-        pool[1 % pool.length],
-        pool[2 % pool.length],
-      ]);
+      setBoxCodes([pool[0], pool[1 % pool.length], pool[2 % pool.length]]);
     });
   }, []);
 
@@ -39,10 +38,25 @@ export function BoxSpinner({ onClose }: { onClose: () => void }) {
     if (phase !== "idle") return;
     setChosen(i);
     setPhase("chosen");
-    setTimeout(() => {
-      setPhase("open");
-      setDiscountCode(boxCodes[i].code);
-    }, 680);
+    setTimeout(() => setPhase("gate"), 680);
+  }
+
+  async function submitGate(e: FormEvent) {
+    e.preventDefault();
+    if (!name.trim() || !email.trim() || submitting) return;
+    setSubmitting(true);
+    try {
+      await supabase.from("azkomoly_leads").insert({
+        name: name.trim(),
+        email: email.trim().toLowerCase(),
+        source: "box_spinner",
+      });
+    } catch {
+      // non-blocking — reveal code even if save fails
+    }
+    if (chosen !== null) setDiscountCode(boxCodes[chosen].code);
+    setPhase("revealed");
+    setSubmitting(false);
   }
 
   const revealedCode = chosen !== null ? boxCodes[chosen] : null;
@@ -72,7 +86,7 @@ export function BoxSpinner({ onClose }: { onClose: () => void }) {
             ✕
           </button>
 
-          {phase !== "open" ? (
+          {phase === "idle" || phase === "chosen" ? (
             <>
               <p
                 className="relative font-display text-base sm:text-lg text-fire mb-0.5"
@@ -132,6 +146,51 @@ export function BoxSpinner({ onClose }: { onClose: () => void }) {
                 {t.boxSpinner.tap}
               </p>
             </>
+          ) : phase === "gate" ? (
+            <div style={{ animation: "bxReveal 0.45s ease-out both" }}>
+              <p
+                className="font-display text-lg sm:text-xl text-fire mb-3"
+                style={{ textShadow: "0 0 30px oklch(0.78 0.17 70 / 0.8)" }}
+              >
+                {t.boxSpinner.congrats}
+              </p>
+              <div className="mx-auto mb-4" style={{ width: "6rem" }}>
+                <img
+                  src="/2_box_abierta.png"
+                  alt="Nyitott doboz"
+                  className="w-full object-contain"
+                  style={{ filter: "drop-shadow(0 0 22px oklch(0.78 0.17 70 / 0.7))" }}
+                />
+              </div>
+              <p className="font-sans text-xs text-white/60 mb-4 leading-relaxed">
+                {t.boxSpinner.gateHint}
+              </p>
+              <form onSubmit={submitGate} className="flex flex-col gap-2.5">
+                <input
+                  type="text"
+                  required
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder={t.boxSpinner.gateName}
+                  className="w-full bg-white/5 border border-fire/30 focus:border-fire/70 text-white font-sans text-sm px-3 py-2 outline-none placeholder:text-white/30 transition-colors"
+                />
+                <input
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder={t.boxSpinner.gateEmail}
+                  className="w-full bg-white/5 border border-fire/30 focus:border-fire/70 text-white font-sans text-sm px-3 py-2 outline-none placeholder:text-white/30 transition-colors"
+                />
+                <button
+                  type="submit"
+                  disabled={submitting}
+                  className="w-full bg-fire text-primary-foreground font-display text-base py-2.5 graffiti-border hover:translate-y-[-2px] transition-transform disabled:opacity-60 mt-1"
+                >
+                  {submitting ? "..." : t.boxSpinner.gateSubmit}
+                </button>
+              </form>
+            </div>
           ) : (
             <div style={{ animation: "bxReveal 0.45s ease-out both" }}>
               <p

@@ -1,6 +1,10 @@
 import { useEffect, useState } from "react";
 import { useT } from "@/lib/i18n";
 
+function scrollToProducts() {
+  document.getElementById("termekek")?.scrollIntoView({ behavior: "smooth" });
+}
+
 export function HeroOverlay({ onCta }: { onCta: () => void }) {
   const t = useT();
   const [hp, setHp] = useState(0);
@@ -30,7 +34,7 @@ export function HeroOverlay({ onCta }: { onCta: () => void }) {
         style={{ transform: `translateY(calc(-50% + ${hp * 55}px))` }}
       >
         <button
-          onClick={onCta}
+          onClick={scrollToProducts}
           className="bg-fire text-primary-foreground font-display text-2xl sm:text-3xl px-12 py-4 graffiti-border hover:translate-y-[-2px] transition-transform pulse-glow"
           style={{ textShadow: "0 0 12px rgba(0,0,0,0.5)" }}
         >

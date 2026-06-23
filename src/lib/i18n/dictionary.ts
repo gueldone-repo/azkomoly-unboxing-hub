@@ -161,6 +161,10 @@ export type Dict = {
     sub: string;
     tap: string;
     congrats: string;
+    gateHint: string;
+    gateName: string;
+    gateEmail: string;
+    gateSubmit: string;
     couponLabel: string;
     discount: string;
     copyHint: string;
@@ -183,7 +187,7 @@ const hu: Dict = {
     mysteryBox: "MYSTERY · BOX",
     tagline: "Márkás ruhák. Véletlenszerű tartalom. Nevetséges áron.",
     scroll: "GÖRGESS",
-    cta: "Légy az első, aki felfedi a titkot",
+    cta: "AKAROM KINYITNI A DOBOZT →",
   },
   promo: {
     live: "DROP #002 · ÉLŐBEN",
@@ -367,6 +371,10 @@ const hu: Dict = {
     sub: "Nyerj kedvezményt az első rendelésre",
     tap: "KATTINTS EGY DOBOZRA",
     congrats: "GRATULÁLUNK! 🎉",
+    gateHint: "Add meg az adataid a kód megjelenítéséhez",
+    gateName: "Neved",
+    gateEmail: "E-mail cím",
+    gateSubmit: "MUTASD A KÓDOT →",
     couponLabel: "KUPONKÓD",
     discount: "−10% az első rendelésre",
     copyHint: "Másold ki és add meg a pénztárnál",
@@ -389,7 +397,7 @@ const en: Dict = {
     mysteryBox: "MYSTERY · BOX",
     tagline: "Branded clothing. Random contents. Ridiculous prices.",
     scroll: "SCROLL",
-    cta: "Be the first to reveal the secret",
+    cta: "I WANT TO OPEN MY BOX →",
   },
   promo: {
     live: "DROP #002 · LIVE",
@@ -573,6 +581,10 @@ const en: Dict = {
     sub: "Win a discount on your first order",
     tap: "CLICK A BOX",
     congrats: "CONGRATULATIONS! 🎉",
+    gateHint: "Enter your details to reveal your code",
+    gateName: "Your name",
+    gateEmail: "Email address",
+    gateSubmit: "SHOW MY CODE →",
     couponLabel: "COUPON CODE",
     discount: "−10% on your first order",
     copyHint: "Copy it and enter it at checkout",

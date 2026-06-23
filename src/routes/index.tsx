@@ -94,11 +94,13 @@ function Landing() {
 
   useEffect(() => {
     if (typeof window === "undefined") return;
+    if (sessionStorage.getItem("azkomoly-box-seen")) return;
     const t = setTimeout(() => setBoxVisible(true), 1800);
     return () => clearTimeout(t);
   }, []);
 
   function closeBox() {
+    sessionStorage.setItem("azkomoly-box-seen", "1");
     setBoxVisible(false);
   }
 
