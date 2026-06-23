@@ -21,7 +21,7 @@ function CookiesPage() {
           ← Vissza
         </Link>
         <h1 className="font-display text-fire text-4xl sm:text-5xl">SÜTI SZABÁLYZAT</h1>
-        <p className="font-sans text-sm text-muted-foreground">Hatályos: 2025. január 1.</p>
+        <p className="font-sans text-sm text-muted-foreground">Hatályos: 2026. január 1.</p>
 
         <Section title="1. Mi az a süti?">
           <p>

@@ -7,7 +7,7 @@ export const Route = createFileRoute("/privacy")({
       {
         name: "description",
         content:
-          "AZKOMOLY adatvédelmi tájékoztató. Hogyan kezeljük adataidat a GDPR szerint, marketing célokra is.",
+          "AZKOMOLY adatvédelmi tájékoztató. Hogyan kezeljük adataidat a GDPR szerint.",
       },
     ],
   }),
@@ -23,7 +23,7 @@ function PrivacyPage() {
         </Link>
         <h1 className="font-display text-fire text-4xl sm:text-5xl">ADATVÉDELMI TÁJÉKOZTATÓ</h1>
         <p className="font-sans text-sm text-muted-foreground">
-          Hatályos: 2025. január 1. · GDPR (EU) 2016/679 szerint
+          Hatályos: 2026. január 1. · GDPR (EU) 2016/679 szerint
         </p>
 
         <Section title="1. Adatkezelő">
@@ -32,7 +32,7 @@ function PrivacyPage() {
             Székhely: 4029 Debrecen, Csapó utca 26. Fsz. 1. ajtó<br />
             Adószám: 32331486-2-09<br />
             Cégjegyzékszám: 09 09 036321<br />
-            (a továbbiakban: „mi", „AZKOMOLY"). Kapcsolat:{" "}
+            Kapcsolat:{" "}
             <a href="mailto:azkomoly.hu@gmail.com" className="text-fire underline">
               azkomoly.hu@gmail.com
             </a>
@@ -43,8 +43,10 @@ function PrivacyPage() {
           <ul className="list-disc pl-6 space-y-1">
             <li>Név</li>
             <li>Email cím</li>
-            <li>Telefonszám és országhívó (opcionális)</li>
-            <li>Időbélyeg és forrás (pl. landing oldal)</li>
+            <li>Telefonszám és országhívó (opcionális, feliratkozásnál)</li>
+            <li>Szállítási és számlázási cím (rendelésnél)</li>
+            <li>Fizetési adatok (kizárólag a Shopify fizetési rendszerén keresztül — mi ezeket nem tároljuk)</li>
+            <li>Időbélyeg és forrás (pl. doboznyitó játék, landing oldal)</li>
             <li>Sütikből származó technikai adatok (lásd Süti szabályzat)</li>
           </ul>
         </Section>
@@ -52,12 +54,15 @@ function PrivacyPage() {
         <Section title="3. Az adatkezelés célja és jogalapja">
           <ul className="list-disc pl-6 space-y-2">
             <li>
+              <strong>Rendelések teljesítése</strong> — szerződés teljesítése (GDPR 6. cikk (1) b)).
+            </li>
+            <li>
               <strong>Várólista kezelése</strong> — hozzájárulás alapján (GDPR 6. cikk (1) a)).
             </li>
             <li>
-              <strong>Marketing kommunikáció</strong> — termékindítás, ajánlatok, hírlevelek
-              küldése. Jogalap: <em>kifejezett hozzájárulás</em>. Bármikor visszavonható az
-              email-ben található „leiratkozás" linkre kattintva, vagy az{" "}
+              <strong>Marketing kommunikáció</strong> — termékindítás, ajánlatok, hírlevelek küldése.
+              Jogalap: <em>kifejezett hozzájárulás</em>. Bármikor visszavonható az emailben
+              található „leiratkozás" linkre kattintva, vagy az{" "}
               <a href="mailto:azkomoly.hu@gmail.com" className="text-fire underline">
                 azkomoly.hu@gmail.com
               </a>{" "}
@@ -71,14 +76,16 @@ function PrivacyPage() {
 
         <Section title="4. Megőrzési idő">
           <p>
-            Adataidat a hozzájárulásod visszavonásáig, illetve legfeljebb a feliratkozástól számított
-            5 évig őrizzük. Visszavonás után az adatok 30 napon belül törlésre kerülnek.
+            Rendelési adatokat a vonatkozó számviteli és adójogi kötelezettségek szerint, legalább
+            8 évig őrizzük. Feliratkozási adatokat a hozzájárulás visszavonásáig, legfeljebb 5 évig.
+            Visszavonás után az adatok 30 napon belül törlésre kerülnek.
           </p>
         </Section>
 
         <Section title="5. Adatfeldolgozók">
           <ul className="list-disc pl-6 space-y-1">
-            <li>Supabase Inc. — adatbázis és autentikáció</li>
+            <li>Shopify Inc. — webáruház platform, rendeléskezelés, fizetési feldolgozás</li>
+            <li>Supabase Inc. — adatbázis (várólista, feliratkozók)</li>
             <li>Google LLC — Google Sheets (lista kezelése)</li>
             <li>Tárhely- és infrastruktúra-szolgáltatók (EU/USA, SCC alapján)</li>
           </ul>
@@ -108,7 +115,8 @@ function PrivacyPage() {
         <Section title="7. Biztonság">
           <p>
             Megfelelő technikai és szervezési intézkedéseket alkalmazunk (titkosított kapcsolat,
-            jogosultságkezelés, RLS) adataid védelmére.
+            jogosultságkezelés, hozzáférés-korlátozás) adataid védelmére. A fizetési adatokat
+            kizárólag a PCI-DSS tanúsítvánnyal rendelkező Shopify rendszere kezeli.
           </p>
         </Section>
 
@@ -118,7 +126,7 @@ function PrivacyPage() {
             <a href="mailto:azkomoly.hu@gmail.com" className="text-fire underline">
               azkomoly.hu@gmail.com
             </a>{" "}
-            címre.
+            címre. Kérésedre 30 napon belül válaszolunk.
           </p>
         </Section>
       </article>
