@@ -19,6 +19,8 @@ export function ScrubBackdrop({ children }: { children: ReactNode }) {
               alt=""
               className="absolute inset-0 w-full h-full object-cover"
               draggable={false}
+              fetchPriority="high"
+              decoding="sync"
             />
             <div className="absolute inset-0 bg-gradient-to-b from-dark-bg/40 via-dark-bg/20 to-dark-bg/70" />
           </div>

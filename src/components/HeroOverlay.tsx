@@ -30,17 +30,39 @@ export function HeroOverlay({ onCta }: { onCta: () => void }) {
   return (
     <section className="relative h-screen w-full overflow-hidden">
       <div
-        className="absolute inset-x-0 top-1/2 flex flex-col items-center gap-4 px-6 text-center z-10"
+        className="absolute inset-x-0 top-1/2 flex flex-col items-center gap-5 px-6 text-center z-10"
         style={{ transform: `translateY(calc(-50% + ${hp * 55}px))` }}
       >
+        {/* Kicker */}
+        <p className="font-sans text-[9px] tracking-[0.55em] text-white/40 uppercase">
+          {t.hero.est} · {t.hero.mysteryBox}
+        </p>
+
+        {/* Giant outline question mark — the brand icon */}
+        <div
+          className="font-display leading-[0.85] select-none pointer-events-none"
+          style={{
+            fontSize: "clamp(7rem, 25vw, 15rem)",
+            color: "transparent",
+            WebkitTextStroke: "2px oklch(0.78 0.17 70 / 0.85)",
+            filter:
+              "drop-shadow(0 0 40px oklch(0.78 0.17 70 / 0.5)) drop-shadow(0 0 80px oklch(0.78 0.17 70 / 0.2))",
+            animation: "pulse-glow 3s ease-in-out infinite",
+          }}
+        >
+          ?
+        </div>
+
+        {/* CTA */}
         <button
           onClick={scrollToProducts}
-          className="bg-fire text-primary-foreground font-display text-2xl sm:text-3xl px-12 py-4 graffiti-border hover:translate-y-[-2px] transition-transform pulse-glow"
-          style={{ textShadow: "0 0 12px rgba(0,0,0,0.5)" }}
+          className="bg-fire text-primary-foreground font-display text-2xl sm:text-3xl px-12 py-4 graffiti-border hover:translate-y-[-3px] transition-transform"
+          style={{ textShadow: "0 0 12px rgba(0,0,0,0.6)" }}
         >
           {t.hero.cta}
         </button>
-        <span className="font-sans text-[10px] tracking-[0.45em] text-white/35 mt-1">
+
+        <span className="font-sans text-[9px] tracking-[0.5em] text-white/30">
           {t.hero.scroll} ↓
         </span>
       </div>

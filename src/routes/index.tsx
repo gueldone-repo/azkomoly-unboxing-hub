@@ -4,12 +4,11 @@ import { useServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { appendLeadToSheet } from "@/lib/leads.functions";
-import { Instagram, Facebook, Youtube, ShieldCheck, Truck, Sparkles, RefreshCcw } from "lucide-react";
+import { Instagram, Facebook, Youtube, ShieldCheck, Truck, Sparkles } from "lucide-react";
 import { CookieBanner } from "@/components/CookieBanner";
 import { ScrubBackdrop } from "@/components/ScrubBackdrop";
 import { HeroOverlay } from "@/components/HeroOverlay";
 import { BoxSpinner } from "@/components/BoxSpinner";
-import { PromoBanner } from "@/components/shop/PromoBanner";
 import { ProductCard } from "@/components/shop/ProductCard";
 import { SocialProof } from "@/components/shop/SocialProof";
 import { LanguageToggle } from "@/components/LanguageToggle";
@@ -99,6 +98,23 @@ function Landing() {
     return () => clearTimeout(t);
   }, []);
 
+  useEffect(() => {
+    const els = document.querySelectorAll("[data-reveal]");
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) {
+            e.target.classList.add("in-view");
+            io.unobserve(e.target);
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
+    els.forEach((el) => io.observe(el));
+    return () => io.disconnect();
+  }, []);
+
   function closeBox() {
     sessionStorage.setItem("azkomoly-box-seen", "1");
     setBoxVisible(false);
@@ -110,7 +126,6 @@ function Landing() {
 
       <ScrubBackdrop>
         <HeroOverlay onCta={() => setOpen(true)} />
-        <PromoBanner />
         <ProductsSection />
       </ScrubBackdrop>
       <LifestyleStrip />
@@ -186,7 +201,7 @@ function ProductsSection() {
       className="relative bg-gradient-to-b from-transparent via-background/60 to-background"
     >
       <div className="mx-auto max-w-7xl px-6 py-20">
-        <div className="flex items-end justify-between flex-wrap gap-4 mb-10">
+        <div data-reveal className="flex items-end justify-between flex-wrap gap-4 mb-10">
           <div>
             <p className="font-sans text-xs tracking-[0.35em] text-fire mb-2">
               {t.products.kicker}
@@ -195,9 +210,6 @@ function ProductsSection() {
               {t.products.heading}
             </h2>
           </div>
-          <p className="font-sans text-sm text-foreground/60 max-w-sm">
-            {t.products.sub}
-          </p>
         </div>
         {loading ? (
           <>
@@ -241,29 +253,6 @@ function ProductsSection() {
   );
 }
 
-function RevealOutro() {
-  const t = useT();
-  return (
-    <section className="relative min-h-[90vh] flex items-center justify-center px-6 text-center">
-      {/* Transparent so the now-sealed box (final frame) is fully visible. */}
-      <div className="max-w-xl [text-shadow:0_2px_18px_rgba(0,0,0,0.85)]">
-        <p className="font-sans text-xs tracking-[0.4em] text-fire mb-4">
-          {t.reveal.kicker}
-        </p>
-        <h2 className="font-display text-5xl sm:text-7xl text-white leading-[0.95]">
-          {t.reveal.heading}
-        </h2>
-        <p className="font-sans text-base text-white/85 mt-4">{t.reveal.sub}</p>
-        <a
-          href="#termekek"
-          className="mt-8 inline-block bg-fire text-primary-foreground font-display text-lg sm:text-xl px-8 py-4 graffiti-border hover:translate-y-[-2px] transition-transform"
-        >
-          {t.reveal.cta}
-        </a>
-      </div>
-    </section>
-  );
-}
 
 const LIFESTYLE_PHOTOS = [
   "/Outfit_reveal_vertical_box_202606092123.jpeg",
@@ -290,14 +279,16 @@ function LifestyleStrip() {
           {all.map((src, i) => (
             <div
               key={i}
-              className="shrink-0 h-64 w-48 overflow-hidden border border-cardboard/25 hover:border-fire/60 transition-colors"
+              className="shrink-0 h-64 w-48 overflow-hidden border border-cardboard/25 hover:border-fire/60 transition-colors duration-300"
               style={{ aspectRatio: "3/4" }}
             >
               <img
                 src={src}
                 alt=""
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
                 draggable={false}
+                loading="lazy"
+                decoding="async"
               />
             </div>
           ))}
@@ -309,21 +300,24 @@ function LifestyleStrip() {
 
 function ValueProps() {
   const t = useT();
-  const icons = [ShieldCheck, Sparkles, Truck, RefreshCcw];
+  const icons = [ShieldCheck, Sparkles, Truck];
   return (
-    <section className="bg-dark-bg border-y border-cardboard/30 py-14">
-      <div className="mx-auto max-w-7xl px-6 grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+    <section className="bg-dark-bg border-y border-cardboard/20 py-16">
+      <div className="mx-auto max-w-4xl px-6 grid sm:grid-cols-3 gap-px bg-cardboard/20">
         {t.values.items.map((item, i) => {
           const Icon = icons[i];
           return (
-            <div key={item.title} className="flex gap-4 items-start">
-              <span className="shrink-0 grid place-items-center h-12 w-12 border-2 border-fire/60 text-fire">
-                <Icon className="h-6 w-6" />
+            <div
+              key={item.title}
+              data-reveal
+              data-delay={String(i + 1)}
+              className="flex flex-col items-center text-center p-8 bg-dark-bg group hover:bg-fire/5 transition-colors duration-300"
+            >
+              <span className="grid place-items-center h-14 w-14 border-2 border-fire/50 text-fire mb-5 group-hover:border-fire group-hover:bg-fire/10 transition-all duration-300">
+                <Icon className="h-7 w-7" />
               </span>
-              <div>
-                <h3 className="font-display text-lg text-foreground tracking-wider">{item.title}</h3>
-                <p className="font-sans text-sm text-foreground/70 mt-1">{item.text}</p>
-              </div>
+              <h3 className="font-display text-xl text-foreground tracking-wider mb-2">{item.title}</h3>
+              <p className="font-sans text-sm text-foreground/60 leading-relaxed">{item.text}</p>
             </div>
           );
         })}
@@ -336,21 +330,33 @@ function HowItWorks() {
   const t = useT();
   return (
     <section id="hogyan" className="bg-background">
-      <div className="mx-auto max-w-7xl px-6 py-20">
-        <p className="font-sans text-xs tracking-[0.35em] text-fire mb-2 text-center">
-          {t.how.kicker}
-        </p>
-        <h2 className="font-display text-4xl sm:text-5xl text-foreground text-center mb-12">
-          {t.how.heading}
-        </h2>
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
-          {t.how.steps.map((s) => (
-            <div key={s.n} className="relative bg-dark-bg border-2 border-cardboard/50 p-6 hover:border-fire transition-colors">
-              <span className="absolute -top-5 -left-2 font-display text-6xl text-fire/30 leading-none">
+      <div className="mx-auto max-w-7xl px-6 py-24">
+        <div data-reveal className="text-center mb-14">
+          <p className="font-sans text-xs tracking-[0.4em] text-fire mb-3">
+            {t.how.kicker}
+          </p>
+          <h2 className="font-display text-4xl sm:text-6xl text-foreground">
+            {t.how.heading}
+          </h2>
+        </div>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {t.how.steps.map((s, i) => (
+            <div
+              key={s.n}
+              data-reveal
+              data-delay={String(i + 1)}
+              className="relative bg-dark-bg border border-cardboard/30 p-7 overflow-hidden group hover:border-fire/70 hover:-translate-y-1 transition-all duration-300"
+            >
+              {/* Watermark number */}
+              <span className="absolute -bottom-3 -right-1 font-display leading-none text-fire/6 select-none pointer-events-none"
+                style={{ fontSize: "7rem" }}>
                 {s.n}
               </span>
-              <h3 className="font-display text-2xl text-foreground mt-6">{s.title}</h3>
-              <p className="font-sans text-sm text-foreground/70 mt-2 leading-relaxed">{s.text}</p>
+              <span className="font-sans text-[10px] tracking-[0.4em] text-fire block mb-4">
+                {s.n}
+              </span>
+              <h3 className="font-display text-2xl text-foreground mb-2">{s.title}</h3>
+              <p className="font-sans text-sm text-foreground/60 leading-relaxed">{s.text}</p>
             </div>
           ))}
         </div>
@@ -397,26 +403,51 @@ function BigCTA({ onCta }: { onCta: () => void }) {
   );
 }
 
+function FAQItem({ q, a }: { q: string; a: string }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className={`border ${open ? "border-fire/60 bg-fire/5" : "border-cardboard/30 bg-dark-bg"} transition-all duration-300`}>
+      <button
+        className="w-full flex items-center justify-between p-5 text-left gap-4"
+        onClick={() => setOpen(!open)}
+      >
+        <span className="font-display text-lg text-foreground">{q}</span>
+        <span
+          className="shrink-0 font-display text-2xl text-fire transition-transform duration-300"
+          style={{ transform: open ? "rotate(45deg)" : "rotate(0deg)" }}
+        >
+          +
+        </span>
+      </button>
+      <div
+        style={{
+          maxHeight: open ? "600px" : "0",
+          overflow: "hidden",
+          transition: "max-height 0.4s ease-in-out",
+        }}
+      >
+        <p className="px-5 pb-5 font-sans text-sm text-foreground/75 leading-relaxed">{a}</p>
+      </div>
+    </div>
+  );
+}
+
 function FAQSection() {
   const t = useT();
   return (
     <section id="gyik" className="bg-background">
-      <div className="mx-auto max-w-3xl px-6 py-20">
-        <p className="font-sans text-xs tracking-[0.35em] text-fire mb-2 text-center">
-          {t.faq.kicker}
-        </p>
-        <h2 className="font-display text-4xl sm:text-5xl text-foreground text-center mb-10">
-          {t.faq.heading}
-        </h2>
-        <div className="space-y-3">
+      <div className="mx-auto max-w-3xl px-6 py-24">
+        <div data-reveal className="text-center mb-12">
+          <p className="font-sans text-xs tracking-[0.4em] text-fire mb-3">
+            {t.faq.kicker}
+          </p>
+          <h2 className="font-display text-4xl sm:text-5xl text-foreground">
+            {t.faq.heading}
+          </h2>
+        </div>
+        <div className="space-y-2" data-reveal data-delay="1">
           {t.faq.items.map((f) => (
-            <details key={f.q} className="group bg-dark-bg border-2 border-cardboard/40 hover:border-fire/60 transition-colors">
-              <summary className="cursor-pointer list-none flex items-center justify-between p-5">
-                <span className="font-display text-lg text-foreground">{f.q}</span>
-                <span className="font-display text-2xl text-fire group-open:rotate-45 transition-transform">+</span>
-              </summary>
-              <p className="px-5 pb-5 font-sans text-sm text-foreground/80 leading-relaxed">{f.a}</p>
-            </details>
+            <FAQItem key={f.q} q={f.q} a={f.a} />
           ))}
         </div>
       </div>

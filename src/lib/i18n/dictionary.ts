@@ -187,7 +187,7 @@ const hu: Dict = {
     mysteryBox: "MYSTERY · BOX",
     tagline: "Márkás ruhák. Véletlenszerű tartalom. Nevetséges áron.",
     scroll: "GÖRGESS",
-    cta: "AKAROM KINYITNI A DOBOZT →",
+    cta: "KINYITOM A DOBOZOM →",
   },
   promo: {
     live: "DROP #002 · ÉLŐBEN",
@@ -249,8 +249,7 @@ const hu: Dict = {
     items: [
       { title: "TOTÁLIS TITOK", text: "Nem tudod, mi van benne. Ez a lényeg. Amit kapsz, azt kapsz." },
       { title: "BÁRMI LEHET", text: "Ruhák, kiegészítők, kütyük, különlegességek. Nem csak ruha." },
-      { title: "GYORS SZÁLLÍTÁS", text: "2–4 munkanap egész Magyarországon. Foxpost / GLS." },
-      { title: "14 NAP GARANCIA", text: "Ha sérülten érkezik, cseréljük. A meglepetés viszont marad." },
+      { title: "GYORS SZÁLLÍTÁS", text: "A dobozod gyorsan megérkezik. Csomagold ki, ne várj." },
     ],
   },
   reviews: [
@@ -266,7 +265,7 @@ const hu: Dict = {
     steps: [
       { n: "01", title: "VÁLASSZ DOBOZT", text: "Mini, Klasszikus, Prémium vagy Legendás. Te döntöd el a tétet." },
       { n: "02", title: "FIZESS", text: "Bankkártya, Apple Pay, Google Pay. 2 perc az egész." },
-      { n: "03", title: "VÁRJ 2–4 NAPOT", text: "Becsomagoljuk, elküldjük, jön a postás." },
+      { n: "03", title: "VÁRJ", text: "Dőlj hátra. A dobozod úton van hozzád." },
       { n: "04", title: "NYISD KI", text: "Vedd fel kamerával. Posztold. Címkézz be minket." },
     ],
   },
@@ -281,10 +280,12 @@ const hu: Dict = {
     heading: "Még valami?",
     items: [
       { q: "Mi van a dobozban?", a: "Ezt nem tudhatod előre — ez a lényeg. Ruhák, kiegészítők, kütyük, meglepetések. Bármi lehet. A titok nem spoilerezhető." },
-      { q: "Választhatok méretet?", a: "Ruháknál igen — a vásárlás során megadod a méreted (S–XL). Más termékek esetén a méret nem releváns." },
-      { q: "Mi van, ha sérülten érkezik?", a: "Ha valami sérülten érkezik, cseréljük. Egyébként a meglepetés nem visszaváltható — tudtad, hogy random. Ez a játék." },
-      { q: "Mennyi a szállítás?", a: "Foxpost: 1490 Ft. GLS házhoz: 1990 Ft. 20.000 Ft feletti rendelés ingyenes." },
-      { q: "Mikor érkeznek új dobozok?", a: "Minden vasárnap 20:00-kor új drop. Iratkozz fel, hogy elsőként szólj." },
+      { q: "Választhatok méretet?", a: "Sajnos a méret előre nem választható — ez a mystery box természetéből adódik. Amit ígérünk: csak minőségi, új termékek kerülnek a dobozba. Ha egy ruha mégsem lenne a te méreted, az tökéletes darab lehet ajándéknak, vagy add tovább Vinteden vagy Vaterán — ezek a termékek mind újak, így könnyen el lehet őket adni." },
+      { q: "Mi van, ha sérülten érkezik?", a: "Általában a termékek hibátlan állapotban érkeznek, de ha mégis valami sérülten kerülne hozzád, azonnal vedd fel a kapcsolatot ügyfélszolgálatunkkal és megoldjuk." },
+      { q: "Mennyi ideig tart a szállítás?", a: "Általában 2–3 munkanap, de a kézbesítési vállalattól függően legfeljebb egy hétig tarthat. Mindig a legmegbízhatóbb megoldást választjuk." },
+      { q: "Honnan származnak a termékek?", a: "Termékeink nem átvett, visszaküldött és túlkészletezett csomagokból származnak, amelyek eredetileg olyan nagy webáruházakban kerültek értékesítésre, mint a Shein, Temu, Amazon és más e-kereskedelmi platformok. Ezeket a vegyes tételeket gondosan válogatjuk össze, és a bennük lévő termékekből hozzuk létre Mystery Boxainkat. Mivel minden szállítmány különböző, minden doboz egyedi — ez teszi az unboxingot izgalmassá és kiszámíthatatlanná. Azzal, hogy ezeknek a termékeknek második esélyt adunk, a pazarlás csökkentéséhez és a fenntarthatóbb e-kereskedelem támogatásához is hozzájárulunk." },
+      { q: "Mi van, ha nem tetszik a termék?", a: "Biztosak vagyunk benne, hogy imádni fogod — de ha mégsem, lépj kapcsolatba ügyfélszolgálatunkkal és megtaláljuk a legjobb megoldást." },
+      { q: "Melyik futárszolgálat szállítja a csomagot?", a: "Ez attól függ, hogy házhoz kéred vagy csomagpontra. Mindig a legjobb elérhető megoldást választjuk, és ha csomagpontra megy, mindig a hozzád legközelebbi pontot jelöljük ki." },
     ],
   },
   footer: {
@@ -459,8 +460,7 @@ const en: Dict = {
     items: [
       { title: "TOTAL MYSTERY", text: "You don't know what's inside. That's the whole point. What you get, you get." },
       { title: "ANYTHING INSIDE", text: "Clothes, accessories, gadgets, collectibles. All kinds of stuff." },
-      { title: "FAST SHIPPING", text: "2–4 business days across Hungary. Foxpost / GLS." },
-      { title: "14-DAY GUARANTEE", text: "Damaged on arrival? We replace it. The surprise, however, stays." },
+      { title: "FAST SHIPPING", text: "Your box arrives fast. No waiting around — just open it." },
     ],
   },
   reviews: [
@@ -476,7 +476,7 @@ const en: Dict = {
     steps: [
       { n: "01", title: "PICK A BOX", text: "Mini, Classic, Premium or Legendary. You set the stake." },
       { n: "02", title: "PAY", text: "Card, Apple Pay, Google Pay. Takes 2 minutes." },
-      { n: "03", title: "WAIT 2–4 DAYS", text: "We pack it, ship it, the courier comes." },
+      { n: "03", title: "WAIT", text: "Sit back. Your box is on its way." },
       { n: "04", title: "OPEN IT", text: "Film it. Post it. Tag us." },
     ],
   },
@@ -491,10 +491,12 @@ const en: Dict = {
     heading: "Anything else?",
     items: [
       { q: "What's in the box?", a: "That's exactly what you can't know upfront. Clothes, accessories, gadgets, random finds — anything goes. The unknown is the whole point." },
-      { q: "Can I choose my size?", a: "For clothing items, yes — you pick your size (S–XL) during checkout. For other items, size isn't a factor." },
-      { q: "What if something arrives damaged?", a: "Damaged on arrival? We replace it. Otherwise, the mystery is non-refundable — you knew it was random. That's the game." },
-      { q: "How much is shipping?", a: "Foxpost: 1490 HUF. GLS to your door: 1990 HUF. Free over 20,000 HUF." },
-      { q: "When do new boxes drop?", a: "New drop every Sunday at 8 PM. Subscribe to be the first to know." },
+      { q: "Can I choose my size?", a: "Unfortunately, size selection isn't possible — that's part of the mystery box experience. What we can promise is that every item inside is brand new and good quality. If a clothing piece isn't your size, it makes a great gift, or you can easily resell it on Vinted or similar platforms — since everything is new, it goes fast." },
+      { q: "What if something arrives damaged?", a: "Items almost always arrive in perfect condition. But if something does arrive damaged, just reach out to our customer support team and we'll sort it out straight away." },
+      { q: "How long does shipping take?", a: "Usually 2–3 business days, but depending on the delivery company it can take up to a week. We always choose the most reliable option available." },
+      { q: "Where are the products from?", a: "Our products come from unclaimed, returned, and overstock parcels originally sold by major online retailers such as Shein, Temu, Amazon, and other e-commerce platforms. These parcels may include orders that were never collected, deliveries that could not be completed, customer returns, or excess inventory. Instead of being discarded, the items are grouped into bulk containers and resold through liquidation channels. We carefully source these mixed lots and create our Mystery Boxes from the products inside. Because every shipment is different, each Mystery Box contains a unique selection of items, making every unboxing experience exciting and unpredictable. By giving these products a second chance, we also help reduce waste and support a more sustainable approach to e-commerce." },
+      { q: "What if I don't like my product?", a: "We're confident you'll love what's inside — but if you don't, reach out to our customer support team and we'll find the best solution for you." },
+      { q: "Which delivery company will bring my order?", a: "It depends on whether you choose home delivery or a pickup point. Either way, we always select the best available option — and if it's a pickup point, we assign the one closest to your address." },
     ],
   },
   footer: {
