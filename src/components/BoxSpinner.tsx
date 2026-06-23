@@ -1,7 +1,9 @@
 import { useState, useEffect, type FormEvent } from "react";
+import { useServerFn } from "@tanstack/react-start";
 import { useT } from "@/lib/i18n";
 import { useShopifyCart } from "@/lib/shopify/cart-store";
 import { fetchShopifyDiscountCodes, type DiscountCode } from "@/lib/shopify/discounts.functions";
+import { appendLeadToSheet } from "@/lib/leads.functions";
 import { supabase } from "@/integrations/supabase/client";
 
 const FALLBACK_CODES: DiscountCode[] = [
@@ -25,6 +27,7 @@ export function BoxSpinner({ onClose }: { onClose: () => void }) {
   const [submitting, setSubmitting] = useState(false);
   const t = useT();
   const setDiscountCode = useShopifyCart((s) => s.setDiscountCode);
+  const appendToSheet = useServerFn(appendLeadToSheet);
 
   useEffect(() => {
     fetchShopifyDiscountCodes().then((codes) => {
@@ -45,15 +48,25 @@ export function BoxSpinner({ onClose }: { onClose: () => void }) {
     e.preventDefault();
     if (!name.trim() || !email.trim() || submitting) return;
     setSubmitting(true);
+    const trimmedName = name.trim();
+    const loweredEmail = email.trim().toLowerCase();
     try {
       await supabase.from("azkomoly_leads").insert({
-        name: name.trim(),
-        email: email.trim().toLowerCase(),
+        name: trimmedName,
+        email: loweredEmail,
         source: "box_spinner",
       });
     } catch {
       // non-blocking — reveal code even if save fails
     }
+    appendToSheet({
+      data: {
+        name: trimmedName,
+        email: loweredEmail,
+        countryCode: null,
+        phone: null,
+      },
+    }).catch((err) => console.error("Sheet append error", err));
     if (chosen !== null) setDiscountCode(boxCodes[chosen].code);
     setPhase("revealed");
     setSubmitting(false);
