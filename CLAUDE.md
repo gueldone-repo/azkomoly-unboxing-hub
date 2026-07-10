@@ -80,6 +80,13 @@ Built for Diego (GUELDONE Agency). Path: `C:\Users\Mariana\Desktop\GUELDOEN\AZKO
 - Adószám: 32331486-2-09 · Cégjegyzékszám: 09 09 036321
 - Email: azkomoly.hu@gmail.com
 
+### Arquitectura de dominios (IMPORTANTE — dos sitios distintos)
+El front (este repo, hecho con Lovable + Storefront API) y el checkout de Shopify **viven en dos dominios separados** porque no se pudieron conectar ambos al mismo dominio raíz sin romper el DNS:
+- **`azkomoly.hu`** → este repo (TanStack Start). Landing, catálogo, carrito custom.
+- **`checkout.azkomoly.hu`** → checkout nativo de Shopify (dominio propio apuntado por CNAME al checkout de Shopify, no a este código). El botón de checkout de `CartSheet.tsx` redirige ahí con el `checkoutUrl` de Shopify + `discountCode`.
+- Este repo **no controla ni puede inyectar código** en `checkout.azkomoly.hu` — es una página servida por Shopify. Cualquier tracking/analytics ahí (Clarity, GA, Meta Pixel, etc.) se configura desde **Shopify Admin**, no desde este código.
+- Shopify bloquea scripts custom inyectados en checkout salvo plan Plus. La única vía soportada en cualquier plan es instalar la **app oficial del proveedor** desde el Shopify App Store (usa el Web Pixel nativo de Shopify, que sí tiene permiso de correr en checkout + thank-you page).
+
 ---
 
 ## Hero
@@ -106,6 +113,14 @@ Built for Diego (GUELDONE Agency). Path: `C:\Users\Mariana\Desktop\GUELDOEN\AZKO
 | `Outfit_reveal_vertical_box_…`, `Unboxing_…`, `Hands_…` | LifestyleStrip marquee |
 
 > Filenames con `…` (U+2026) son literales.
+
+---
+
+## Analytics
+
+- **Microsoft Clarity** (storefront, `azkomoly.hu`): Project ID `xkb7njvdoh`. Carga vía `src/lib/analytics/clarity.ts` → `initClarity()`. **Gateado por consentimiento** — solo se dispara si `CookieBanner` tiene `analytics: true` guardado (`localStorage` key `azkomoly_cookie_consent_v1`, ver `getStoredConsent()` en `src/components/CookieBanner.tsx`). Se llama en dos lugares: `RootComponent` en `__root.tsx` (mount, si ya había consentimiento previo) y dentro de `CookieBanner.save()` (al aceptar en el momento). **NO** volver a poner el snippet de Clarity directo en `head()`/`scripts` de la ruta raíz — eso lo cargaría sin importar el consentimiento (rompe GDPR).
+- **Checkout de Shopify** (`checkout.azkomoly.hu`): NO se puede trackear desde este repo (ver arquitectura de dominios arriba). Para trackear ahí, instalar la app oficial **"Microsoft Clarity: AI Insights"** desde el Shopify App Store y conectarla al mismo proyecto de Clarity — usa el Web Pixel nativo de Shopify, funciona en cualquier plan.
+- `CookieBanner` (`src/components/CookieBanner.tsx`) solo se renderiza en `/` (`index.tsx`) hoy, no en `/shop/$slug` ni en las páginas legales — pendiente de decisión si debe ir global.
 
 ---
 

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { useT } from "@/lib/i18n";
+import { initClarity } from "@/lib/analytics/clarity";
 
 const STORAGE_KEY = "azkomoly_cookie_consent_v1";
 
@@ -42,6 +43,7 @@ export function CookieBanner() {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(full));
     } catch {}
+    if (full.analytics) initClarity();
     setVisible(false);
   }
 

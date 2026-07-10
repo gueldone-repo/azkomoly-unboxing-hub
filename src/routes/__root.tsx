@@ -14,6 +14,8 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { I18nProvider, readLangCookie } from "../lib/i18n";
 import { CartSheet } from "../components/cart/CartSheet";
 import { useCartSync } from "../hooks/useCartSync";
+import { getStoredConsent } from "../components/CookieBanner";
+import { initClarity } from "../lib/analytics/clarity";
 
 function NotFoundComponent() {
   return (
@@ -99,15 +101,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         href: appCss,
       },
     ],
-    scripts: [
-      {
-        children: `(function(c,l,a,r,i,t,y){
-        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-    })(window, document, "clarity", "script", "xkb7njvdoh");`,
-      },
-    ],
   }),
   shellComponent: RootShell,
   component: RootComponent,
@@ -132,6 +125,10 @@ function RootShell({ children }: { children: ReactNode }) {
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   useCartSync();
+
+  useEffect(() => {
+    if (getStoredConsent()?.analytics) initClarity();
+  }, []);
 
   return (
     <QueryClientProvider client={queryClient}>
