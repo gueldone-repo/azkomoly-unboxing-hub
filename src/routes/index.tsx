@@ -8,7 +8,6 @@ import { Instagram, Facebook, Youtube, ShieldCheck, Truck, Sparkles } from "luci
 import { CookieBanner } from "@/components/CookieBanner";
 import { ScrubBackdrop } from "@/components/ScrubBackdrop";
 import { HeroOverlay } from "@/components/HeroOverlay";
-import { BoxSpinner } from "@/components/BoxSpinner";
 import { ProductCard } from "@/components/shop/ProductCard";
 import { SocialProof } from "@/components/shop/SocialProof";
 import { LanguageToggle } from "@/components/LanguageToggle";
@@ -89,14 +88,9 @@ const signupSchema = z.object({
 
 function Landing() {
   const [open, setOpen] = useState(false);
-  const [boxVisible, setBoxVisible] = useState(false);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    if (sessionStorage.getItem("azkomoly-box-seen")) return;
-    const t = setTimeout(() => setBoxVisible(true), 1800);
-    return () => clearTimeout(t);
-  }, []);
+  // BoxSpinner popup disabled for now — will come back rebuilt on
+  // https://headlessui.com/react/dialog. Keep closeBox/boxVisible plumbing
+  // removed rather than dead-code so nothing half-fires in the meantime.
 
   useEffect(() => {
     const els = document.querySelectorAll("[data-reveal]");
@@ -114,11 +108,6 @@ function Landing() {
     els.forEach((el) => io.observe(el));
     return () => io.disconnect();
   }, []);
-
-  function closeBox() {
-    sessionStorage.setItem("azkomoly-box-seen", "1");
-    setBoxVisible(false);
-  }
 
   return (
     <main className="relative min-h-screen bg-background text-foreground">
@@ -139,7 +128,6 @@ function Landing() {
       </div>
 
       <SignupDialog open={open} onOpenChange={setOpen} />
-      {boxVisible && <BoxSpinner onClose={closeBox} />}
       <CookieBanner />
     </main>
   );
