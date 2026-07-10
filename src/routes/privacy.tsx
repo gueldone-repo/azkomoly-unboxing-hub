@@ -23,110 +23,207 @@ function PrivacyPage() {
         </Link>
         <h1 className="font-display text-fire text-4xl sm:text-5xl">ADATVÉDELMI TÁJÉKOZTATÓ</h1>
         <p className="font-sans text-sm text-muted-foreground">
-          Hatályos: 2026. január 1. · GDPR (EU) 2016/679 szerint
+          Hatályba lépés dátuma: 2026. július 10.
         </p>
 
-        <Section title="1. Adatkezelő">
+        <Section title="1. Bevezetés">
           <p>
-            <strong>Oscar Investments Kft.</strong><br />
-            Székhely: 4029 Debrecen, Csapó utca 26. Fsz. 1. ajtó<br />
+            A(z) Oscar Investments Kft. (a továbbiakban: Adatkezelő) elkötelezett a
+            felhasználók és vásárlók magánéletének védelme és a személyes adatok
+            jogszabályoknak megfelelő kezelése mellett. Jelen Adatkezelési Tájékoztató célja,
+            hogy részletesen bemutassa, miként gyűjtjük, tároljuk és használjuk fel az Ön
+            adatait az azkomoly.hu webáruház (a továbbiakban: Webshop) használata, valamint a
+            mystery box termékek vásárlása során.
+          </p>
+          <p className="mt-2">
+            Az Adatkezelő a személyes adatokat a mindenkori hatályos jogszabályoknak, így
+            különösen az Európai Parlament és a Tanács (EU) 2016/679 rendeletének (GDPR),
+            valamint az információs önrendelkezési jogról és az információszabadságról szóló
+            2011. évi CXII. törvénynek (Infotörvény) megfelelően kezeli.
+          </p>
+        </Section>
+
+        <Section title="2. Az Adatkezelő adatai">
+          <p>
+            Név / Cégnév: Oscar Investments Kft.<br />
+            Székhely: 4029 Debrecen Csapó utca 26. Fsz. 1. ajtó<br />
+            Cégjegyzékszám / Nyilvántartási szám: 0909035321<br />
             Adószám: 32331486-2-09<br />
-            Cégjegyzékszám: 09 09 036321<br />
-            Kapcsolat:{" "}
+            E-mail cím:{" "}
             <a href="mailto:azkomoly.hu@gmail.com" className="text-fire underline">
               azkomoly.hu@gmail.com
+            </a>
+            <br />
+            Weboldal:{" "}
+            <a
+              href="https://azkomoly.hu"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-fire underline"
+            >
+              https://azkomoly.hu
             </a>
           </p>
         </Section>
 
-        <Section title="2. Milyen adatokat gyűjtünk">
-          <ul className="list-disc pl-6 space-y-1">
-            <li>Név</li>
-            <li>Email cím</li>
-            <li>Telefonszám és országhívó (opcionális, feliratkozásnál)</li>
-            <li>Szállítási és számlázási cím (rendelésnél)</li>
-            <li>Fizetési adatok (kizárólag a Shopify fizetési rendszerén keresztül — mi ezeket nem tároljuk)</li>
-            <li>Időbélyeg és forrás (pl. doboznyitó játék, landing oldal)</li>
-            <li>Sütikből származó technikai adatok (lásd Süti szabályzat)</li>
-          </ul>
-        </Section>
-
-        <Section title="3. Az adatkezelés célja és jogalapja">
-          <ul className="list-disc pl-6 space-y-2">
-            <li>
-              <strong>Rendelések teljesítése</strong> — szerződés teljesítése (GDPR 6. cikk (1) b)).
-            </li>
-            <li>
-              <strong>Várólista kezelése</strong> — hozzájárulás alapján (GDPR 6. cikk (1) a)).
-            </li>
-            <li>
-              <strong>Marketing kommunikáció</strong> — termékindítás, ajánlatok, hírlevelek küldése.
-              Jogalap: <em>kifejezett hozzájárulás</em>. Bármikor visszavonható az emailben
-              található „leiratkozás" linkre kattintva, vagy az{" "}
-              <a href="mailto:azkomoly.hu@gmail.com" className="text-fire underline">
-                azkomoly.hu@gmail.com
-              </a>{" "}
-              címre küldött kéréssel.
-            </li>
-            <li>
-              <strong>Elemzés és termékfejlesztés</strong> — jogos érdek (GDPR 6. cikk (1) f)).
-            </li>
-          </ul>
-        </Section>
-
-        <Section title="4. Megőrzési idő">
+        <Section title="3. A kezelt adatok köre, célja, jogalapja és időtartama">
+          <p className="font-semibold">3.1. Webshopos vásárlás és megrendelés teljesítése</p>
           <p>
-            Rendelési adatokat a vonatkozó számviteli és adójogi kötelezettségek szerint, legalább
-            8 évig őrizzük. Feliratkozási adatokat a hozzájárulás visszavonásáig, legfeljebb 5 évig.
-            Visszavonás után az adatok 30 napon belül törlésre kerülnek.
+            A Webshopban történő mystery box vásárlás során az adatok megadása kötelező a
+            szerződés teljesítéséhez.
+          </p>
+          <p className="mt-2">
+            <strong>Kezelt adatok köre:</strong> Vezetéknév, keresztnév, számlázási cím,
+            szállítási cím (ha eltér), e-mail cím, telefonszám, a vásárolt termék adatai, a
+            fizetés módja.
+          </p>
+          <p className="mt-2">
+            <strong>Az adatkezelés célja:</strong> A megrendelés feldolgozása, a mystery box
+            összeállítása, szállítása, a fizetés lebonyolítása, a vásárlói kapcsolattartás,
+            valamint a számviteli kötelezettségek teljesítése.
+          </p>
+          <p className="mt-2">
+            <strong>Az adatkezelés jogalapja:</strong> Szerződés teljesítése [GDPR 6. cikk (1)
+            bek. b) pont], illetve jogi kötelezettség teljesítése (számlázás esetén) [GDPR 6.
+            cikk (1) bek. c) pont].
+          </p>
+          <p className="mt-2">
+            <strong>Az adatkezelés időtartama:</strong> A számviteli bizonylatokat a
+            Számvitelről szóló 2000. évi C. törvény 169. § (2) bekezdése alapján 8 évig köteles
+            megőrizni az Adatkezelő.
+          </p>
+
+          <p className="font-semibold mt-4">
+            3.2. Felhasználói fiók regisztráció (Opcionális)
+          </p>
+          <p>
+            <strong>Kezelt adatok köre:</strong> Név, e-mail cím, jelszó, korábbi vásárlások
+            előzményei.
+          </p>
+          <p className="mt-2">
+            <strong>Az adatkezelés célja:</strong> A vásárlás kényelmesebbé tétele, a
+            rendelések nyomon követése.
+          </p>
+          <p className="mt-2">
+            <strong>Az adatkezelés jogalapja:</strong> Az Ön önkéntes hozzájárulása [GDPR 6.
+            cikk (1) bek. a) pont].
+          </p>
+          <p className="mt-2">
+            <strong>Az adatkezelés időtartama:</strong> A fiók törléséig, vagy a hozzájárulás
+            visszavonásáig.
+          </p>
+
+          <p className="font-semibold mt-4">
+            3.3. Hírlevél és marketing célú megkeresések
+          </p>
+          <p>
+            <strong>Kezelt adatok köre:</strong> Név, e-mail cím.
+          </p>
+          <p className="mt-2">
+            <strong>Az adatkezelés célja:</strong> Akciókról, új mystery box dropokról,
+            exkluzív ajánlatokról és promóciókról szóló értesítések küldése.
+          </p>
+          <p className="mt-2">
+            <strong>Az adatkezelés jogalapja:</strong> Az Ön kifejezett és önkéntes
+            hozzájárulása [GDPR 6. cikk (1) bek. a) pont].
+          </p>
+          <p className="mt-2">
+            <strong>Az adatkezelés időtartama:</strong> A leiratkozásig (a hozzájárulás
+            visszavonásáig). Minden hírlevél alján található leiratkozási link.
+          </p>
+
+          <p className="font-semibold mt-4">
+            3.4. Élő közvetítések (Live Stream) és Nyereményjátékok
+          </p>
+          <p>
+            Amennyiben a Webshophoz kapcsolódóan élő adásban (pl. TikTok, Twitch, YouTube)
+            rendelések kerülnek kibontásra, vagy nyertesek nevei kerülnek kihirdetésre:
+          </p>
+          <p className="mt-2">
+            <strong>Kezelt adatok köre:</strong> Keresztnév, Monogram, Rendelésszám vagy
+            Felhasználónév (egyedileg egyeztetett módon). Full nevet és pontos címet élő
+            adásban nem kezelünk/jelenítünk meg.
+          </p>
+          <p className="mt-2">
+            <strong>Az adatkezelés célja:</strong> Közösségi élmény biztosítása, interaktív
+            mystery box bontás, nyereményjátékok lebonyolítása.
+          </p>
+          <p className="mt-2">
+            <strong>Az adatkezelés jogalapja:</strong> Az Ön kifejezett hozzájárulása (a
+            vásárlási folyamat során vagy külön check-box formájában).
+          </p>
+          <p className="mt-2">
+            <strong>Az adatkezelés időtartama:</strong> A nyereményjáték vagy a live stream
+            kampány lezárultáig.
           </p>
         </Section>
 
-        <Section title="5. Adatfeldolgozók">
-          <ul className="list-disc pl-6 space-y-1">
-            <li>Shopify Inc. — webáruház platform, rendeléskezelés, fizetési feldolgozás</li>
-            <li>Supabase Inc. — adatbázis (várólista, feliratkozók)</li>
-            <li>Google LLC — Google Sheets (lista kezelése)</li>
-            <li>Tárhely- és infrastruktúra-szolgáltatók (EU/USA, SCC alapján)</li>
-          </ul>
-        </Section>
-
-        <Section title="6. Jogaid (GDPR)">
-          <ul className="list-disc pl-6 space-y-1">
-            <li>Hozzáférés, helyesbítés, törlés, korlátozás joga</li>
-            <li>Adathordozhatóság joga</li>
-            <li>Tiltakozás a marketing célú adatkezelés ellen</li>
-            <li>Hozzájárulás bármikori visszavonása</li>
-            <li>
-              Panasz benyújtása a NAIH-hoz (
-              <a
-                href="https://naih.hu"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-fire underline"
-              >
-                naih.hu
-              </a>
-              )
-            </li>
-          </ul>
-        </Section>
-
-        <Section title="7. Biztonság">
+        <Section title="4. Adatfeldolgozók és Adattovábbítás">
           <p>
-            Megfelelő technikai és szervezési intézkedéseket alkalmazunk (titkosított kapcsolat,
-            jogosultságkezelés, hozzáférés-korlátozás) adataid védelmére. A fizetési adatokat
-            kizárólag a PCI-DSS tanúsítvánnyal rendelkező Shopify rendszere kezeli.
+            Az adatok feldolgozását és tárolását az Adatkezelő mellett az alábbi partnerek
+            (adatfeldolgozók) végzik a feladataik ellátásához szükséges mértekben.
+          </p>
+          <ul className="list-disc pl-5 mt-1">
+            <li>Webshop platform: Shopify</li>
+          </ul>
+        </Section>
+
+        <Section title="5. Cookie-k (Sütik) kezelése">
+          <p>
+            Az azkomoly.hu weboldal sütiket (cookie-kat) használ a honlap működtetése, a
+            felhasználói élmény fokozása, valamint statisztikai és marketing (pl. Facebook
+            Pixel, Google Analytics) célokból. A weboldalra történő első belépéskor a
+            cookie-banner segítségével Ön beállíthatja, hogy mely sütik használatához járul
+            hozzá. A sütik beállításait a böngészőjében bármikor módosíthatja vagy törölheti.
           </p>
         </Section>
 
-        <Section title="8. Kapcsolat">
-          <p>
-            Bármely jogod gyakorlásához írj az{" "}
+        <Section title="6. Az Ön jogai az adatkezeléssel kapcsolatban">
+          <p>Önt az adatkezeléssel kapcsolatban az alábbi jogok illetik meg:</p>
+          <ul className="list-disc pl-5 mt-1 space-y-1">
+            <li>
+              <strong>Hozzáférés joga:</strong> Jogosult tájékoztatást kérni arról, hogy
+              milyen adatokat kezelünk Önre vonatkozóan.
+            </li>
+            <li>
+              <strong>Helyesbítés joga:</strong> Kérheti a pontatlan vagy elavult adatai
+              javítását.
+            </li>
+            <li>
+              <strong>Törléshez való jog („az elfeledtetéshez való jog”):</strong> Kérheti
+              adatai törlését, kivéve, ha az adatkezelést jogszabály (pl. a számviteli
+              törvény) kötelezővé teszi.
+            </li>
+            <li>
+              <strong>Az adatkezelés korlátozásához való jog:</strong> Bizonyos esetekben
+              kérheti az adatok zárolását.
+            </li>
+            <li>
+              <strong>Adathordozhatósághoz való jog:</strong> Kérheti adatai kiadását tagolt,
+              széles körben használt formátumban.
+            </li>
+            <li>
+              <strong>Tiltakozáshoz való jog:</strong> Tiltakozhat személyes adatai jogos
+              érdek alapján történő kezelése ellen.
+            </li>
+          </ul>
+          <p className="mt-2">
+            Ezen igényeit az{" "}
             <a href="mailto:azkomoly.hu@gmail.com" className="text-fire underline">
               azkomoly.hu@gmail.com
             </a>{" "}
-            címre. Kérésedre 30 napon belül válaszolunk.
+            e-mail címre küldött nyilatkozattal bármikor jelezheti felénk.
+          </p>
+        </Section>
+
+        <Section title="7. Jogorvoslati lehetőségek">
+          <p>
+            Amennyiben úgy érzi, hogy az Adatkezelő megsértette a személyes adatok védelméhez
+            fűződő jogait, kérjük, forduljon hozzánk közvetlenül az{" "}
+            <a href="mailto:azkomoly.hu@gmail.com" className="text-fire underline">
+              azkomoly.hu@gmail.com
+            </a>{" "}
+            címen, hogy a problémát mielőbb orvosolhassuk.
           </p>
         </Section>
       </article>
