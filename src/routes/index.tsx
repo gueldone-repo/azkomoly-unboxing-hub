@@ -140,7 +140,7 @@ function TopNav({ onCta }: { onCta: () => void }) {
       <div className="mx-auto max-w-7xl px-6 py-3 flex items-center justify-between gap-4">
         <a href="#top" className="shrink-0">
           <img
-            src="/azkomoly (1).png"
+            src="/AZKOMOLY.png"
             alt="AZKOMOLY"
             className="h-10 w-auto"
             style={{ filter: "brightness(0) invert(1)" }}
