@@ -14,7 +14,7 @@ import { SocialProof } from "@/components/shop/SocialProof";
 import { LanguageToggle } from "@/components/LanguageToggle";
 import { CartButton } from "@/components/cart/CartSheet";
 import { fetchProducts, type ShopifyProduct } from "@/lib/shopify/client";
-import { useT, readLangCookie } from "@/lib/i18n";
+import { useT, useI18n, readLangCookie } from "@/lib/i18n";
 import { DICTIONARIES } from "@/lib/i18n/dictionary";
 
 import {
@@ -184,15 +184,17 @@ function TopNav({ onCta }: { onCta: () => void }) {
 
 function ProductsSection() {
   const t = useT();
+  const { lang } = useI18n();
   const [products, setProducts] = useState<ShopifyProduct[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchProducts(20).then((prods) => {
+    setLoading(true);
+    fetchProducts(20, undefined, lang).then((prods) => {
       setProducts(prods);
       setLoading(false);
     }).catch(() => setLoading(false));
-  }, []);
+  }, [lang]);
 
   return (
     <section

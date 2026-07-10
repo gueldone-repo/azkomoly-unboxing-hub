@@ -1,7 +1,7 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ShieldCheck, Truck, Sparkles, ChevronLeft } from "lucide-react";
-import { useT, readLangCookie } from "@/lib/i18n";
+import { useT, useI18n, readLangCookie } from "@/lib/i18n";
 import { DICTIONARIES } from "@/lib/i18n/dictionary";
 import { fetchProductByHandle, formatShopifyPrice, type ShopifyProduct } from "@/lib/shopify/client";
 import { useShopifyCart } from "@/lib/shopify/cart-store";
@@ -20,9 +20,10 @@ export const Route = createFileRoute("/shop/$slug")({
     };
   },
   loader: async ({ params }) => {
-    const product = await fetchProductByHandle(params.slug);
+    const lang = readLangCookie();
+    const product = await fetchProductByHandle(params.slug, lang);
     if (!product) throw notFound();
-    return { product };
+    return { product, lang };
   },
   errorComponent: ({ reset }) => <ProductError reset={reset} />,
   notFoundComponent: () => <ProductNotFound />,
@@ -58,16 +59,37 @@ function ProductNotFound() {
 }
 
 function ProductPage() {
-  const { product } = Route.useLoaderData();
+  const { product: loaderProduct, lang: loaderLang } = Route.useLoaderData();
+  const { lang } = useI18n();
   const t = useT();
   const addItem = useShopifyCart((s) => s.addItem);
   const checkoutUrl = useShopifyCart((s) => s.checkoutUrl);
   const isLoading = useShopifyCart((s) => s.isLoading);
 
+  const [product, setProduct] = useState(loaderProduct);
+
+  useEffect(() => {
+    if (lang === loaderLang) {
+      setProduct(loaderProduct);
+      return;
+    }
+    fetchProductByHandle(loaderProduct.handle, lang).then((p) => {
+      if (p) setProduct(p);
+    });
+  }, [lang, loaderLang, loaderProduct]);
+
   type ProductVariant = ShopifyProduct["node"]["variants"]["edges"][number]["node"];
   const variants = product.variants.edges.map((e: { node: ProductVariant }) => e.node);
   const [selectedVariant, setSelectedVariant] = useState(variants[0]);
   const [qty, setQty] = useState(1);
+
+  useEffect(() => {
+    setSelectedVariant((current: ProductVariant | undefined) => {
+      const match = variants.find((v: ProductVariant) => v.id === current?.id);
+      return match ?? variants[0];
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [product]);
 
   const image = product.images.edges[0]?.node;
   const available = selectedVariant?.availableForSale ?? false;

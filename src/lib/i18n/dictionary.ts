@@ -164,6 +164,7 @@ export type Dict = {
     gateHint: string;
     gateName: string;
     gateEmail: string;
+    gatePhone: string;
     gateSubmit: string;
     couponLabel: string;
     discount: string;
@@ -375,6 +376,7 @@ const hu: Dict = {
     gateHint: "Add meg az adataid a kód megjelenítéséhez",
     gateName: "Neved",
     gateEmail: "E-mail cím",
+    gatePhone: "Telefonszám (nem kötelező)",
     gateSubmit: "MUTASD A KÓDOT →",
     couponLabel: "KUPONKÓD",
     discount: "−10% az első rendelésre",
@@ -586,6 +588,7 @@ const en: Dict = {
     gateHint: "Enter your details to reveal your code",
     gateName: "Your name",
     gateEmail: "Email address",
+    gatePhone: "Phone number (optional)",
     gateSubmit: "SHOW MY CODE →",
     couponLabel: "COUPON CODE",
     discount: "−10% on your first order",

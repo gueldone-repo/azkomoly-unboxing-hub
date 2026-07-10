@@ -58,8 +58,16 @@ export async function storefrontApiRequest<T = any>(
   return data;
 }
 
+export type ShopifyLanguage = "HU" | "EN";
+
+/** Maps our app's `Lang` ("hu"/"en") to Shopify's `LanguageCode` enum. */
+export function toShopifyLanguage(lang: string): ShopifyLanguage {
+  return lang === "en" ? "EN" : "HU";
+}
+
 export const PRODUCTS_QUERY = /* GraphQL */ `
-  query GetProducts($first: Int!, $query: String) {
+  query GetProducts($first: Int!, $query: String, $language: LanguageCode!)
+  @inContext(language: $language) {
     products(first: $first, query: $query) {
       edges {
         node {
@@ -88,7 +96,8 @@ export const PRODUCTS_QUERY = /* GraphQL */ `
 `;
 
 export const PRODUCT_BY_HANDLE_QUERY = /* GraphQL */ `
-  query GetProductByHandle($handle: String!) {
+  query GetProductByHandle($handle: String!, $language: LanguageCode!)
+  @inContext(language: $language) {
     product(handle: $handle) {
       id
       title
@@ -112,17 +121,17 @@ export const PRODUCT_BY_HANDLE_QUERY = /* GraphQL */ `
   }
 `;
 
-export async function fetchProducts(first = 20, query?: string) {
+export async function fetchProducts(first = 20, query?: string, lang = "hu") {
   const res = await storefrontApiRequest<{
     products: { edges: ShopifyProduct[] };
-  }>(PRODUCTS_QUERY, { first, query });
+  }>(PRODUCTS_QUERY, { first, query, language: toShopifyLanguage(lang) });
   return res?.data?.products.edges ?? [];
 }
 
-export async function fetchProductByHandle(handle: string) {
+export async function fetchProductByHandle(handle: string, lang = "hu") {
   const res = await storefrontApiRequest<{ product: ShopifyProduct["node"] | null }>(
     PRODUCT_BY_HANDLE_QUERY,
-    { handle },
+    { handle, language: toShopifyLanguage(lang) },
   );
   return res?.data?.product ?? null;
 }

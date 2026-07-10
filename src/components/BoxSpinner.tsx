@@ -24,6 +24,7 @@ export function BoxSpinner({ onClose }: { onClose: () => void }) {
   const [boxCodes, setBoxCodes] = useState<DiscountCode[]>(FALLBACK_CODES);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const t = useT();
   const setDiscountCode = useShopifyCart((s) => s.setDiscountCode);
@@ -50,10 +51,12 @@ export function BoxSpinner({ onClose }: { onClose: () => void }) {
     setSubmitting(true);
     const trimmedName = name.trim();
     const loweredEmail = email.trim().toLowerCase();
+    const trimmedPhone = phone.trim() || null;
     try {
       await supabase.from("azkomoly_leads").insert({
         name: trimmedName,
         email: loweredEmail,
+        phone: trimmedPhone,
         source: "box_spinner",
       });
     } catch {
@@ -64,7 +67,7 @@ export function BoxSpinner({ onClose }: { onClose: () => void }) {
         name: trimmedName,
         email: loweredEmail,
         countryCode: null,
-        phone: null,
+        phone: trimmedPhone,
       },
     }).catch((err) => console.error("Sheet append error", err));
     if (chosen !== null) setDiscountCode(boxCodes[chosen].code);
@@ -193,6 +196,13 @@ export function BoxSpinner({ onClose }: { onClose: () => void }) {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder={t.boxSpinner.gateEmail}
+                  className="w-full bg-white/5 border border-fire/30 focus:border-fire/70 text-white font-sans text-sm px-3 py-2 outline-none placeholder:text-white/30 transition-colors"
+                />
+                <input
+                  type="tel"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  placeholder={t.boxSpinner.gatePhone}
                   className="w-full bg-white/5 border border-fire/30 focus:border-fire/70 text-white font-sans text-sm px-3 py-2 outline-none placeholder:text-white/30 transition-colors"
                 />
                 <button
