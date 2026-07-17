@@ -29,6 +29,8 @@ export function HeroOverlay({ onCta }: { onCta: () => void }) {
 
   return (
     <section className="relative h-screen w-full overflow-hidden">
+      <h1 className="sr-only">{t.hero.heading}</h1>
+
       {/* ? as background texture — huge, off-center, mostly transparent */}
       <div
         className="absolute pointer-events-none select-none"
