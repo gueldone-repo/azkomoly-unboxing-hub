@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { seoLinksHuOnly } from "@/lib/seo";
 
 export const Route = createFileRoute("/privacy")({
   head: () => ({
@@ -10,11 +11,13 @@ export const Route = createFileRoute("/privacy")({
           "AZKOMOLY adatvédelmi tájékoztató. Hogyan kezeljük adataidat a GDPR szerint.",
       },
     ],
+    // Solo húngaro: el texto legal está hardcodeado en hu, sin versión /en.
+    links: seoLinksHuOnly("/privacy"),
   }),
   component: PrivacyPage,
 });
 
-function PrivacyPage() {
+export function PrivacyPage() {
   return (
     <main className="min-h-screen bg-background text-foreground px-6 py-12">
       <article className="mx-auto max-w-3xl flex flex-col gap-6">

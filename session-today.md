@@ -73,6 +73,168 @@ Claude lo lee al inicio de cada conversación para tener contexto inmediato.
 
 ---
 
+## 2026-07-10 (Sesión 3) ✅ CERRADA
+
+### Lo que se hizo
+
+**Microsoft Clarity conectado (customer experience tracking):**
+- Instalado el snippet de Clarity (Project ID `xkb7njvdoh`) en el storefront (`azkomoly.hu`), vía `src/lib/analytics/clarity.ts` → `initClarity()`.
+- **Gateado por consentimiento GDPR:** ya existía un `CookieBanner.tsx` con toggle de analíticas que no estaba conectado a nada. Ahora Clarity solo carga si el usuario aceptó cookies de analítica (`localStorage` key `azkomoly_cookie_consent_v1`). Se dispara en `RootComponent` (`__root.tsx`, si ya había consentimiento previo) y en `CookieBanner.save()` (al aceptar en el momento).
+- **IMPORTANTE — arquitectura de dos dominios documentada en CLAUDE.md:** el front (`azkomoly.hu`, este repo) y el checkout (`checkout.azkomoly.hu`, hosteado por Shopify) son dominios separados — no se pudieron conectar bajo el mismo dominio raíz por un tema de DNS (pendiente de revisar si se puede arreglar). Este repo NO puede inyectar scripts en `checkout.azkomoly.hu`.
+- Para trackear el checkout: se instaló la app oficial **"Microsoft Clarity: AI Insights"** desde el Shopify App Store (usa el Web Pixel nativo de Shopify, funciona en cualquier plan, no requiere Plus).
+  - Pendiente de confirmar: aprobar el project link request en clarity.microsoft.com (proyecto `xkb7njvdoh`), activar toggle **"Clarity JS"** en la config de la app, y activar el app embed **"Clarity Agents JS"** en Theme Customizer → App embeds → Save.
+- Commits: `a8fdff2` (snippet inicial) y `34792d3` (gate por consentimiento + doc de arquitectura). Ambos pusheados a `main`.
+
+### Pendiente (para próximas sesiones)
+- [ ] Confirmar que el project link de Clarity quedó aprobado y que "Clarity JS" + "Clarity Agents JS" están activos en Shopify → validar que las sesiones de checkout empiecen a aparecer en el dashboard de Clarity.
+- [ ] Decidir si `CookieBanner` debe renderizarse en todas las rutas (hoy solo está en `/`, no en `/shop/$slug` ni en las páginas legales).
+- [ ] Revisar si el problema de DNS que impidió conectar `azkomoly.hu` y `checkout.azkomoly.hu` bajo un solo dominio se puede resolver (Diego mencionó que lo evitó a propósito para no romper nada).
+- [ ] Próxima sesión: mejoras al tracking (eventos custom, funnel de compra) y mejor experiencia de compra en general.
+- (siguen pendientes de sesión 2, ver arriba: `SHOPIFY_ADMIN_TOKEN`, envíos, pagos, ÁFA, productos reales, revisión legal)
+
+---
+
+## 2026-07-17 (Sesión 4 — parte B: SEO / GEO + /en + diagnóstico .com)
+
+### Diagnóstico azkomoly.com — NO es conflicto de dominios
+- DNS OK: `azkomoly.hu` y `azkomoly.com` resuelven a la misma IP de Lovable (`185.158.133.1`).
+- El problema real: **falta el certificado TLS del apex `azkomoly.com`**. En Lovable se dio de alta
+  `www.azkomoly.com` (funciona, 302 → azkomoly.hu) pero NO el apex sin www. Sin cert, el navegador
+  corta en el handshake → "no abre". `http://azkomoly.com` (sin TLS) sí responde.
+- **Acción de Diego (fuera de código):** agregar `azkomoly.com` (apex) como dominio en el dashboard de
+  Lovable para que emita el cert. Decisión tomada: el `.com` es redirect defensivo → `.hu` (toda la
+  autoridad SEO se concentra en `.hu`; el inglés vive en `azkomoly.hu/en`, no en el `.com`).
+
+### Corrección a mi propio diagnóstico anterior
+- **La home NUNCA dijo "coming soon".** El title real siempre fue `AZKOMOLY — Mi van a dobozban?` con
+  buena description húngara. Lo que leí como "coming soon" era el HTML de `/robots.txt` (un 404, que
+  hereda el head del root). Todas las rutas (`index`, `privacy`, `terms`, `cookies`, `shop`) ya tenían
+  `head()` propio con buen copy hu. La base era mucho mejor de lo que reporté.
+
+### Lo que se hizo (todo invisible — solo <head>, archivos nuevos y rutas nuevas)
+**Metadata / limpieza Lovable:**
+- `src/routes/__root.tsx`: el head del root ahora usa `DICTIONARIES[lang].meta` (antes: fallback
+  "coming soon" + `author: Lovable` + `twitter:site: @Lovable` + og:image colgando de un dominio de
+  Lovable). Sacada toda referencia a Lovable. OG completo + `og:image` propio (`/og-image.jpg`,
+  1200×630 generado desde `HERO_1_FRAME.jpeg`). `twitter:card` = summary_large_image.
+
+**Módulo SEO central — `src/lib/seo.ts` (nuevo):**
+- `SITE_URL`, `canonicalUrl()`, `seoLinks()` (canonical + hreflang hu/en/x-default),
+  `seoLinksHuOnly()` (legales), y builders JSON-LD: `organizationSchema` (OnlineStore + WebSite con
+  datos de Oscar Investments Kft.), `faqSchema` (FAQPage), `productSchema` (Product+Offer),
+  `breadcrumbSchema`. Helper `jsonLd()` para el array `scripts` de head().
+
+**Schema aplicado:**
+- Root: `OnlineStore` + `WebSite` (entidad de marca, en todas las páginas).
+- Home + `/en`: `FAQPage` con los 7 Q/A que YA existían en el diccionario (pieza clave para que la IA cite).
+- `/shop/$slug` + `/en/shop/$slug`: `Product` + `Offer` + `BreadcrumbList`.
+
+**Bug real arreglado:** todas las páginas de producto compartían el `<title>` "AZKOMOLY" (para Google
+eran indistinguibles). Ahora cada una lleva `"<nombre del producto> — AZKOMOLY"` + description propia
++ og:image del producto.
+
+**Rutas /en (aditivo, cookie intacta):**
+- Hasta ahora el idioma vivía SOLO en la cookie `azkomoly_lang` → para Google el inglés no existía (una
+  sola URL). Ahora `/en`, `/en/shop/$slug` son URLs indexables.
+- `I18nProvider` acepta `forceLang` (ignora la cookie). Layout `src/routes/en.tsx` envuelve con
+  `forceLang="en"`. `/` sigue funcionando por cookie exactamente igual — ningún usuario actual nota nada.
+- `ProductPage` refactorizado a recibir datos por props (antes usaba `Route.useLoaderData()` acoplado a
+  la ruta hu) para poder reutilizarlo en `/en/shop/$slug`.
+- Componentes de página exportados (`Landing`, `ProductPage`, etc.) para reuso.
+- Legales (`/privacy /terms /cookies`): **solo húngaro** (su texto está hardcodeado en hu, no sale del
+  diccionario) → canonical sin alternate en (declarar hreflang=en apuntaría a contenido hu = señal falsa).
+
+**robots.txt (nuevo):** antes 404. Allow a Googlebot/Bingbot + bots de IA (GPTBot, PerplexityBot,
+ClaudeBot, OAI-SearchBot, Google-Extended, Applebot, CCBot, meta-externalagent…). Línea `Sitemap:`.
+
+**sitemap.xml (nuevo):** antes 404. Generado por `scripts/generate-sitemap.mjs` leyendo los productos
+reales de Shopify (Storefront API). Cada URL con hreflang; legales hu-only sin alternate. 8 URLs.
+Regenerar el script cuando se agregue/renombre un producto.
+
+**Verificación (server real + build):** `tsc` exit 0; `npm run build` ✓ 16.52s; SSR servido probado en
+`/`, `/en`, `/privacy`, `/shop/…`, `/en/shop/…` → titles hu/en correctos, canonical + 3 hreflang,
+JSON-LD (FAQPage 7 Q/A + OnlineStore + Product + Breadcrumb), 0 refs a Lovable; robots/sitemap/og-image
+sirven 200; dist/client tiene todos los assets. **Nota crítica:** el build regenera `routeTree.gen.ts`
+y REINYECTA el bloque `declare module '@tanstack/react-start'` que rompe tsc (gotcha de CLAUDE.md) —
+hay que quitarlo antes de commitear, pero conservando las rutas /en. Estado actual: limpio + con /en.
+
+### Hallazgos NO arreglados (necesitan a Diego / Shopify Admin)
+- ⚠️ **Handles de producto rotos para SEO:** 3 de 4 productos tienen URLs de prueba en Shopify —
+  `/shop/azkomoly-not-real-box-2-copy`, `/shop/azkomoly-not-real-box-2-copy-copy`, `/shop/try`. Google
+  las indexará así. Cambiar el handle en Shopify Admin (cambia la URL = cambio visible, no lo toqué).
+- ⚠️ **Cert apex `azkomoly.com`** — pendiente en Lovable (ver arriba).
+- ⚠️ El **og-image 512** del favicon sigue siendo upscale 2x (de sesión 4A).
+- ⚠️ `shopify-theme/` + `azkomoly-shopify-theme.zip` sin trackear — sin explicación aún.
+
+### Pendiente
+- [ ] Diego: agregar apex `azkomoly.com` en Lovable (cert TLS) → luego confirmar redirect 301 a `.hu`.
+- [ ] Diego: renombrar handles de producto en Shopify (sacar `not-real-box`, `try`).
+- [ ] Tras deploy: subir `sitemap.xml` a Google Search Console (ambos dominios) + validar rich results.
+- [ ] Blogs con enlazado interno (pediste crear blog para posicionar) — no empezado, es la próxima pieza.
+- [ ] Publicar: recordar quitar el bloque `react-start` del `routeTree.gen.ts` que reinyecta el build.
+
+---
+
+## 2026-07-17 (Sesión 4)
+
+### Lo que se hizo
+
+**Contexto:** Diego indexó `azkomoly.hu` y `azkomoly.com` en Google Search Console
+y pidió auditar el favicon + convertir sus reglas de favicon en una skill.
+
+**Auditoría del favicon — qué estaba mal:**
+- ✅ NO era el default de Lovable — era arte de marca real (caja + `?`). Esa regla se cumplía.
+- ❌ `favicon.ico` pesaba **104 KB** (límite: 100 KB) y era un único 256×256.
+- ❌ **Cero** `<link rel="icon">` en el `<head>` — no había ninguno. Google caía al
+  `/favicon.ico` de la raíz por default.
+- ❌ No existía ningún PNG (16/32/48/96/192/512), ni `apple-touch-icon.png`,
+  ni `site.webmanifest`, ni `theme-color`.
+
+**Qué se arregló:**
+- Set completo generado con Pillow desde el arte de 256×256: PNGs en los 6 tamaños,
+  `favicon.png` (298 KB < 500), `apple-touch-icon.png` 180×180 sobre `#111` opaco,
+  y `favicon.ico` regenerado **multi-size (16/32/48) → 10.1 KB** (era 104 KB).
+- `site.webmanifest` nuevo (192+512, theme/bg `#111111`, standalone).
+- `__root.tsx`: agregados los 7 `<link rel="icon">` + `apple-touch-icon` + `manifest`
+  en el array `links`, y `theme-color` en `meta`.
+- Verificado de verdad: `tsc --noEmit` = 0, todos los assets sirven con content-type
+  correcto, y los tags salen en el HTML renderizado.
+
+**Decisión de Diego:** arte completo en todos los tamaños. A 16px (el que usa Google en
+resultados) se lee borroso; se le mostró la alternativa de recortar al `?` y prefirió
+consistencia de marca. No cambiarlo sin pedírselo.
+
+**Skill creada:** `~/.claude/skills/favicon-check/` (global, aplica a todo proyecto)
+con el checklist completo + `scripts/generate.py` (probado con fuente cuadrada y no
+cuadrada). Se guardó también como memoria.
+
+### Hallazgos NO arreglados (fuera de scope — decidir con Diego)
+
+- ⚠️ **Metadata de Lovable filtrada en `__root.tsx`** — relevante ahora que está en GSC:
+  - `<meta name="author" content="Lovable">`
+  - `<meta name="twitter:site" content="@Lovable">`
+  - `og:image` y `twitter:image` apuntan a `storage.googleapis.com/gpt-engineer-file-uploads/…`
+    (un dominio de Lovable, no de AZKOMOLY — si lo borran, se rompe el preview social)
+  - El `<title>` es `"Azkomoly"` y la description `"Hamarosan itt van. Készülj fel."`
+    (copy de "coming soon", ya no aplica — la tienda está viva)
+- ⚠️ El **512×512 es un upscale 2x** desde 256. Si aparece el arte original en alta, regenerar.
+- ⚠️ `shopify-theme/` + `azkomoly-shopify-theme.zip` sin trackear en el repo — sin explicación
+  todavía, pendiente de saber qué son y si van al repo o al `.gitignore`.
+
+### Pendiente
+- [ ] Decidir qué hacer con la metadata de Lovable + title/description de "coming soon" (SEO)
+- [ ] Aclarar qué es `shopify-theme/` y si se commitea o se ignora
+- [ ] (siguen todos los pendientes de sesión 3 y 2, ver arriba)
+
+---
+
+**Gotcha nuevo (documentado en la skill):** Vite cachea el listado de `public/` al arrancar.
+Si generás archivos nuevos con el dev server corriendo, devuelven `200` pero con
+`content_type: text/html` (fallback SPA) y los `<link>` no aparecen. **Reiniciar el dev
+server** antes de dar por bueno cualquier resultado — un `200` no prueba que el archivo exista.
+
+---
+
 <!-- PLANTILLA PARA NUEVAS SESIONES:
 
 ## YYYY-MM-DD (Sesión N)

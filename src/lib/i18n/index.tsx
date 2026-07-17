@@ -43,8 +43,21 @@ type I18nValue = {
 
 const I18nCtx = createContext<I18nValue | null>(null);
 
-export function I18nProvider({ children }: { children: ReactNode }) {
-  const [lang, setLangState] = useState<Lang>(() => readLangCookie());
+/**
+ * `forceLang` fija el idioma ignorando la cookie. Lo usa el layout `/en` para
+ * que esas URLs sirvan inglés siempre — un crawler llega sin cookie y tiene que
+ * ver inglés en /en y húngaro en /. Sin `forceLang` el comportamiento es el de
+ * siempre (cookie), así que `/` no cambia en nada.
+ */
+export function I18nProvider({
+  children,
+  forceLang,
+}: {
+  children: ReactNode;
+  forceLang?: Lang;
+}) {
+  const [cookieLang, setLangState] = useState<Lang>(() => readLangCookie());
+  const lang = forceLang ?? cookieLang;
 
   const setLang = useCallback((next: Lang) => {
     setLangState(next);

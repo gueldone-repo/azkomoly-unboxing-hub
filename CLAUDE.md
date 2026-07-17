@@ -114,6 +114,46 @@ El front (este repo, hecho con Lovable + Storefront API) y el checkout de Shopif
 
 > Filenames con `…` (U+2026) son literales.
 
+### Favicon
+Set completo generado desde el arte de marca (caja + `?`), declarado en el array
+`links` de `head()` en `__root.tsx` + `theme-color` en `meta`:
+`favicon.ico` (multi-size 16/32/48), `favicon.png`, `favicon-{16,32,48,96,192,512}x…png`,
+`apple-touch-icon.png` (180×180, fondo opaco `#111`), `site.webmanifest`.
+
+- La fuente del arte es el **propio `favicon.ico` viejo a 256×256** — no existe
+  en más resolución, así que el 512 es un upscale 2x (queda algo blando). Si
+  aparece el arte original en alta, regenerar.
+- Decisión de Diego: **arte completo en todos los tamaños**, aunque a 16px se lea
+  borroso. No recortar al `?` sin pedírselo.
+- Reglas globales + script de generación: skill `favicon-check`.
+
+---
+
+## SEO / GEO
+
+- **Módulo central:** `src/lib/seo.ts` — `SITE_URL`, `canonicalUrl()`, `seoLinks()` (canonical +
+  hreflang hu/en/x-default), `seoLinksHuOnly()`, y builders JSON-LD (`organizationSchema`,
+  `faqSchema`, `productSchema`, `breadcrumbSchema`) + helper `jsonLd()` para el array `scripts` de head().
+- **i18n por URL para crawlers:** el idioma de usuario sigue viviendo en la cookie `azkomoly_lang`, PERO
+  el inglés ahora tiene URLs propias indexables: `/en` y `/en/shop/$slug`. El layout `src/routes/en.tsx`
+  usa `<I18nProvider forceLang="en">`. `/` = húngaro = x-default. **Al agregar una ruta nueva que deba
+  indexarse en ambos idiomas, crear también su gemela `/en/...` y darle `seoLinks(path, lang)`.**
+- **Legales solo en húngaro:** `/privacy /terms /cookies` tienen el texto hardcodeado en hu (no sale del
+  diccionario) → usan `seoLinksHuOnly()` (canonical sin hreflang). NO crear `/en/privacy` sin traducir
+  primero el contenido — un hreflang=en hacia texto hu es señal falsa que Google penaliza.
+- **Metadata:** el head del root y cada ruta usan `DICTIONARIES[lang].meta`. NO volver a meter
+  `author: Lovable`, `twitter:site: @Lovable` ni og:image de `storage.googleapis.com/gpt-engineer-*`.
+  El og:image propio es `/og-image.jpg` (1200×630).
+- **robots.txt / sitemap.xml:** archivos estáticos en `public/`. Esta versión de TanStack Start NO expone
+  server routes, por eso el sitemap es estático. Regenerarlo con `node scripts/generate-sitemap.mjs`
+  (lee productos reales de Shopify) cada vez que se agregue/quite/renombre un producto.
+- **routeTree gotcha al buildear:** `npm run build` regenera `routeTree.gen.ts` y REINYECTA el bloque
+  `declare module '@tanstack/react-start' { interface Register … }` que rompe `tsc` (además del bloque
+  `Register` de react-router ya documentado abajo). Antes de commitear/publicar: quitar ese bloque pero
+  **conservar** las rutas `/en` que el build sí agrega correctamente. `tsc --noEmit` debe salir 0.
+- **Pendiente Shopify (no es código):** 3 de 4 handles de producto son de prueba (`not-real-box…`,
+  `try`) → renombrar en Shopify Admin antes de que Google los fije.
+
 ---
 
 ## Analytics

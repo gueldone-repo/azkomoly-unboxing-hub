@@ -2,20 +2,68 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { ShieldCheck, Truck, Sparkles, ChevronLeft } from "lucide-react";
 import { useT, useI18n, readLangCookie } from "@/lib/i18n";
-import { DICTIONARIES } from "@/lib/i18n/dictionary";
+import { DICTIONARIES, type Lang } from "@/lib/i18n/dictionary";
 import { fetchProductByHandle, formatShopifyPrice, type ShopifyProduct } from "@/lib/shopify/client";
 import { useShopifyCart } from "@/lib/shopify/cart-store";
 import { CartButton } from "@/components/cart/CartSheet";
+import { seoLinks, canonicalUrl, jsonLd, productSchema, breadcrumbSchema } from "@/lib/seo";
 
 export const Route = createFileRoute("/shop/$slug")({
-  head: () => {
-    const t = DICTIONARIES[readLangCookie()];
+  head: (ctx) => {
+    const lang = readLangCookie();
+    const t = DICTIONARIES[lang];
+    // TanStack no infiere el tipo del `loader` definido en este mismo objeto
+    // (resuelve a `never`), así que lo anotamos a mano. Debe seguir al `loader`
+    // de abajo si cambia su retorno.
+    const loaderData = ctx.loaderData as { product: ShopifyProduct["node"]; lang: Lang } | undefined;
+    const params = ctx.params as { slug: string };
+    const p = loaderData?.product;
+
+    // Sin loaderData (error / 404) caemos al copy genérico de marca.
+    if (!p) {
+      return {
+        meta: [
+          { title: "AZKOMOLY" },
+          { name: "description", content: t.meta.ogDescription },
+        ],
+        links: seoLinks(`/shop/${params.slug}`, lang),
+      };
+    }
+
+    // Antes todos los productos compartían el título "AZKOMOLY", así que para
+    // Google eran páginas indistinguibles. Ahora cada uno lleva su nombre.
+    const title = `${p.title} — AZKOMOLY`;
+    const desc = (p.description || t.meta.description).slice(0, 155);
+    const image = p.images.edges[0]?.node.url;
+    const available = p.variants.edges.some((v) => v.node.availableForSale);
+
     return {
       meta: [
-        { title: "AZKOMOLY" },
-        { name: "description", content: t.meta.ogDescription },
-        { property: "og:title", content: "AZKOMOLY" },
-        { property: "og:description", content: t.meta.ogDescription },
+        { title },
+        { name: "description", content: desc },
+        { property: "og:title", content: title },
+        { property: "og:description", content: desc },
+        { property: "og:type", content: "product" },
+        { property: "og:url", content: canonicalUrl(`/shop/${p.handle}`, lang) },
+        ...(image ? [{ property: "og:image", content: image }] : []),
+        { property: "product:price:amount", content: p.priceRange.minVariantPrice.amount },
+        { property: "product:price:currency", content: p.priceRange.minVariantPrice.currencyCode },
+      ],
+      links: seoLinks(`/shop/${p.handle}`, lang),
+      scripts: [
+        jsonLd(productSchema({
+          handle: p.handle,
+          title: p.title,
+          description: p.description || t.meta.description,
+          image,
+          price: String(Math.round(parseFloat(p.priceRange.minVariantPrice.amount))),
+          currency: p.priceRange.minVariantPrice.currencyCode,
+          available,
+        }, lang)),
+        jsonLd(breadcrumbSchema([
+          { name: "AZKOMOLY", path: "/" },
+          { name: p.title, path: `/shop/${p.handle}` },
+        ], lang)),
       ],
     };
   },
@@ -27,8 +75,13 @@ export const Route = createFileRoute("/shop/$slug")({
   },
   errorComponent: ({ reset }) => <ProductError reset={reset} />,
   notFoundComponent: () => <ProductNotFound />,
-  component: ProductPage,
+  component: HuProductPage,
 });
+
+function HuProductPage() {
+  const { product, lang } = Route.useLoaderData();
+  return <ProductPage product={product} lang={lang} />;
+}
 
 function ProductError({ reset }: { reset: () => void }) {
   const t = useT();
@@ -58,8 +111,18 @@ function ProductNotFound() {
   );
 }
 
-function ProductPage() {
-  const { product: loaderProduct, lang: loaderLang } = Route.useLoaderData();
+/**
+ * Recibe los datos del loader por props en vez de llamar a `Route.useLoaderData()`,
+ * porque lo reutiliza también `/en/shop/$slug` — con un `Route` distinto. Si
+ * leyera el Route de este módulo, la versión inglesa apuntaría a la ruta húngara.
+ */
+export function ProductPage({
+  product: loaderProduct,
+  lang: loaderLang,
+}: {
+  product: ShopifyProduct["node"];
+  lang: Lang;
+}) {
   const { lang } = useI18n();
   const t = useT();
   const addItem = useShopifyCart((s) => s.addItem);

@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { seoLinksHuOnly } from "@/lib/seo";
 
 export const Route = createFileRoute("/terms")({
   head: () => ({
@@ -9,11 +10,13 @@ export const Route = createFileRoute("/terms")({
         content: "AZKOMOLY általános szerződési feltételek (ÁSZF).",
       },
     ],
+    // Solo húngaro: el texto legal está hardcodeado en hu, sin versión /en.
+    links: seoLinksHuOnly("/terms"),
   }),
   component: TermsPage,
 });
 
-function TermsPage() {
+export function TermsPage() {
   return (
     <main className="min-h-screen bg-background text-foreground px-6 py-12">
       <article className="mx-auto max-w-3xl flex flex-col gap-6">

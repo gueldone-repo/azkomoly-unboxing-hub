@@ -11,9 +11,12 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as EnRouteImport } from './routes/en'
 import { Route as CookiesRouteImport } from './routes/cookies'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as EnIndexRouteImport } from './routes/en.index'
 import { Route as ShopSlugRouteImport } from './routes/shop.$slug'
+import { Route as EnShopSlugRouteImport } from './routes/en.shop.$slug'
 
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
@@ -23,6 +26,11 @@ const TermsRoute = TermsRouteImport.update({
 const PrivacyRoute = PrivacyRouteImport.update({
   id: '/privacy',
   path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EnRoute = EnRouteImport.update({
+  id: '/en',
+  path: '/en',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CookiesRoute = CookiesRouteImport.update({
@@ -35,18 +43,31 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EnIndexRoute = EnIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => EnRoute,
+} as any)
 const ShopSlugRoute = ShopSlugRouteImport.update({
   id: '/shop/$slug',
   path: '/shop/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EnShopSlugRoute = EnShopSlugRouteImport.update({
+  id: '/shop/$slug',
+  path: '/shop/$slug',
+  getParentRoute: () => EnRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/cookies': typeof CookiesRoute
+  '/en': typeof EnRouteWithChildren
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
   '/shop/$slug': typeof ShopSlugRoute
+  '/en/': typeof EnIndexRoute
+  '/en/shop/$slug': typeof EnShopSlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -54,26 +75,56 @@ export interface FileRoutesByTo {
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
   '/shop/$slug': typeof ShopSlugRoute
+  '/en': typeof EnIndexRoute
+  '/en/shop/$slug': typeof EnShopSlugRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/cookies': typeof CookiesRoute
+  '/en': typeof EnRouteWithChildren
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
   '/shop/$slug': typeof ShopSlugRoute
+  '/en/': typeof EnIndexRoute
+  '/en/shop/$slug': typeof EnShopSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/cookies' | '/privacy' | '/terms' | '/shop/$slug'
+  fullPaths:
+    | '/'
+    | '/cookies'
+    | '/en'
+    | '/privacy'
+    | '/terms'
+    | '/shop/$slug'
+    | '/en/'
+    | '/en/shop/$slug'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/cookies' | '/privacy' | '/terms' | '/shop/$slug'
-  id: '__root__' | '/' | '/cookies' | '/privacy' | '/terms' | '/shop/$slug'
+  to:
+    | '/'
+    | '/cookies'
+    | '/privacy'
+    | '/terms'
+    | '/shop/$slug'
+    | '/en'
+    | '/en/shop/$slug'
+  id:
+    | '__root__'
+    | '/'
+    | '/cookies'
+    | '/en'
+    | '/privacy'
+    | '/terms'
+    | '/shop/$slug'
+    | '/en/'
+    | '/en/shop/$slug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   CookiesRoute: typeof CookiesRoute
+  EnRoute: typeof EnRouteWithChildren
   PrivacyRoute: typeof PrivacyRoute
   TermsRoute: typeof TermsRoute
   ShopSlugRoute: typeof ShopSlugRoute
@@ -95,6 +146,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PrivacyRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/en': {
+      id: '/en'
+      path: '/en'
+      fullPath: '/en'
+      preLoaderRoute: typeof EnRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/cookies': {
       id: '/cookies'
       path: '/cookies'
@@ -109,6 +167,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/en/': {
+      id: '/en/'
+      path: '/'
+      fullPath: '/en/'
+      preLoaderRoute: typeof EnIndexRouteImport
+      parentRoute: typeof EnRoute
+    }
     '/shop/$slug': {
       id: '/shop/$slug'
       path: '/shop/$slug'
@@ -116,12 +181,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ShopSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/en/shop/$slug': {
+      id: '/en/shop/$slug'
+      path: '/shop/$slug'
+      fullPath: '/en/shop/$slug'
+      preLoaderRoute: typeof EnShopSlugRouteImport
+      parentRoute: typeof EnRoute
+    }
   }
 }
+
+interface EnRouteChildren {
+  EnIndexRoute: typeof EnIndexRoute
+  EnShopSlugRoute: typeof EnShopSlugRoute
+}
+
+const EnRouteChildren: EnRouteChildren = {
+  EnIndexRoute: EnIndexRoute,
+  EnShopSlugRoute: EnShopSlugRoute,
+}
+
+const EnRouteWithChildren = EnRoute._addFileChildren(EnRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   CookiesRoute: CookiesRoute,
+  EnRoute: EnRouteWithChildren,
   PrivacyRoute: PrivacyRoute,
   TermsRoute: TermsRoute,
   ShopSlugRoute: ShopSlugRoute,
@@ -129,3 +214,4 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+

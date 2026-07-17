@@ -15,6 +15,7 @@ import { CartButton } from "@/components/cart/CartSheet";
 import { fetchProducts, type ShopifyProduct } from "@/lib/shopify/client";
 import { useT, useI18n, readLangCookie } from "@/lib/i18n";
 import { DICTIONARIES } from "@/lib/i18n/dictionary";
+import { seoLinks, jsonLd, faqSchema } from "@/lib/seo";
 
 import {
   Dialog,
@@ -32,7 +33,8 @@ import {
 
 export const Route = createFileRoute("/")({
   head: () => {
-    const t = DICTIONARIES[readLangCookie()];
+    const lang = readLangCookie();
+    const t = DICTIONARIES[lang];
     return {
       meta: [
         { title: t.meta.title },
@@ -48,7 +50,13 @@ export const Route = createFileRoute("/")({
           rel: "stylesheet",
           href: "https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Space+Grotesk:wght@400;500;700&display=swap",
         },
+        // `/` es la versión húngara para crawlers y el x-default.
+        ...seoLinks("/", lang),
       ],
+      // El FAQ ya existe en el diccionario (7 pares Q/A en hu y en). Exponerlo
+      // como FAQPage es la pieza de mayor impacto para que los motores
+      // generativos citen respuestas de AZKOMOLY textualmente.
+      scripts: [jsonLd(faqSchema(t.faq.items, lang))],
     };
   },
   component: Landing,
@@ -86,7 +94,7 @@ const signupSchema = z.object({
     .or(z.literal("")),
 });
 
-function Landing() {
+export function Landing() {
   const [open, setOpen] = useState(false);
   // BoxSpinner popup disabled for now — will come back rebuilt on
   // https://headlessui.com/react/dialog. Keep closeBox/boxVisible plumbing

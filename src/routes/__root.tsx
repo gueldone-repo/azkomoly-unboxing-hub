@@ -12,6 +12,8 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { I18nProvider, readLangCookie } from "../lib/i18n";
+import { DICTIONARIES } from "../lib/i18n/dictionary";
+import { SITE_URL, jsonLd, organizationSchema } from "../lib/seo";
 import { CartSheet } from "../components/cart/CartSheet";
 import { useCartSync } from "../hooks/useCartSync";
 import { getStoredConsent } from "../components/CookieBanner";
@@ -78,30 +80,55 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
 }
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
-  head: () => ({
+  head: () => {
+    // El idioma sale de la cookie. Un crawler llega sin cookie -> húngaro,
+    // que es exactamente lo que queremos indexar en `/`. La ruta /en fuerza
+    // inglés por su cuenta.
+    const lang = readLangCookie();
+    const m = DICTIONARIES[lang].meta;
+
+    return {
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Azkomoly" },
-      { name: "description", content: "Hamarosan itt van. Készülj fel." },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Azkomoly" },
-      { property: "og:description", content: "Hamarosan itt van. Készülj fel." },
+      { title: m.title },
+      { name: "description", content: m.description },
+      { property: "og:title", content: m.ogTitle },
+      { property: "og:description", content: m.ogDescription },
       { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
-      { name: "twitter:site", content: "@Lovable" },
-      { name: "twitter:title", content: "Azkomoly" },
-      { name: "twitter:description", content: "Hamarosan itt van. Készülj fel." },
-      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/2n40GwZrOOUihC1CB3n178mNI2g2/social-images/social-1780421041588-photo_5832647317360676478_y.webp" },
-      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/2n40GwZrOOUihC1CB3n178mNI2g2/social-images/social-1780421041588-photo_5832647317360676478_y.webp" },
+      { property: "og:site_name", content: "AZKOMOLY" },
+      { property: "og:url", content: SITE_URL },
+      { property: "og:locale", content: lang === "hu" ? "hu_HU" : "en_GB" },
+      { property: "og:image", content: `${SITE_URL}/og-image.jpg` },
+      { property: "og:image:width", content: "1200" },
+      { property: "og:image:height", content: "630" },
+      { property: "og:image:alt", content: m.ogTitle },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: m.ogTitle },
+      { name: "twitter:description", content: m.ogDescription },
+      { name: "twitter:image", content: `${SITE_URL}/og-image.jpg` },
+      { name: "theme-color", content: "#111111" },
     ],
     links: [
       {
         rel: "stylesheet",
         href: appCss,
       },
+      { rel: "icon", href: "/favicon.ico", sizes: "any" },
+      { rel: "icon", type: "image/png", sizes: "16x16", href: "/favicon-16x16.png" },
+      { rel: "icon", type: "image/png", sizes: "32x32", href: "/favicon-32x32.png" },
+      { rel: "icon", type: "image/png", sizes: "48x48", href: "/favicon-48x48.png" },
+      { rel: "icon", type: "image/png", sizes: "96x96", href: "/favicon-96x96.png" },
+      { rel: "icon", type: "image/png", sizes: "192x192", href: "/favicon-192x192.png" },
+      { rel: "icon", type: "image/png", sizes: "512x512", href: "/favicon-512x512.png" },
+      { rel: "apple-touch-icon", sizes: "180x180", href: "/apple-touch-icon.png" },
+      { rel: "manifest", href: "/site.webmanifest" },
     ],
-  }),
+    // Entidad de marca para Google y los LLMs. Invisible en la página.
+    // (Clarity NO va acá — ver CLAUDE.md, va gateado por consentimiento.)
+    scripts: [jsonLd(organizationSchema())],
+    };
+  },
   shellComponent: RootShell,
   component: RootComponent,
   notFoundComponent: NotFoundComponent,
