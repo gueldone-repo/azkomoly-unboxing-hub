@@ -14,11 +14,12 @@ export function CartButton({ className = "" }: { className?: string }) {
   const count = useShopifyCart((s) => s.items.reduce((n, i) => n + i.quantity, 0));
   const setOpen = useShopifyCart((s) => s.setOpen);
   const t = useT();
+  const cartLabel = count > 0 ? `${t.cart.title}, ${t.cart.count(count)}` : t.cart.title;
   return (
     <button
       type="button"
       onClick={() => setOpen(true)}
-      aria-label={t.cart.title}
+      aria-label={cartLabel}
       className={`relative grid h-9 w-9 place-items-center border-2 border-cardboard/50 text-foreground hover:text-fire hover:border-fire transition-colors ${className}`}
     >
       <ShoppingBag className="h-5 w-5" />

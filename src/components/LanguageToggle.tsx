@@ -12,19 +12,20 @@ export function LanguageToggle({ className = "" }: { className?: string }) {
       {LANGS.map((l) => {
         const active = l.code === lang;
         return (
-          <button
-            key={l.code}
-            type="button"
-            onClick={() => setLang(l.code)}
-            aria-pressed={active}
-            className={`px-2.5 py-1 font-sans text-xs font-bold tracking-wider transition-colors ${
-              active
-                ? "bg-fire text-primary-foreground"
-                : "text-foreground/60 hover:text-fire"
-            }`}
-          >
-            {l.short}
-          </button>
+        <button
+          key={l.code}
+          type="button"
+          onClick={() => setLang(l.code)}
+          aria-pressed={active}
+          aria-label={l.label}
+          className={`px-2.5 py-1 font-sans text-xs font-bold tracking-wider transition-colors ${
+            active
+              ? "bg-fire text-primary-foreground"
+              : "text-foreground/60 hover:text-fire"
+          }`}
+        >
+          {l.short}
+        </button>
         );
       })}
     </div>

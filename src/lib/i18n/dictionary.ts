@@ -30,6 +30,7 @@ export type Dict = {
     est: string;
     index: string;
     mysteryBox: string;
+    heading: string;
     tagline: string;
     scroll: string;
     cta: string;
@@ -186,6 +187,7 @@ const hu: Dict = {
     est: "EST · MMXXVI",
     index: "/01",
     mysteryBox: "MYSTERY · BOX",
+    heading: "AZKOMOLY — Mystery Box Shop",
     tagline: "Márkás ruhák. Véletlenszerű tartalom. Nevetséges áron.",
     scroll: "GÖRGESS",
     cta: "KINYITOM A DOBOZOM →",
@@ -398,6 +400,7 @@ const en: Dict = {
     est: "EST · MMXXVI",
     index: "/01",
     mysteryBox: "MYSTERY · BOX",
+    heading: "AZKOMOLY — Mystery Box Shop",
     tagline: "Branded clothing. Random contents. Ridiculous prices.",
     scroll: "SCROLL",
     cta: "I WANT TO OPEN MY BOX →",
