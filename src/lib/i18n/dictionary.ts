@@ -205,7 +205,7 @@ const hu: Dict = {
     kicker: "VÁLASZD A TÉTEDET",
     heading: "A dobozaink",
     sub: "Minél nagyobb a doboz, annál nagyobb a dobás. Minden tier garantált minimum értékkel.",
-    open: "MEGNYITOM",
+    open: "MEGVESZEM",
     lastUnits: (n) => `UTOLSÓ ${n} DB`,
     inStock: "Készleten",
     guaranteedValue: "Garantált érték",
