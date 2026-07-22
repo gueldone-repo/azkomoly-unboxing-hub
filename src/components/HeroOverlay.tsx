@@ -52,11 +52,6 @@ export function HeroOverlay({ onCta }: { onCta: () => void }) {
         className="absolute inset-x-0 top-1/2 flex flex-col items-center gap-5 px-6 text-center z-10"
         style={{ transform: `translateY(calc(-50% + ${hp * 55}px))` }}
       >
-        {/* Kicker */}
-        <p className="font-sans text-[9px] tracking-[0.55em] text-white/40 uppercase">
-          {t.hero.est} · {t.hero.mysteryBox}
-        </p>
-
         {/* CTA */}
         <button
           onClick={scrollToProducts}
