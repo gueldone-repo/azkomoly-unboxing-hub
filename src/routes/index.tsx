@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState, useEffect, type FormEvent } from "react";
+import { useState, useEffect, useRef, type FormEvent } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
@@ -261,37 +261,268 @@ const LIFESTYLE_PHOTOS = [
 ];
 
 function LifestyleStrip() {
+  const scrollerRef = useRef<HTMLDivElement | null>(null);
+  const pausedRef = useRef(false);
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
   const all = [...LIFESTYLE_PHOTOS, ...LIFESTYLE_PHOTOS];
+
+  // Auto-scroll that yields to user interaction.
+  useEffect(() => {
+    const el = scrollerRef.current;
+    if (!el) return;
+    let raf = 0;
+    let last = performance.now();
+    const SPEED = 40; // px/sec
+
+    const tick = (now: number) => {
+      const dt = (now - last) / 1000;
+      last = now;
+      if (!pausedRef.current && el.scrollWidth > el.clientWidth) {
+        const half = el.scrollWidth / 2;
+        let next = el.scrollLeft + SPEED * dt;
+        if (next >= half) next -= half;
+        el.scrollLeft = next;
+      }
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+
+    const pause = () => { pausedRef.current = true; };
+    const resumeSoon = () => {
+      window.clearTimeout((el as any).__resumeT);
+      (el as any).__resumeT = window.setTimeout(() => { pausedRef.current = false; }, 1800);
+    };
+
+    el.addEventListener("pointerdown", pause);
+    el.addEventListener("pointerup", resumeSoon);
+    el.addEventListener("pointercancel", resumeSoon);
+    el.addEventListener("pointerleave", resumeSoon);
+    el.addEventListener("wheel", () => { pause(); resumeSoon(); }, { passive: true });
+    el.addEventListener("touchstart", pause, { passive: true });
+    el.addEventListener("touchend", resumeSoon);
+
+    return () => {
+      cancelAnimationFrame(raf);
+      el.removeEventListener("pointerdown", pause);
+      el.removeEventListener("pointerup", resumeSoon);
+      el.removeEventListener("pointercancel", resumeSoon);
+      el.removeEventListener("pointerleave", resumeSoon);
+      el.removeEventListener("touchstart", pause);
+      el.removeEventListener("touchend", resumeSoon);
+    };
+  }, []);
+
+  // Drag-to-scroll for mouse users.
+  useEffect(() => {
+    const el = scrollerRef.current;
+    if (!el) return;
+    let down = false;
+    let startX = 0;
+    let startLeft = 0;
+    let moved = 0;
+
+    const onDown = (e: PointerEvent) => {
+      down = true;
+      moved = 0;
+      startX = e.clientX;
+      startLeft = el.scrollLeft;
+      el.setPointerCapture?.(e.pointerId);
+    };
+    const onMove = (e: PointerEvent) => {
+      if (!down) return;
+      const dx = e.clientX - startX;
+      moved = Math.max(moved, Math.abs(dx));
+      el.scrollLeft = startLeft - dx;
+    };
+    const onUp = (e: PointerEvent) => {
+      down = false;
+      el.releasePointerCapture?.(e.pointerId);
+      (el as any).__lastDragDist = moved;
+    };
+    el.addEventListener("pointerdown", onDown);
+    el.addEventListener("pointermove", onMove);
+    el.addEventListener("pointerup", onUp);
+    el.addEventListener("pointercancel", onUp);
+    return () => {
+      el.removeEventListener("pointerdown", onDown);
+      el.removeEventListener("pointermove", onMove);
+      el.removeEventListener("pointerup", onUp);
+      el.removeEventListener("pointercancel", onUp);
+    };
+  }, []);
+
+  const handleClick = (i: number) => {
+    const dragged = (scrollerRef.current as any)?.__lastDragDist ?? 0;
+    if (dragged > 6) return; // suppress click after drag
+    setOpenIndex(i % LIFESTYLE_PHOTOS.length);
+  };
+
   return (
     <>
-      <style>{`@keyframes strip-scroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}`}</style>
       <section className="py-6 overflow-hidden border-y border-cardboard/20 bg-dark-bg/60">
         <div
-          className="flex gap-3"
-          style={{
-            width: "max-content",
-            animation: "strip-scroll 38s linear infinite",
-          }}
+          ref={scrollerRef}
+          className="flex gap-3 overflow-x-auto scrollbar-none cursor-grab active:cursor-grabbing select-none"
+          style={{ scrollbarWidth: "none", touchAction: "pan-x" }}
         >
           {all.map((src, i) => (
-            <div
+            <button
               key={i}
-              className="shrink-0 h-64 w-48 overflow-hidden border border-cardboard/25 hover:border-fire/60 transition-colors duration-300"
+              type="button"
+              onClick={() => handleClick(i)}
+              className="shrink-0 h-64 w-48 overflow-hidden border border-cardboard/25 hover:border-fire/60 transition-colors duration-300 p-0 bg-transparent"
               style={{ aspectRatio: "3/4" }}
+              aria-label="Nyisd meg a galériát"
             >
               <img
                 src={src}
                 alt=""
-                className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+                className="w-full h-full object-cover hover:scale-105 transition-transform duration-500 pointer-events-none"
                 draggable={false}
                 loading="lazy"
                 decoding="async"
               />
-            </div>
+            </button>
           ))}
         </div>
       </section>
+      <InstagramFeedModal
+        open={openIndex !== null}
+        startIndex={openIndex ?? 0}
+        onClose={() => setOpenIndex(null)}
+      />
     </>
+  );
+}
+
+function InstagramFeedModal({
+  open,
+  startIndex,
+  onClose,
+}: {
+  open: boolean;
+  startIndex: number;
+  onClose: () => void;
+}) {
+  const feedRef = useRef<HTMLDivElement | null>(null);
+  const IG_URL = "https://www.instagram.com/azkomoly.hu/";
+
+  useEffect(() => {
+    if (!open) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    window.addEventListener("keydown", onKey);
+    // Scroll to start index once mounted
+    requestAnimationFrame(() => {
+      const el = feedRef.current;
+      if (!el) return;
+      const target = el.querySelector<HTMLElement>(`[data-idx="${startIndex}"]`);
+      target?.scrollIntoView({ block: "start" });
+    });
+    return () => {
+      document.body.style.overflow = prev;
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [open, startIndex, onClose]);
+
+  if (!open) return null;
+
+  return (
+    <div className="fixed inset-0 z-[100] bg-black/85 backdrop-blur-sm animate-fade-in">
+      <div className="absolute inset-0 flex flex-col">
+        {/* Header */}
+        <div className="flex items-center justify-between px-4 py-3 border-b border-white/10 bg-black/70">
+          <a
+            href={IG_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-3 group"
+          >
+            <span className="grid place-items-center h-9 w-9 rounded-full bg-gradient-to-tr from-fire via-pink-500 to-purple-600">
+              <Instagram className="h-5 w-5 text-white" />
+            </span>
+            <div className="flex flex-col leading-tight">
+              <span className="font-sans text-sm text-white font-semibold group-hover:text-fire transition-colors">
+                azkomoly.hu
+              </span>
+              <span className="font-sans text-[11px] text-white/60">Kövess minket Instagramon</span>
+            </div>
+          </a>
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Bezárás"
+            className="h-9 w-9 grid place-items-center text-white/80 hover:text-white text-2xl leading-none"
+          >
+            ×
+          </button>
+        </div>
+
+        {/* Feed */}
+        <div
+          ref={feedRef}
+          className="flex-1 overflow-y-auto overscroll-contain snap-y snap-mandatory"
+        >
+          <div className="mx-auto max-w-md w-full">
+            {LIFESTYLE_PHOTOS.map((src, i) => (
+              <article
+                key={i}
+                data-idx={i}
+                className="snap-start border-b border-white/10 py-4"
+              >
+                <div className="flex items-center gap-2 px-3 pb-2">
+                  <span className="grid place-items-center h-8 w-8 rounded-full bg-gradient-to-tr from-fire via-pink-500 to-purple-600">
+                    <Instagram className="h-4 w-4 text-white" />
+                  </span>
+                  <a
+                    href={IG_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-sans text-sm text-white font-semibold hover:text-fire"
+                  >
+                    azkomoly.hu
+                  </a>
+                </div>
+                <div className="bg-dark-bg">
+                  <img
+                    src={src}
+                    alt=""
+                    className="w-full h-auto object-contain max-h-[75vh] mx-auto"
+                    draggable={false}
+                  />
+                </div>
+                <div className="flex items-center justify-between px-3 pt-3">
+                  <div className="flex items-center gap-4 text-white/90">
+                    <span aria-hidden>♥</span>
+                    <span aria-hidden>💬</span>
+                    <span aria-hidden>↗</span>
+                  </div>
+                  <a
+                    href={IG_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-sans text-xs uppercase tracking-widest text-fire hover:underline"
+                  >
+                    Megnyitás Instagramon
+                  </a>
+                </div>
+              </article>
+            ))}
+            <div className="p-6 text-center">
+              <a
+                href={IG_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-5 py-3 bg-fire text-black font-display tracking-widest text-sm hover:bg-fire/90 transition-colors"
+              >
+                <Instagram className="h-4 w-4" /> @azkomoly.hu
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
 
