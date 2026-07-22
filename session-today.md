@@ -235,6 +235,37 @@ server** antes de dar por bueno cualquier resultado — un `200` no prueba que e
 
 ---
 
+## 2026-07-22 (Sesión 5) ✅ CERRADA
+
+### Lo que se hizo
+
+**Pull de Lovable (`594ceb1..df804c0`):**
+- Botón de producto HU: `MEGNYITOM` → `MEGVESZEM` ("Lo abro" → "Lo compro"). Coherente: es webshop real.
+- `routeTree.gen.ts`: quedó limpio — solo el bloque `Register` de **react-router** (el normal), SIN el de `react-start` que rompe `tsc`. Rutas `/en` intactas. Repo publicable.
+
+**Cambio de código — tarjeta de producto 100% clickeable (commit `15d0b82`, pusheado):**
+- Pedido del cliente: "clicking anywhere on the product, not just the button, opens it."
+- `src/components/shop/ProductCard.tsx`: agregado **stretched link** (`<Link absolute inset-0 z-10>` con `aria-label={product.title}`) que cubre toda la card. Fila de botones subida a `z-20` para que quick-add (bolsita) y CTA `MEGVESZEM` sigan funcionando por separado. `tsc --noEmit` = 0.
+- Pendiente menor: el botón `MEGVESZEM` quedó redundante (toda la card abre el producto). Diego no decidió aún si quitarlo — DEJAR hasta que lo pida.
+
+**Decisión SEO — Shopify NO debe rankear (solo `azkomoly.hu` rankea):**
+- Confirmado por Diego: el sitio oficial/navegable/que rankea es `azkomoly.hu` (este repo, Lovable). La tienda Shopify (`checkout.azkomoly.hu`) es **solo checkout + backup**, no tienda navegable. Se creó ese subdominio aparte para que en el checkout salga el dominio propio (no `…myshopify.com`) sin romper el DNS.
+- **Solución elegida: Opción A — password-protejer la Online Store de Shopify** (`Online Store → Preferences → Password protection: ON`). Saca todo el storefront del índice de Google, pero el checkout sigue funcionando porque va por el permalink/`checkoutUrl` (no está detrás de la password). La tienda queda como backup funcional.
+- **Rechazado de la receta de Lovable:** el `<link rel="canonical" href="azkomoly.hu{{request.path}}">` (paths de Shopify NO coinciden con `/shop/$slug` → señal falsa) y bloquear `robots.txt` (impediría que Google lea el `noindex`). Con la password alcanza.
+- Pasos para Diego (Shopify Admin, no código): 1) activar password, 2) primary domain = `checkout.azkomoly.hu`, 3) "Return to store URL" = `https://azkomoly.hu`, 4) GSC: agregar propiedad `checkout.azkomoly.hu` + Removals/Temporary hide. Luego: compra de prueba para confirmar que el checkout abre con la password puesta (si no, ir a Opción B = noindex en `theme.liquid`).
+
+**Apex `azkomoly.com`:** confirmado el diagnóstico de sesión 4B (falta cert TLS del apex en Lovable). Acción de Diego: dar de alta apex en Lovable, `.hu` Primary, `.com`/`www` → 301 a `.hu`.
+
+### Pendiente (para próximas sesiones)
+- [ ] Diego: activar password protection en Shopify + los 4 pasos de arriba → confirmar compra de prueba.
+- [ ] Diego: decidir si se quita el botón `MEGVESZEM` de la card (ahora redundante).
+- [ ] **Diego hará cambios en Lovable antes de la próxima sesión → HACER PULL al abrir.**
+- [ ] Blogs con enlazado interno (pieza SEO pendiente, no empezada).
+- [ ] `shopify-theme/` + `.zip` sin trackear — sin resolver aún.
+- (siguen pendientes de sesiones previas: apex `.com`, handles de producto, `SHOPIFY_ADMIN_TOKEN`, envíos, pagos, ÁFA, sitemap a GSC)
+
+---
+
 <!-- PLANTILLA PARA NUEVAS SESIONES:
 
 ## YYYY-MM-DD (Sesión N)
