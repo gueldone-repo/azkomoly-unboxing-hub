@@ -266,7 +266,7 @@ const hu: Dict = {
     kicker: "4 LÉPÉS",
     heading: "Hogyan működik?",
     steps: [
-      { n: "01", title: "VÁLASSZ DOBOZT", text: "Mini, Klasszikus, Prémium vagy Legendás. Te döntöd el a tétet." },
+      { n: "01", title: "VÁLASSZ DOBOZT", text: "" },
       { n: "02", title: "FIZESS", text: "Bankkártya, Apple Pay, Google Pay. 2 perc az egész." },
       { n: "03", title: "VÁRJ", text: "Dőlj hátra. A dobozod úton van hozzád." },
       { n: "04", title: "NYISD KI", text: "Vedd fel kamerával. Posztold. Címkézz be minket." },
@@ -479,7 +479,7 @@ const en: Dict = {
     kicker: "4 STEPS",
     heading: "How does it work?",
     steps: [
-      { n: "01", title: "PICK A BOX", text: "Mini, Classic, Premium or Legendary. You set the stake." },
+      { n: "01", title: "PICK A BOX", text: "" },
       { n: "02", title: "PAY", text: "Card, Apple Pay, Google Pay. Takes 2 minutes." },
       { n: "03", title: "WAIT", text: "Sit back. Your box is on its way." },
       { n: "04", title: "OPEN IT", text: "Film it. Post it. Tag us." },
