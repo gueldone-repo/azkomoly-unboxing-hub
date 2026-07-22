@@ -28,6 +28,13 @@ export function ProductCard({ p }: { p: ShopifyProduct }) {
 
   return (
     <article className="group relative flex flex-col bg-dark-bg/85 backdrop-blur-md border-2 border-cardboard/40 hover:border-fire transition-all duration-300 overflow-hidden hover:shadow-[0_0_30px_oklch(0.78_0.17_70/0.25)] hover:-translate-y-1">
+      {/* Whole-card link: clicking anywhere opens the product */}
+      <Link
+        to="/shop/$slug"
+        params={{ slug: product.handle }}
+        aria-label={product.title}
+        className="absolute inset-0 z-10"
+      />
       {/* Visual */}
       <div className="relative aspect-square overflow-hidden bg-dark-bg">
         {image ? (
@@ -68,7 +75,7 @@ export function ProductCard({ p }: { p: ShopifyProduct }) {
               : formatShopifyPrice(product.priceRange.minVariantPrice)}
           </span>
         </div>
-        <div className="mt-2 flex gap-2">
+        <div className="relative z-20 mt-2 flex gap-2">
           <Link
             to="/shop/$slug"
             params={{ slug: product.handle }}
