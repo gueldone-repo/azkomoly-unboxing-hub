@@ -9,7 +9,7 @@ const TTL_MS = 24 * 60 * 60 * 1000;
 
 export function IntroVideoModal() {
   const [open, setOpen] = useState(false);
-  const [muted, setMuted] = useState(true);
+  const [muted, setMuted] = useState(false);
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
   useEffect(() => {
@@ -44,6 +44,21 @@ export function IntroVideoModal() {
       if (e.key === "Escape") setOpen(false);
     };
     window.addEventListener("keydown", onKey);
+
+    // Intentamos reproducir con sonido; si el navegador bloquea el autoplay,
+    // volvemos a silenciar y reproducimos.
+    const v = videoRef.current;
+    if (v) {
+      v.muted = false;
+      v.play().catch(() => {
+        setMuted(true);
+        if (v) {
+          v.muted = true;
+          void v.play().catch(() => {});
+        }
+      });
+    }
+
     return () => {
       document.body.style.overflow = prev;
       window.removeEventListener("keydown", onKey);
