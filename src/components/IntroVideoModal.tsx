@@ -9,7 +9,7 @@ const TTL_MS = 24 * 60 * 60 * 1000;
 
 export function IntroVideoModal() {
   const [open, setOpen] = useState(false);
-  const [muted, setMuted] = useState(true);
+  const [muted, setMuted] = useState(false);
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
   useEffect(() => {
