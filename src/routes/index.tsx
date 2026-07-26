@@ -136,7 +136,9 @@ export function Landing() {
       </div>
 
       <SignupDialog open={open} onOpenChange={setOpen} />
+      <IntroVideoModal />
       <CookieBanner />
+
     </main>
   );
 }
