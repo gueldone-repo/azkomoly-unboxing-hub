@@ -44,6 +44,21 @@ export function IntroVideoModal() {
       if (e.key === "Escape") setOpen(false);
     };
     window.addEventListener("keydown", onKey);
+
+    // Intentamos reproducir con sonido; si el navegador bloquea el autoplay,
+    // volvemos a silenciar y reproducimos.
+    const v = videoRef.current;
+    if (v) {
+      v.muted = false;
+      v.play().catch(() => {
+        setMuted(true);
+        if (v) {
+          v.muted = true;
+          void v.play().catch(() => {});
+        }
+      });
+    }
+
     return () => {
       document.body.style.overflow = prev;
       window.removeEventListener("keydown", onKey);
