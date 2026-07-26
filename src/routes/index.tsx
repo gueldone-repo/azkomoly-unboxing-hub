@@ -6,6 +6,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { appendLeadToSheet } from "@/lib/leads.functions";
 import { Instagram, Facebook, Youtube, ShieldCheck, Truck, Sparkles } from "lucide-react";
 import { CookieBanner } from "@/components/CookieBanner";
+import { IntroVideoModal } from "@/components/IntroVideoModal";
+
 import { ScrubBackdrop } from "@/components/ScrubBackdrop";
 import { HeroOverlay } from "@/components/HeroOverlay";
 import { ProductCard } from "@/components/shop/ProductCard";
@@ -136,7 +138,9 @@ export function Landing() {
       </div>
 
       <SignupDialog open={open} onOpenChange={setOpen} />
+      <IntroVideoModal />
       <CookieBanner />
+
     </main>
   );
 }
