@@ -86,9 +86,9 @@ export function IntroVideoModal() {
             }
           }}
           aria-label={muted ? "Hang bekapcsolása" : "Némítás"}
-          className="absolute bottom-3 left-3 grid place-items-center h-10 w-10 rounded-full bg-black/60 text-white hover:bg-black/80 transition-colors"
+          className="absolute bottom-4 right-4 grid place-items-center h-16 w-16 rounded-full bg-fire text-black shadow-[0_0_20px_rgba(245,166,35,0.6)] animate-pulse-glow hover:scale-105 active:scale-95 transition-transform"
         >
-          {muted ? <VolumeX className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
+          {muted ? <VolumeX className="h-7 w-7" /> : <Volume2 className="h-7 w-7" />}
         </button>
 
         <button
