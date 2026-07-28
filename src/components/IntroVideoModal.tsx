@@ -3,25 +3,13 @@ import { X, Volume2, VolumeX } from "lucide-react";
 import videoAsset from "@/assets/azk-intro.mp4.asset.json";
 import posterAsset from "@/assets/azk-intro-poster.jpg.asset.json";
 
-const SEEN_KEY = "azkomoly_intro_video_v1";
-// Se muestra una vez cada 24h por visitante.
-const TTL_MS = 24 * 60 * 60 * 1000;
-
 export function IntroVideoModal() {
   const [open, setOpen] = useState(false);
   const [muted, setMuted] = useState(false);
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
   useEffect(() => {
-    let seen = 0;
-    try {
-      seen = Number(window.localStorage.getItem(SEEN_KEY) ?? 0);
-    } catch {
-      /* storage bloqueado */
-    }
-    if (Date.now() - seen < TTL_MS) return;
-
-    // Esperamos a que la página termine de cargar para no competir por ancho de banda.
+    // Se muestra en cada carga/refresh de la página, sin gate de localStorage.
     const start = () => window.setTimeout(() => setOpen(true), 400);
     if (document.readyState === "complete") {
       start();
@@ -33,11 +21,6 @@ export function IntroVideoModal() {
 
   useEffect(() => {
     if (!open) return;
-    try {
-      window.localStorage.setItem(SEEN_KEY, String(Date.now()));
-    } catch {
-      /* noop */
-    }
     const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     const onKey = (e: KeyboardEvent) => {
@@ -120,9 +103,9 @@ export function IntroVideoModal() {
         <button
           type="button"
           onClick={() => setOpen(false)}
-          className="mt-3 w-full font-sans text-xs uppercase tracking-[0.3em] text-white/70 hover:text-fire transition-colors"
+          className="mt-4 w-full rounded-md bg-fire py-4 font-display text-lg text-black shadow-[0_0_25px_rgba(245,166,35,0.5)] transition-transform hover:scale-[1.02] hover:shadow-[0_0_35px_rgba(245,166,35,0.7)] active:scale-[0.98]"
         >
-          Kihagyás
+          Tovább a weboldalra!
         </button>
       </div>
     </div>

@@ -62,6 +62,15 @@ Built for Diego (GUELDONE Agency). Path: `C:\Users\Mariana\Desktop\GUELDOEN\AZKO
 
 ---
 
+## Skills
+
+15 official Shopify skills installed in `.claude/skills/` (gitignored, not real store access — just verified GraphQL/docs knowledge). Use:
+- `shopify-storefront-graphql` — any Storefront API query/mutation work (products, cart, checkout).
+- `shopify-admin` — any Admin API work (price_rules/discounts, future admin features).
+- Others (`shopify-liquid`, `shopify-hydrogen`, `shopify-pos-ui`, Polaris extensions, etc.) — not applicable to this headless project, ignore unless scope changes.
+
+---
+
 ## Shopify
 
 | Dato | Valor |

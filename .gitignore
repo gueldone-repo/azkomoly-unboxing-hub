@@ -9,6 +9,7 @@ lerna-debug.log*
 
 node_modules
 dist
+.claude/skills
 dist-ssr
 .output
 .vinxi
