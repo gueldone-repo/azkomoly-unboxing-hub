@@ -266,6 +266,51 @@ server** antes de dar por bueno cualquier resultado — un `200` no prueba que e
 
 ---
 
+## 2026-08-05 (Sesión 6) ✅ CERRADA — Rediseño visual completo
+
+### Lo que se hizo
+
+**Pivote de marca — de naranja/graffiti oscuro a morado/blanco/negro:**
+- Paleta nueva: `--fire` pasó de naranja (#F5A623) a morado oscuro `#5B2EA8`; `--cardboard` a lavanda `#8F78B5`. Fondo del sitio pasó de oscuro a blanco. Ver tabla actualizada en CLAUDE.md.
+- Tipografía nueva: Archivo Black (`font-display`) + Poppins (`font-sans`) reemplazan Permanent Marker + Space Grotesk. El H1 del Hero usa **Danfo** (fuente aparte, no es la variable global) y los subtítulos/CTA del Hero y de "Don't read · open" usan **ADLaM Display** — probamos Nosifer también pero el cliente no lo quiso (efecto "goteo sangre" muy literal), quedó cargada la fuente por si se reusa en otra sección más adelante.
+
+**Componente nuevo — `DripDivider` (`src/components/DripDivider.tsx`):**
+- El efecto "derretido" que ahora es parte de la identidad visual: bordes orgánicos entre secciones (navbar, footer, transición hero→productos) con relieve 3D (capas SVG offset en negro). Variantes `drip`/`wave`/`organic`.
+- Bug importante resuelto: si la sección padre tiene su propio `bg-fire` de fondo, tapa el recorte y se ve una línea recta en vez del efecto orgánico — la solución fue sacar el `bg-fire` del contenedor padre y dejarlo solo en la franja de contenido, para que los "valles" de la onda muestren de verdad lo que hay detrás.
+- **Pendiente**: en alguna(s) de las secciones wavy todavía se ve una línea recta remanente (parece un fondo lineal viejo que quedó por debajo del SVG) — hay que ubicarla bien y sacarla, se ve mal. Revisar navbar, footer, y transición hero→productos con zoom para encontrar exactamente dónde.
+
+**Hero rediseñado en capas:** logo → H1 (2 líneas, corta arriba/larga abajo, morado con relieve 3D negro) → imagen (`azkomoly-caja-hero.png`, caja+"?" de cartón) superpuesta al H1 → tagline → CTA redondeado con `.btn-drip` → scroll-down animado (chevron morado con rebote).
+
+**Navbar:** siempre morado sólido (ya no transparente/oculto — se probaron varias versiones), texto blanco, borde inferior con el efecto derretido orgánico + relieve 3D negro más profundo. Menú hamburguesa (`md:hidden`) con overlay a pantalla completa que también cierra con el efecto derretido abajo. Toggle de idioma HU/EN con banderas SVG propias (los emoji de bandera no se renderizan en Windows) y ahora **navega de verdad** entre `/` y `/en` en vez de solo cambiar cookie — de paso se arregló un bug de sincronización: el `I18nProvider` de la raíz no releía la cookie al volver de `/en`.
+
+**Secciones:**
+- "Our boxes" (productos): fondo morado con transición derretida; luego a pedido del cliente pasó de grid a **stack vertical** (una card ancha por producto, imagen grande + descripción completa sin recortar) con sombreado morado oscuro en cada card. Nuevo componente `ProductCardWide` en `ProductCard.tsx` (el `ProductCard` chico original queda para otros usos).
+- "How does it work": números 01-04 mucho más grandes y morados (antes casi invisibles al 6% opacidad).
+- "Don't read · open" (BigCTA): fondo con dos fotos (`boxes.jpeg` / `boxes inside.jpeg`) y **efecto de linterna** — un círculo que sigue al cursor revela la segunda foto solo ahí adentro (mask-image radial-gradient siguiendo mouse position), sin ningún velo de color encima (se probó con velo morado primero, no gustó). Hint animado "Move your cursor" con ícono de puntero.
+- Carrusel "reviews" (donde antes iban las fotos lifestyle viejas — esas 6 imágenes **se borraron del disco intencionalmente**, el cliente ya no las necesita): ahora son 6 imágenes (`review1.png`...`review6.png`) que linkean a reels de Instagram/TikTok reales, con flechas de navegación y loop infinito verdadero (funciona igual con auto-scroll, arrastre o flechas — antes el loop infinito solo aplicaba al auto-scroll). Debajo, fila "Follow us" con los íconos a los canales reales.
+- 3D en títulos (`.text-3d-fire`, texto morado + relieve negro): se probó en "How does it work" y "FAQ" pero el cliente no lo quiso ahí ("no se ven chidos") — se sacó de esas dos, se mantiene en "Our boxes".
+- Footer: morado con texto blanco, borde superior con el efecto derretido (mismo componente, `flip` para que el borde plano quede pegado al footer y las crestas apunten hacia arriba).
+
+**Assets nuevos en `public/`:** `azkomoly_new_logo.png` (negro, para hero/footer) y `azkomoly_new_logo_negativo.png` (blanco, para navbar) reemplazan el logo viejo `azkomoly (1).png`. `hero_new.webp` y `azkomoly-caja-hero.png` para el hero. `boxes.jpeg` / `boxes inside.jpeg` para el efecto linterna. `review1-6.png` para el carrusel social.
+
+**Borrado intencional (confirmado con Diego):** logo viejo, `HERO_1_FRAME.jpeg`, y las 6 fotos del carrusel lifestyle viejo — ya no se usan, el carrusel de reviews las reemplazó.
+
+**Git:** 2 commits pusheados a `main` (`c5f4482`, `6e35eca`), ambos sin publicar (Diego dijo explícitamente "aún no publicaré"). En los dos casos se revirtió `src/routeTree.gen.ts` antes de commitear (gotcha de siempre — el dev server reinyecta el bloque `@tanstack/react-start` que rompe `tsc`).
+
+### Pendiente (para próximas sesiones)
+
+- [ ] **Sacar la línea recta remanente en las secciones wavy** (ver arriba, sección DripDivider) — es lo primero a resolver la próxima sesión.
+- [ ] **Nuevas páginas — flujo definido por Diego, pendiente de generar vía Lovable:**
+  - **About Us** (página independiente): manifiesto de marca ("Our goal"), historia/equipo ("Who we are"), y una sección "Follow us" con TODOS los logos de redes sociales. Mensaje clave: empresa 100% húngara, solo vende productos **originales** (no de marca/branded — aclarar esta distinción, es intencional y repetida por Diego) y de misterio.
+  - **FAQ / Q&A** (página independiente): acordeón de preguntas frecuentes completo (envíos, cómo funcionan las sorpresas, políticas), bloque "Still need help? / Email us!" con contacto directo, footer con redes.
+  - **Landing actual**: se mantiene como está (Hero, Products, Videos/reviews, Reviews con estrellas, How it works, FAQ recortado a ~3 preguntas principales + botón "Ver más" que lleva a la página FAQ completa, Footer/Follow us).
+  - **Plan acordado**: Diego le va a pedir a Lovable que genere estas dos páginas (prompts ya redactados y entregados en el chat de cierre de esta sesión — pedirle a Diego que los pegue en Lovable). Una vez que Lovable las cree, la próxima sesión hay que hacer `git pull` y mergear/ajustar esas páginas para que calcen 100% con el sistema de diseño actual (paleta morada, `DripDivider`, `.text-3d-fire`, fuente Danfo en H1 de página, ADLaM Display en subtítulos si aplica).
+  - Falta actualizar la navegación del navbar (agregar "About"/"FAQ" con sus links reales) — **sin tocar el diseño del navbar**, solo los `href` y el array `navLinks` en `TopNav` (`src/routes/index.tsx`).
+- [ ] `shopify-theme/` + `.zip` sin trackear — sin resolver aún (mismo pendiente de sesiones anteriores).
+- (siguen pendientes de sesiones previas: apex `.com`, handles de producto, `SHOPIFY_ADMIN_TOKEN`, envíos, pagos, ÁFA, sitemap a GSC, blogs SEO)
+
+---
+
 <!-- PLANTILLA PARA NUEVAS SESIONES:
 
 ## YYYY-MM-DD (Sesión N)

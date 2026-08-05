@@ -17,17 +17,35 @@ Built for Diego (GUELDONE Agency). Path: `C:\Users\Mariana\Desktop\GUELDOEN\AZKO
 
 ## Design system
 
+> **Actualizado en sesión de rediseño visual (2026-08-05).** Paleta y tipografía cambiaron por
+> completo respecto a la versión original (naranja/graffiti oscuro) — ahora es morado oscuro
+> sobre blanco, con acentos negros tipo "3D/derretido". Si ves referencias a naranja/negro en
+> comentarios viejos del código, están desactualizadas.
+
 | Token | Value | Usage |
 |---|---|---|
-| `--fire` | `oklch(0.78 0.17 70)` = #F5A623 | Primary accent, CTAs |
-| `--cardboard` | `oklch(0.66 0.12 65)` = #C8923A | Borders, secondary |
-| `--dark-bg` | `oklch(0.16 0 0)` = #111 | Card backgrounds |
-| `--background` | `oklch(0.14 0 0)` | Page background |
+| `--fire` | `#5B2EA8` (morado oscuro) | Primary accent, CTAs, navbar, secciones destacadas |
+| `--cardboard` | `#8F78B5` (lavanda secundario) | Borders, secondary |
+| `--dark-bg` | near-white | Card backgrounds |
+| `--background` | white | Page background |
+| Negro `#0D0D0D` | — | Relieve 3D (texto, botones, dividers), nunca como color de fondo de sección |
 
-**Fonts:** `font-display` = Permanent Marker (graffiti), `font-sans` = Space Grotesk.
+**Fonts:**
+- `font-display` = Archivo Black (títulos generales)
+- `font-sans` = Poppins (nav, cuerpo, botones)
+- **H1 del Hero específicamente**: Danfo (vía `style={{ fontFamily: "'Danfo', var(--font-display)" }}`, no es la variable global) — usar esta misma fuente para títulos de páginas nuevas (About/FAQ) que quieran igualar el estilo del Hero
+- Subtítulos/CTA del Hero y de "Don't read · open": ADLaM Display (mismo patrón inline, no es variable global)
+- Ambas cargadas vía Google Fonts `<link>` en `head()` de cada ruta (ver `src/routes/index.tsx` y `en.index.tsx`)
+
+**Efecto "derretido" (marca registrada de este rediseño):**
+- Componente `src/components/DripDivider.tsx` — capas SVG (sombra negra offset + color principal) simulando un borde orgánico/goteando. Variantes: `drip` (gotas pesadas), `wave` (ondas parejas), `organic` (silueta irregular, la más usada).
+- Regla de color: `mainColor` = color de la sección que "gotea" (arriba en `flip=false`, abajo en `flip=true`); dejar `bgColor` sin pasar para que los valles muestren de verdad lo que hay detrás (nunca forzar un color ahí o se pierde el efecto de recorte real).
+- **Pendiente conocido**: en algunas de estas secciones wavy queda una línea recta visible (remanente de un fondo lineal viejo) — hay que revisarla y sacarla, se ve mal. Ver sección Pendiente más abajo.
+- `.text-3d-fire` (en `styles.css`) — mismo relieve pero para texto (títulos). Usado en H1 del Hero y en "Our boxes"; se sacó deliberadamente de "How does it work" y "FAQ" (el cliente no lo quiso ahí).
+- `.btn-drip` (en `styles.css`) — relieve 3D discreto + hover a texto negro, para botones morados (`bg-fire`).
 
 **Signature utilities** (defined in `src/styles.css`):
-- `.graffiti-border` — fire-colored offset box-shadow
+- `.graffiti-border` — fire-colored offset box-shadow (utilidad vieja, en desuso en las secciones rediseñadas, pero sigue existiendo para lo que no se tocó)
 - `.text-fire-glow` — fire text-shadow glow
 - `.text-stroke-black` — black text stroke
 - `.torn-card` / `.torn-divider` — clip-path torn paper edges
