@@ -139,7 +139,7 @@ export function CartSheet() {
               <p className="font-sans text-foreground/60">{t.cart.empty}</p>
               <button
                 onClick={() => setOpen(false)}
-                className="mt-4 inline-block bg-fire text-primary-foreground font-display px-5 py-2.5 graffiti-border hover:translate-y-[-2px] transition-transform"
+                className="mt-4 inline-block bg-fire text-primary-foreground font-display px-5 py-2.5 btn-drip hover:translate-y-[-2px] transition-transform"
               >
                 {t.cart.emptyCta}
               </button>
@@ -174,7 +174,7 @@ export function CartSheet() {
               <button
                 onClick={goToCheckout}
                 disabled={!getCheckoutUrl()}
-                className="w-full bg-fire text-primary-foreground font-display text-xl py-4 graffiti-border hover:translate-y-[-2px] transition-transform disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full bg-fire text-primary-foreground font-display text-xl py-4 btn-drip hover:translate-y-[-2px] transition-transform disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {t.cart.checkout} →
               </button>

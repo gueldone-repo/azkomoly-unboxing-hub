@@ -22,8 +22,10 @@ export type Dict = {
   };
   nav: {
     shop: string;
+    merch: string;
     how: string;
     faq: string;
+    contact: string;
     notify: string;
   };
   hero: {
@@ -182,13 +184,13 @@ const hu: Dict = {
     ogTitle: "AZKOMOLY — Mi van a dobozban?",
     ogDescription: "Nem tudod mi van benne. Ez a lényeg.",
   },
-  nav: { shop: "Bolt", how: "Hogyan működik", faq: "GYIK", notify: "Értesíts" },
+  nav: { shop: "Bolt", merch: "Merch", how: "Hogyan működik", faq: "GYIK", contact: "Kapcsolat", notify: "Értesíts" },
   hero: {
     est: "EST · MMXXVI",
     index: "/01",
     mysteryBox: "MYSTERY · BOX",
-    heading: "AZKOMOLY — Mystery Box Shop",
-    tagline: "Márkás ruhák. Véletlenszerű tartalom. Nevetséges áron.",
+    heading: "NYISD\nKI A TITKOT",
+    tagline: "Válassz egy dobozt. Fedezd fel, mi van benne. Minden alkalommal más meglepetés.",
     scroll: "GÖRGESS",
     cta: "KINYITOM A DOBOZOM →",
   },
@@ -395,13 +397,13 @@ const en: Dict = {
     ogTitle: "AZKOMOLY — What's in the box?",
     ogDescription: "You don't know what's inside. That's the point.",
   },
-  nav: { shop: "Shop", how: "How it works", faq: "FAQ", notify: "Notify me" },
+  nav: { shop: "Shop", merch: "Merch", how: "How it works", faq: "FAQ", contact: "Contact", notify: "Notify me" },
   hero: {
     est: "EST · MMXXVI",
     index: "/01",
     mysteryBox: "MYSTERY · BOX",
-    heading: "AZKOMOLY — Mystery Box Shop",
-    tagline: "Branded clothing. Random contents. Ridiculous prices.",
+    heading: "OPEN\nTHE MYSTERY",
+    tagline: "Pick a box. Discover what's inside. A new surprise every time.",
     scroll: "SCROLL",
     cta: "I WANT TO OPEN MY BOX →",
   },

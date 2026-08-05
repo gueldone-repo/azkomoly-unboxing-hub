@@ -89,7 +89,7 @@ function ProductError({ reset }: { reset: () => void }) {
     <div className="min-h-screen grid place-items-center bg-background text-foreground p-6 text-center">
       <div>
         <h1 className="font-display text-3xl text-fire mb-4">{t.product.errorTitle}</h1>
-        <button onClick={reset} className="bg-fire text-primary-foreground font-display px-6 py-3 graffiti-border">
+        <button onClick={reset} className="bg-fire text-primary-foreground font-display px-6 py-3 btn-drip">
           {t.product.retry}
         </button>
       </div>
@@ -103,7 +103,7 @@ function ProductNotFound() {
     <div className="min-h-screen grid place-items-center bg-background text-foreground p-6 text-center">
       <div>
         <h1 className="font-display text-4xl text-fire mb-4">{t.product.notFound}</h1>
-        <Link to="/" className="bg-fire text-primary-foreground font-display px-6 py-3 graffiti-border">
+        <Link to="/" className="bg-fire text-primary-foreground font-display px-6 py-3 btn-drip">
           {t.product.backToShop}
         </Link>
       </div>
@@ -250,7 +250,7 @@ export function ProductPage({
             <button
               onClick={handleAddToCart}
               disabled={!available || isLoading}
-              className="flex-1 bg-fire text-primary-foreground font-display text-xl graffiti-border hover:translate-y-[-2px] transition-transform disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 bg-fire text-primary-foreground font-display text-xl btn-drip hover:translate-y-[-2px] transition-transform disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {t.product.addToCart} · {selectedVariant
                 ? formatShopifyPrice({ amount: String(parseFloat(selectedVariant.price.amount) * qty), currencyCode: selectedVariant.price.currencyCode })

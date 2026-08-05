@@ -79,7 +79,7 @@ export function ProductCard({ p }: { p: ShopifyProduct }) {
           <Link
             to="/shop/$slug"
             params={{ slug: product.handle }}
-            className="flex-1 bg-fire text-primary-foreground font-display text-lg text-center py-3 graffiti-border hover:translate-y-[-2px] transition-transform"
+            className="btn-drip flex-1 bg-fire text-primary-foreground font-display text-lg text-center py-3 hover:translate-y-[-2px] transition-transform"
           >
             {t.products.open}
           </Link>

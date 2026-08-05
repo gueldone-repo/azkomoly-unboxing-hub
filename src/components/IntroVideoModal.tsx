@@ -9,8 +9,15 @@ export function IntroVideoModal() {
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
   useEffect(() => {
-    // Se muestra en cada carga/refresh de la página, sin gate de localStorage.
-    const start = () => window.setTimeout(() => setOpen(true), 400);
+    // Solo una vez por sesión de navegación: si el usuario ya lo vio (aunque
+    // navegue a /shop/$slug y vuelva a "/"), no debe volver a aparecer hasta
+    // que cierre la pestaña/navegador.
+    if (sessionStorage.getItem("azkomoly-intro-seen")) return;
+    const start = () =>
+      window.setTimeout(() => {
+        setOpen(true);
+        sessionStorage.setItem("azkomoly-intro-seen", "1");
+      }, 400);
     if (document.readyState === "complete") {
       start();
       return;
@@ -86,7 +93,7 @@ export function IntroVideoModal() {
             }
           }}
           aria-label={muted ? "Hang bekapcsolása" : "Némítás"}
-          className="absolute bottom-4 right-4 grid place-items-center h-16 w-16 rounded-full bg-fire text-black shadow-[0_0_20px_rgba(245,166,35,0.6)] animate-pulse-glow hover:scale-105 active:scale-95 transition-transform"
+          className="absolute bottom-4 right-4 grid place-items-center h-16 w-16 rounded-full bg-fire text-primary-foreground shadow-[0_0_20px_rgba(201,174,235,0.6)] animate-pulse-glow hover:scale-105 active:scale-95 transition-transform"
         >
           {muted ? <VolumeX className="h-7 w-7" /> : <Volume2 className="h-7 w-7" />}
         </button>
@@ -95,7 +102,7 @@ export function IntroVideoModal() {
           type="button"
           onClick={() => setOpen(false)}
           aria-label="Bezárás"
-          className="absolute -top-3 -right-3 grid place-items-center h-11 w-11 rounded-full bg-fire text-black hover:scale-105 transition-transform shadow-lg"
+          className="absolute -top-3 -right-3 grid place-items-center h-11 w-11 rounded-full bg-fire text-primary-foreground hover:scale-105 transition-transform shadow-lg"
         >
           <X className="h-6 w-6" />
         </button>
@@ -103,7 +110,7 @@ export function IntroVideoModal() {
         <button
           type="button"
           onClick={() => setOpen(false)}
-          className="mt-4 w-full rounded-md bg-fire py-4 font-display text-lg text-black shadow-[0_0_25px_rgba(245,166,35,0.5)] transition-transform hover:scale-[1.02] hover:shadow-[0_0_35px_rgba(245,166,35,0.7)] active:scale-[0.98]"
+          className="mt-4 w-full rounded-md bg-fire py-4 font-display text-lg text-primary-foreground shadow-[0_0_25px_rgba(201,174,235,0.5)] transition-transform hover:scale-[1.02] hover:shadow-[0_0_35px_rgba(201,174,235,0.7)] active:scale-[0.98]"
         >
           Tovább a weboldalra!
         </button>

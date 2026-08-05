@@ -106,7 +106,7 @@ export function BoxSpinner({ onClose }: { onClose: () => void }) {
             <>
               <p
                 className="relative font-display text-base sm:text-lg text-fire mb-0.5"
-                style={{ textShadow: "0 0 20px oklch(0.78 0.17 70 / 0.6)" }}
+                style={{ textShadow: "0 0 20px rgb(201 174 235 / 0.6)" }}
               >
                 {t.boxSpinner.pick}
               </p>
@@ -138,9 +138,9 @@ export function BoxSpinner({ onClose }: { onClose: () => void }) {
                         transform: isChosen ? "scale(1.15) translateY(-8px)" : undefined,
                         filter:
                           phase === "idle"
-                            ? "drop-shadow(0 4px 12px oklch(0.78 0.17 70 / 0.3))"
+                            ? "drop-shadow(0 4px 12px rgb(201 174 235 / 0.3))"
                             : isChosen
-                            ? "drop-shadow(0 0 28px oklch(0.78 0.17 70 / 1))"
+                            ? "drop-shadow(0 0 28px rgb(201 174 235 / 1))"
                             : "none",
                         animation:
                           phase === "idle"
@@ -166,7 +166,7 @@ export function BoxSpinner({ onClose }: { onClose: () => void }) {
             <div style={{ animation: "bxReveal 0.45s ease-out both" }}>
               <p
                 className="font-display text-lg sm:text-xl text-fire mb-3"
-                style={{ textShadow: "0 0 30px oklch(0.78 0.17 70 / 0.8)" }}
+                style={{ textShadow: "0 0 30px rgb(201 174 235 / 0.8)" }}
               >
                 {t.boxSpinner.congrats}
               </p>
@@ -175,7 +175,7 @@ export function BoxSpinner({ onClose }: { onClose: () => void }) {
                   src="/2_box_abierta.png"
                   alt="Nyitott doboz"
                   className="w-full object-contain"
-                  style={{ filter: "drop-shadow(0 0 22px oklch(0.78 0.17 70 / 0.7))" }}
+                  style={{ filter: "drop-shadow(0 0 22px rgb(201 174 235 / 0.7))" }}
                 />
               </div>
               <p className="font-sans text-xs text-white/60 mb-4 leading-relaxed">
@@ -218,7 +218,7 @@ export function BoxSpinner({ onClose }: { onClose: () => void }) {
             <div style={{ animation: "bxReveal 0.45s ease-out both" }}>
               <p
                 className="font-display text-lg sm:text-xl text-fire mb-4"
-                style={{ textShadow: "0 0 30px oklch(0.78 0.17 70 / 0.8)" }}
+                style={{ textShadow: "0 0 30px rgb(201 174 235 / 0.8)" }}
               >
                 {t.boxSpinner.congrats}
               </p>
@@ -227,7 +227,7 @@ export function BoxSpinner({ onClose }: { onClose: () => void }) {
                   src="/2_box_abierta.png"
                   alt="Nyitott doboz"
                   className="w-full object-contain"
-                  style={{ filter: "drop-shadow(0 0 22px oklch(0.78 0.17 70 / 0.7))" }}
+                  style={{ filter: "drop-shadow(0 0 22px rgb(201 174 235 / 0.7))" }}
                 />
               </div>
               <div className="relative border-2 border-fire bg-fire/10 py-3 px-4 mb-3 overflow-hidden">

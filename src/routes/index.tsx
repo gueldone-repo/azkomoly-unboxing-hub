@@ -4,11 +4,12 @@ import { useServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { appendLeadToSheet } from "@/lib/leads.functions";
-import { Instagram, Facebook, Youtube, ShieldCheck, Truck, Sparkles } from "lucide-react";
+import { Instagram, Facebook, Youtube, ShieldCheck, Truck, Sparkles, Menu, X } from "lucide-react";
 import { CookieBanner } from "@/components/CookieBanner";
 import { IntroVideoModal } from "@/components/IntroVideoModal";
 
 import { ScrubBackdrop } from "@/components/ScrubBackdrop";
+import { DripDivider } from "@/components/DripDivider";
 import { HeroOverlay } from "@/components/HeroOverlay";
 import { ProductCard } from "@/components/shop/ProductCard";
 import { SocialProof } from "@/components/shop/SocialProof";
@@ -50,7 +51,7 @@ export const Route = createFileRoute("/")({
         { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
         {
           rel: "stylesheet",
-          href: "https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Space+Grotesk:wght@400;500;700&display=swap",
+          href: "https://fonts.googleapis.com/css2?family=Archivo+Black&family=Danfo&family=Nosifer&family=ADLaM+Display&family=Poppins:wght@400;500;700;800&display=swap",
         },
         // `/` es la versión húngara para crawlers y el x-default.
         ...seoLinks("/", lang),
@@ -133,9 +134,7 @@ export function Landing() {
       <BigCTA onCta={() => setOpen(true)} />
       <FAQSection />
 
-      <div className="px-6 pt-16 pb-12">
-        <Footer />
-      </div>
+      <Footer />
 
       <SignupDialog open={open} onOpenChange={setOpen} />
       <IntroVideoModal />
@@ -145,40 +144,186 @@ export function Landing() {
   );
 }
 
+const TIKTOK_PATH =
+  "M448,209.9a210.1,210.1,0,0,1-122.8-39.3V349.4A162.6,162.6,0,1,1,185,188.3V278.2a74.6,74.6,0,1,0,52.2,71.2V0h88a121.2,121.2,0,0,0,1.9,22.2h0A122.2,122.2,0,0,0,381,102.4a121.4,121.4,0,0,0,67,20.1Z";
+
+function SocialIcons({ className = "", dark = false }: { className?: string; dark?: boolean }) {
+  const color = dark ? "text-fire/80 hover:text-fire" : "text-white/85 hover:text-white";
+  return (
+    <div className={`flex items-center gap-3 ${className}`}>
+      <a
+        href="#"
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Facebook"
+        className={`${color} transition-colors`}
+      >
+        <Facebook className="h-4 w-4" />
+      </a>
+      <a
+        href="#"
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="YouTube"
+        className={`${color} transition-colors`}
+      >
+        <Youtube className="h-4 w-4" />
+      </a>
+      <a
+        href="https://www.instagram.com/azkomoly.hu/"
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Instagram"
+        className={`${color} transition-colors`}
+      >
+        <Instagram className="h-4 w-4" />
+      </a>
+      <a
+        href="#"
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="TikTok"
+        className={`${color} transition-colors`}
+      >
+        <svg viewBox="0 0 448 512" className="h-4 w-4" fill="currentColor" aria-hidden="true">
+          <path d={TIKTOK_PATH} />
+        </svg>
+      </a>
+    </div>
+  );
+}
+
 function TopNav({ onCta }: { onCta: () => void }) {
   const t = useT();
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [menuOpen]);
+
+  const navLinks = [
+    { href: "#termekek", label: t.nav.shop },
+    { href: "#termekek", label: t.nav.merch },
+    { href: "#hogyan", label: t.nav.how },
+    { href: "#gyik", label: t.nav.faq },
+    { href: "#kapcsolat", label: t.nav.contact },
+  ];
+
   return (
-    <nav className="sticky top-0 z-40 bg-dark-bg/85 backdrop-blur border-b-2 border-fire/40">
-      <div className="mx-auto max-w-7xl px-6 py-3 flex items-center justify-between gap-4">
-        <a href="#top" className="shrink-0">
-          <img
-            src="/AZKOMOLY.png"
-            alt="AZKOMOLY"
-            className="h-10 w-auto"
-            style={{ filter: "brightness(0) invert(1)" }}
-          />
-        </a>
-        <div className="flex items-center gap-4 sm:gap-5 font-sans text-sm">
-          <a href="#termekek" className="text-foreground hover:text-fire transition-colors">
-            {t.nav.shop}
+    <>
+      <nav className="fixed top-0 inset-x-0 z-40 flex flex-col">
+        <div className="bg-fire w-full">
+        <div className="mx-auto w-full max-w-7xl px-6 py-3 flex items-center justify-between gap-4">
+          <a href="#top" className="shrink-0">
+            <img
+              src="/azkomoly_new_logo_negativo.png"
+              alt="AZKOMOLY"
+              className="h-10 w-auto"
+            />
           </a>
-          <a href="#hogyan" className="text-foreground/80 hover:text-fire transition-colors hidden sm:inline">
-            {t.nav.how}
-          </a>
-          <a href="#gyik" className="text-foreground/80 hover:text-fire transition-colors hidden sm:inline">
-            {t.nav.faq}
-          </a>
-          <LanguageToggle />
-          <CartButton />
-          <button
-            onClick={onCta}
-            className="hidden sm:inline-block bg-fire text-primary-foreground font-display text-sm px-4 py-1.5 graffiti-border hover:translate-y-[-2px] transition-transform"
-          >
-            {t.nav.notify}
-          </button>
+          <div className="hidden md:flex items-center gap-6 font-sans text-sm">
+            {navLinks.map((l, i) => (
+              <a
+                key={i}
+                href={l.href}
+                className="font-extrabold text-white hover:text-black/70 transition-colors"
+              >
+                {l.label}
+              </a>
+            ))}
+          </div>
+          <div className="flex items-center gap-3 sm:gap-4">
+            <LanguageToggle light className="hidden sm:inline-flex" />
+            <SocialIcons className="hidden md:flex" dark={false} />
+            <CartButton className="!text-white !border-white/40 hover:!text-white hover:!border-white" />
+            <button
+              onClick={onCta}
+              className="hidden sm:inline-block bg-black text-white font-display text-xs px-4 py-2 rounded-full hover:translate-y-[-2px] transition-transform"
+            >
+              {t.nav.notify}
+            </button>
+            <button
+              onClick={() => setMenuOpen(true)}
+              aria-label="Menü"
+              className="md:hidden grid place-items-center h-9 w-9 text-white"
+            >
+              <Menu className="h-6 w-6" />
+            </button>
+          </div>
         </div>
+        </div>
+        {/* Sin bg-fire acá: los "valles" de la onda deben mostrar blanco de
+            verdad (recorte real), no un rectángulo morado escondido detrás. */}
+        <DripDivider
+          variant="organic"
+          mainColor="#5B2EA8"
+          shadowColor="#0D0D0D"
+          depth={4}
+          height={22}
+          className="w-full"
+        />
+      </nav>
+
+      {/* Menú hamburguesa — overlay a pantalla completa, con el mismo
+          derretido orgánico cerrando el borde inferior de toda la pantalla */}
+      <div
+        className={`fixed inset-0 z-[60] flex flex-col transition-all duration-300 ${
+          menuOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+        }`}
+      >
+        <div className="bg-fire flex-1 flex flex-col min-h-0">
+          <div className="flex items-center justify-between px-6 py-4">
+            <img src="/azkomoly_new_logo_negativo.png" alt="AZKOMOLY" className="h-9 w-auto" />
+            <button
+              onClick={() => setMenuOpen(false)}
+              aria-label="Bezárás"
+              className="grid place-items-center h-10 w-10 text-white"
+            >
+              <X className="h-7 w-7" />
+            </button>
+          </div>
+          <div className="flex-1 flex flex-col items-center justify-center gap-7 px-6">
+            {navLinks.map((l, i) => (
+              <a
+                key={i}
+                href={l.href}
+                onClick={() => setMenuOpen(false)}
+                className="font-display text-4xl text-white hover:text-black/70 transition-colors"
+              >
+                {l.label}
+              </a>
+            ))}
+            <button
+              onClick={() => {
+                setMenuOpen(false);
+                onCta();
+              }}
+              className="mt-4 bg-black text-white font-display text-base px-8 py-3 rounded-full"
+            >
+              {t.nav.notify}
+            </button>
+            <div className="mt-6 flex items-center gap-6">
+              <LanguageToggle light />
+              <SocialIcons dark={false} className="!gap-5" />
+            </div>
+          </div>
+        </div>
+        <DripDivider
+          variant="organic"
+          mainColor="#5B2EA8"
+          bgColor="#0D0D0D"
+          shadowColor="#3D2170"
+          depth={4}
+          height={40}
+          className="w-full shrink-0"
+        />
       </div>
-    </nav>
+    </>
   );
 }
 
@@ -197,17 +342,25 @@ function ProductsSection() {
   }, [lang]);
 
   return (
-    <section
-      id="termekek"
-      className="relative bg-gradient-to-b from-transparent via-background/60 to-background"
-    >
+    <>
+      {/* Prueba de color: blanco (hero) → morado. El derretido se queda
+          blanco (el color de la sección de arriba) y cae sobre el fondo
+          morado, que ya empieza acá (bgColor), no al final de las gotas. */}
+      <DripDivider
+        mainColor="#FFFFFF"
+        bgColor="#5B2EA8"
+        shadowColor="#0D0D0D"
+        height={90}
+        className="w-full -mb-px"
+      />
+      <section id="termekek" className="relative bg-fire">
       <div className="mx-auto max-w-7xl px-6 py-20">
         <div data-reveal className="flex items-end justify-between flex-wrap gap-4 mb-10">
           <div>
-            <p className="font-sans text-xs tracking-[0.35em] text-fire mb-2">
+            <p className="font-sans text-xs tracking-[0.35em] text-white/70 mb-2">
               {t.products.kicker}
             </p>
-            <h2 className="font-display text-4xl sm:text-5xl text-foreground">
+            <h2 className="font-display text-3d-fire text-4xl sm:text-5xl text-white">
               {t.products.heading}
             </h2>
           </div>
@@ -228,7 +381,7 @@ function ProductsSection() {
             </div>
           </>
         ) : products.length === 0 ? (
-          <p className="font-sans text-foreground/50 text-center py-10">
+          <p className="font-sans text-white/60 text-center py-10">
             {t.products.empty}
           </p>
         ) : (
@@ -250,7 +403,10 @@ function ProductsSection() {
           </>
         )}
       </div>
-    </section>
+      </section>
+      {/* Vuelve a blanco: mismas gotas, ahora "cayendo" del morado */}
+      <DripDivider mainColor="#5B2EA8" shadowColor="#0D0D0D" height={90} className="w-full -mt-px" />
+    </>
   );
 }
 
@@ -518,7 +674,7 @@ function InstagramFeedModal({
                 href={IG_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-5 py-3 bg-fire text-black font-display tracking-widest text-sm hover:bg-fire/90 transition-colors"
+                className="inline-flex items-center gap-2 px-5 py-3 bg-fire text-primary-foreground font-display tracking-widest text-sm hover:bg-fire/90 transition-colors"
               >
                 <Instagram className="h-4 w-4" /> @azkomoly.hu
               </a>
@@ -567,7 +723,7 @@ function HowItWorks() {
           <p className="font-sans text-xs tracking-[0.4em] text-fire mb-3">
             {t.how.kicker}
           </p>
-          <h2 className="font-display text-4xl sm:text-6xl text-foreground">
+          <h2 className="font-display text-4xl sm:text-6xl text-fire">
             {t.how.heading}
           </h2>
         </div>
@@ -580,8 +736,8 @@ function HowItWorks() {
               className="relative bg-dark-bg border border-cardboard/30 p-7 overflow-hidden group hover:border-fire/70 hover:-translate-y-1 transition-all duration-300"
             >
               {/* Watermark number */}
-              <span className="absolute -bottom-3 -right-1 font-display leading-none text-fire/6 select-none pointer-events-none"
-                style={{ fontSize: "7rem" }}>
+              <span className="absolute -bottom-4 -right-2 font-display leading-none text-fire/25 select-none pointer-events-none"
+                style={{ fontSize: "8.5rem" }}>
                 {s.n}
               </span>
               <span className="font-sans text-[10px] tracking-[0.4em] text-fire block mb-4">
@@ -602,9 +758,25 @@ function BigCTA({ onCta }: { onCta: () => void }) {
   const lines = t.bigCta.heading.split("\n");
   return (
     <section className="relative overflow-hidden">
-      <div className="absolute inset-0 bg-fire" />
-      <div className="absolute inset-0 opacity-20 bg-[repeating-linear-gradient(-45deg,transparent_0_24px,oklch(0.14_0_0/0.4)_24px_26px)]" />
+      <div
+        className="absolute inset-0"
+        style={{
+          backgroundImage: [
+            "radial-gradient(circle at 30% 20%, rgba(255,255,255,0.22) 0%, transparent 40%)",
+            "radial-gradient(circle at 70% 80%, rgba(13,13,13,0.35) 0%, transparent 50%)",
+            "linear-gradient(rgba(13,13,13,0.05) 1px, transparent 1px)",
+            "linear-gradient(90deg, rgba(13,13,13,0.05) 1px, transparent 1px)",
+            "linear-gradient(135deg, #7C4FC7 0%, #5B2EA8 50%, #3D1F73 100%)",
+          ].join(", "),
+          backgroundSize: "auto, auto, 35px 35px, 35px 35px, auto",
+        }}
+      />
       <div className="relative mx-auto max-w-7xl px-6 py-20 text-center">
+        <img
+          src="/azkomoly_new_logo_negativo.png"
+          alt="AZKOMOLY"
+          className="h-12 sm:h-14 w-auto mx-auto mb-6"
+        />
         <p className="font-display text-primary-foreground text-base sm:text-lg tracking-[0.4em] mb-4">
           {t.bigCta.kicker}
         </p>
@@ -619,13 +791,13 @@ function BigCTA({ onCta }: { onCta: () => void }) {
         <div className="mt-10 flex flex-wrap justify-center gap-4">
           <a
             href="#termekek"
-            className="inline-block bg-dark-bg text-fire font-display text-xl sm:text-2xl px-10 py-5 border-4 border-dark-bg hover:bg-foreground hover:text-dark-bg transition-colors"
+            className="inline-block bg-dark-bg text-fire font-display text-xl sm:text-2xl px-10 py-5 rounded-2xl border-4 border-dark-bg hover:bg-foreground hover:text-dark-bg transition-colors"
           >
             {t.bigCta.showBoxes}
           </a>
           <button
             onClick={onCta}
-            className="inline-block bg-transparent text-primary-foreground font-display text-xl sm:text-2xl px-10 py-5 border-4 border-dark-bg hover:bg-dark-bg hover:text-fire transition-colors"
+            className="inline-block bg-transparent text-primary-foreground font-display text-xl sm:text-2xl px-10 py-5 rounded-2xl border-4 border-dark-bg hover:bg-dark-bg hover:text-fire transition-colors"
           >
             {t.bigCta.notify}
           </button>
@@ -673,7 +845,7 @@ function FAQSection() {
           <p className="font-sans text-xs tracking-[0.4em] text-fire mb-3">
             {t.faq.kicker}
           </p>
-          <h2 className="font-display text-4xl sm:text-5xl text-foreground">
+          <h2 className="font-display text-4xl sm:text-5xl text-fire">
             {t.faq.heading}
           </h2>
         </div>
@@ -705,33 +877,51 @@ const SOCIALS = [
 function Footer() {
   const t = useT();
   return (
-    <footer className="mt-16 pt-8 border-t border-cardboard/30 flex flex-col items-center gap-4">
-      <p className="font-display text-fire text-lg tracking-wider">{t.footer.follow}</p>
-      <div className="flex gap-4 flex-wrap justify-center">
-        {SOCIALS.map(({ label, href, Icon }) => (
-          <a
-            key={label}
-            href={href}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label={label}
-            className="h-12 w-12 grid place-items-center border-2 border-cardboard/60 text-cardboard hover:text-fire hover:border-fire hover:-translate-y-0.5 transition-all"
-          >
-            <Icon className="h-6 w-6" />
-          </a>
-        ))}
-      </div>
-      <nav className="flex flex-wrap gap-x-4 gap-y-1 justify-center font-sans text-xs text-muted-foreground mt-2">
-        <Link to="/privacy" className="hover:text-fire">{t.footer.privacy}</Link>
-        <span>·</span>
-        <Link to="/terms" className="hover:text-fire">{t.footer.terms}</Link>
-        <span>·</span>
-        <Link to="/cookies" className="hover:text-fire">{t.footer.cookies}</Link>
-      </nav>
-      <p className="font-sans text-xs text-muted-foreground">
-        © 2026 <span className="font-display text-fire">AZKOMOLY</span> · {t.footer.rights}
-      </p>
-    </footer>
+    <div className="relative mt-16">
+      {/* Igual patrón que el navbar (morado que gotea/emerge) pero
+          invertido: el borde plano queda pegado al footer sólido de abajo,
+          y las crestas orgánicas moradas apuntan hacia arriba, hacia el
+          blanco de la sección anterior. */}
+      <DripDivider
+        variant="organic"
+        mainColor="#5B2EA8"
+        shadowColor="#0D0D0D"
+        depth={4}
+        height={36}
+        flip
+        className="w-full"
+      />
+      {/* -mt-2 solapa el footer sobre el borde plano del divisor: el redondeo
+          de subpíxeles del SVG a veces deja una línea blanca de 1px entre
+          ambos; el solape la tapa sin depender de que coincidan al pixel. */}
+      <footer id="kapcsolat" className="relative -mt-2 bg-fire px-6 pt-6 pb-12 flex flex-col items-center gap-4">
+        <p className="font-display text-white text-lg tracking-wider">{t.footer.follow}</p>
+        <div className="flex gap-4 flex-wrap justify-center">
+          {SOCIALS.map(({ label, href, Icon }) => (
+            <a
+              key={label}
+              href={href}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={label}
+              className="h-12 w-12 grid place-items-center border-2 border-white/50 text-white hover:text-black hover:border-black hover:-translate-y-0.5 transition-all"
+            >
+              <Icon className="h-6 w-6" />
+            </a>
+          ))}
+        </div>
+        <nav className="flex flex-wrap gap-x-4 gap-y-1 justify-center font-sans text-xs text-white/70 mt-2">
+          <Link to="/privacy" className="hover:text-white">{t.footer.privacy}</Link>
+          <span>·</span>
+          <Link to="/terms" className="hover:text-white">{t.footer.terms}</Link>
+          <span>·</span>
+          <Link to="/cookies" className="hover:text-white">{t.footer.cookies}</Link>
+        </nav>
+        <p className="font-sans text-xs text-white/70">
+          © 2026 <span className="font-display text-white">AZKOMOLY</span> · {t.footer.rights}
+        </p>
+      </footer>
+    </div>
   );
 }
 

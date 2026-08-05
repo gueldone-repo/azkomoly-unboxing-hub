@@ -8,6 +8,7 @@ import {
 } from "react";
 import { createIsomorphicFn } from "@tanstack/react-start";
 import { getCookie } from "@tanstack/react-start/server";
+import { useRouterState } from "@tanstack/react-router";
 import { DICTIONARIES, type Dict, type Lang } from "./dictionary";
 
 export type { Lang, Dict } from "./dictionary";
@@ -66,6 +67,17 @@ export function I18nProvider({
       document.documentElement.lang = next;
     }
   }, []);
+
+  // Este provider (el de la raíz, sin forceLang) vive montado durante toda
+  // la sesión — al navegar entre / y /en vía LanguageToggle, el layout /en
+  // usa su PROPIO provider (forceLang="en"), así que este nunca se entera
+  // del cambio de cookie por sí solo. Releerla en cada cambio de ruta evita
+  // que "/" se quede mostrando el idioma viejo tras volver de /en.
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  useEffect(() => {
+    if (forceLang) return;
+    setLangState(readLangCookie());
+  }, [pathname, forceLang]);
 
   useEffect(() => {
     document.documentElement.lang = lang;
