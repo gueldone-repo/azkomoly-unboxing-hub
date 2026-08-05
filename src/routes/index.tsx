@@ -4,14 +4,14 @@ import { useServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { appendLeadToSheet } from "@/lib/leads.functions";
-import { Instagram, Facebook, Youtube, ShieldCheck, Truck, Sparkles, Menu, X } from "lucide-react";
+import { Instagram, Facebook, Youtube, ShieldCheck, Truck, Sparkles, Menu, X, MousePointer2, ChevronLeft, ChevronRight } from "lucide-react";
 import { CookieBanner } from "@/components/CookieBanner";
 import { IntroVideoModal } from "@/components/IntroVideoModal";
 
 import { ScrubBackdrop } from "@/components/ScrubBackdrop";
 import { DripDivider } from "@/components/DripDivider";
 import { HeroOverlay } from "@/components/HeroOverlay";
-import { ProductCard } from "@/components/shop/ProductCard";
+import { ProductCardWide } from "@/components/shop/ProductCard";
 import { SocialProof } from "@/components/shop/SocialProof";
 import { LanguageToggle } from "@/components/LanguageToggle";
 import { CartButton } from "@/components/cart/CartSheet";
@@ -129,6 +129,7 @@ export function Landing() {
         <ProductsSection />
       </ScrubBackdrop>
       <LifestyleStrip />
+      <FollowUsRow />
       <SocialProof />
       <HowItWorks />
       <BigCTA onCta={() => setOpen(true)} />
@@ -366,41 +367,22 @@ function ProductsSection() {
           </div>
         </div>
         {loading ? (
-          <>
-            {/* Mobile skeleton */}
-            <div className="sm:hidden flex gap-4 overflow-x-auto pb-2 -mx-6 px-6">
-              {[...Array(3)].map((_, i) => (
-                <div key={i} className="shrink-0 w-[78vw] aspect-square bg-dark-bg/60 border-2 border-cardboard/20 animate-pulse" />
-              ))}
-            </div>
-            {/* Desktop skeleton */}
-            <div className="hidden sm:grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
-              {[...Array(4)].map((_, i) => (
-                <div key={i} className="aspect-square bg-dark-bg/60 border-2 border-cardboard/20 animate-pulse" />
-              ))}
-            </div>
-          </>
+          <div className="flex flex-col gap-6">
+            {[...Array(3)].map((_, i) => (
+              <div key={i} className="aspect-[4/3] sm:aspect-[21/9] bg-dark-bg/60 border-2 border-cardboard/20 animate-pulse" />
+            ))}
+          </div>
         ) : products.length === 0 ? (
           <p className="font-sans text-white/60 text-center py-10">
             {t.products.empty}
           </p>
         ) : (
-          <>
-            {/* Mobile: horizontal snap carousel */}
-            <div className="sm:hidden flex gap-4 overflow-x-auto snap-x snap-mandatory pb-4 -mx-6 px-6 scrollbar-none">
-              {products.map((p) => (
-                <div key={p.node.id} className="snap-start shrink-0 w-[78vw]">
-                  <ProductCard p={p} />
-                </div>
-              ))}
-            </div>
-            {/* Tablet / Desktop: grid */}
-            <div className="hidden sm:grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
-              {products.map((p) => (
-                <ProductCard key={p.node.id} p={p} />
-              ))}
-            </div>
-          </>
+          /* Stack: los productos uno arriba del otro, imagen grande + descripción completa */
+          <div className="flex flex-col gap-6">
+            {products.map((p) => (
+              <ProductCardWide key={p.node.id} p={p} />
+            ))}
+          </div>
         )}
       </div>
       </section>
@@ -411,20 +393,19 @@ function ProductsSection() {
 }
 
 
-const LIFESTYLE_PHOTOS = [
-  "/Outfit_reveal_vertical_box_202606092123.jpeg",
-  "/Unboxing_POV_shot_dark_table_202606092122.jpeg",
-  "/Outfit_reveal_oversized_hoodie_box_202606092122.jpeg",
-  "/Unboxing_cardboard_box_with_graphic_202606092122.jpeg",
-  "/Hands_holding_cardboard_box_202606092122.jpeg",
-  "/Hands_holding_AZKOMOLY_box_202606092122.jpeg",
+const SOCIAL_REVIEWS: { src: string; href: string; platform: "instagram" | "tiktok" }[] = [
+  { src: "/review1.png", href: "https://www.instagram.com/reel/DbOVwukMheu/?utm_source=ig_web_button_share_sheet&igsh=MzRlODBiNWFlZA==", platform: "instagram" },
+  { src: "/review2.png", href: "https://www.instagram.com/reel/DbAyYwQO_z9/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA==", platform: "instagram" },
+  { src: "/review3.png", href: "https://www.instagram.com/reel/DanS3tFsao4/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA==", platform: "instagram" },
+  { src: "/review4.png", href: "https://www.instagram.com/reel/DaLM-yzsLz_/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA==", platform: "instagram" },
+  { src: "/review5.png", href: "https://www.instagram.com/reel/DaFsFjgKlCR/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA==", platform: "instagram" },
+  { src: "/review6.png", href: "https://www.tiktok.com/@azkomoly.hu/video/7670098419981110550?is_from_webapp=1&sender_device=pc&web_id=7644208246575662593", platform: "tiktok" },
 ];
 
 function LifestyleStrip() {
   const scrollerRef = useRef<HTMLDivElement | null>(null);
   const pausedRef = useRef(false);
-  const [openIndex, setOpenIndex] = useState<number | null>(null);
-  const all = [...LIFESTYLE_PHOTOS, ...LIFESTYLE_PHOTOS];
+  const all = [...SOCIAL_REVIEWS, ...SOCIAL_REVIEWS];
 
   // Auto-scroll that yields to user interaction.
   useEffect(() => {
@@ -432,7 +413,7 @@ function LifestyleStrip() {
     if (!el) return;
     let raf = 0;
     let last = performance.now();
-    const SPEED = 40; // px/sec
+    const SPEED = 65; // px/sec
 
     const tick = (now: number) => {
       const dt = (now - last) / 1000;
@@ -446,6 +427,17 @@ function LifestyleStrip() {
       raf = requestAnimationFrame(tick);
     };
     raf = requestAnimationFrame(tick);
+
+    // Loop infinito para CUALQUIER scroll (auto, arrastre o flechas): si se
+    // pasa de la mitad (donde el set duplicado vuelve a empezar) o se va
+    // negativo, lo reacomoda sin transición — nunca hay principio ni fin.
+    const onScroll = () => {
+      const half = el.scrollWidth / 2;
+      if (half <= 0) return;
+      if (el.scrollLeft >= half) el.scrollLeft -= half;
+      else if (el.scrollLeft < 0) el.scrollLeft += half;
+    };
+    el.addEventListener("scroll", onScroll, { passive: true });
 
     const pause = () => { pausedRef.current = true; };
     const resumeSoon = () => {
@@ -463,6 +455,7 @@ function LifestyleStrip() {
 
     return () => {
       cancelAnimationFrame(raf);
+      el.removeEventListener("scroll", onScroll);
       el.removeEventListener("pointerdown", pause);
       el.removeEventListener("pointerup", resumeSoon);
       el.removeEventListener("pointercancel", resumeSoon);
@@ -471,6 +464,15 @@ function LifestyleStrip() {
       el.removeEventListener("touchend", resumeSoon);
     };
   }, []);
+
+  const scrollByCard = (dir: 1 | -1) => {
+    const el = scrollerRef.current;
+    if (!el) return;
+    pausedRef.current = true;
+    el.scrollBy({ left: dir * 204, behavior: "smooth" });
+    window.clearTimeout((el as any).__resumeT);
+    (el as any).__resumeT = window.setTimeout(() => { pausedRef.current = false; }, 1800);
+  };
 
   // Drag-to-scroll for mouse users.
   useEffect(() => {
@@ -511,177 +513,93 @@ function LifestyleStrip() {
     };
   }, []);
 
-  const handleClick = (i: number) => {
+  const handleClick = (e: React.MouseEvent) => {
     const dragged = (scrollerRef.current as any)?.__lastDragDist ?? 0;
-    if (dragged > 6) return; // suppress click after drag
-    setOpenIndex(i % LIFESTYLE_PHOTOS.length);
+    if (dragged > 6) e.preventDefault(); // suppress click after drag
   };
 
   return (
-    <>
-      <section className="py-6 overflow-hidden border-y border-cardboard/20 bg-dark-bg/60">
-        <div
-          ref={scrollerRef}
-          className="flex gap-3 overflow-x-auto scrollbar-none cursor-grab active:cursor-grabbing select-none"
-          style={{ scrollbarWidth: "none", touchAction: "pan-x" }}
-        >
-          {all.map((src, i) => (
-            <button
-              key={i}
-              type="button"
-              onClick={() => handleClick(i)}
-              className="shrink-0 h-64 w-48 overflow-hidden border border-cardboard/25 hover:border-fire/60 transition-colors duration-300 p-0 bg-transparent"
-              style={{ aspectRatio: "3/4" }}
-              aria-label="Nyisd meg a galériát"
+    <section className="relative py-6 overflow-hidden border-y border-cardboard/20 bg-dark-bg/60">
+      <button
+        type="button"
+        onClick={() => scrollByCard(-1)}
+        aria-label="Előző"
+        className="absolute left-2 top-1/2 -translate-y-1/2 z-20 grid place-items-center h-10 w-10 rounded-full bg-fire text-white shadow-lg hover:-translate-x-0.5 hover:top-1/2 transition-transform"
+      >
+        <ChevronLeft className="h-5 w-5" />
+      </button>
+      <button
+        type="button"
+        onClick={() => scrollByCard(1)}
+        aria-label="Következő"
+        className="absolute right-2 top-1/2 -translate-y-1/2 z-20 grid place-items-center h-10 w-10 rounded-full bg-fire text-white shadow-lg hover:translate-x-0.5 hover:top-1/2 transition-transform"
+      >
+        <ChevronRight className="h-5 w-5" />
+      </button>
+      <div
+        ref={scrollerRef}
+        className="flex gap-3 overflow-x-auto scrollbar-none cursor-grab active:cursor-grabbing select-none"
+        style={{ scrollbarWidth: "none", touchAction: "pan-x" }}
+      >
+        {all.map(({ src, href, platform }, i) => (
+          <a
+            key={i}
+            href={href}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={handleClick}
+            className="group relative shrink-0 h-64 w-48 overflow-hidden border border-cardboard/25 hover:border-fire/60 transition-colors duration-300"
+            style={{ aspectRatio: "3/4" }}
+            aria-label={platform === "tiktok" ? "Ver en TikTok" : "Ver en Instagram"}
+          >
+            <img
+              src={src}
+              alt=""
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 pointer-events-none"
+              draggable={false}
+              loading="lazy"
+              decoding="async"
+            />
+            <span className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors pointer-events-none" />
+            <span
+              className={`absolute top-2 right-2 grid place-items-center h-8 w-8 rounded-full shadow-lg pointer-events-none ${
+                platform === "tiktok" ? "bg-black" : "bg-gradient-to-tr from-fire via-pink-500 to-purple-600"
+              }`}
             >
-              <img
-                src={src}
-                alt=""
-                className="w-full h-full object-cover hover:scale-105 transition-transform duration-500 pointer-events-none"
-                draggable={false}
-                loading="lazy"
-                decoding="async"
-              />
-            </button>
-          ))}
-        </div>
-      </section>
-      <InstagramFeedModal
-        open={openIndex !== null}
-        startIndex={openIndex ?? 0}
-        onClose={() => setOpenIndex(null)}
-      />
-    </>
+              {platform === "tiktok" ? (
+                <svg viewBox="0 0 448 512" className="h-4 w-4" fill="white" aria-hidden="true">
+                  <path d={TIKTOK_PATH} />
+                </svg>
+              ) : (
+                <Instagram className="h-4 w-4 text-white" />
+              )}
+            </span>
+          </a>
+        ))}
+      </div>
+    </section>
   );
 }
 
-function InstagramFeedModal({
-  open,
-  startIndex,
-  onClose,
-}: {
-  open: boolean;
-  startIndex: number;
-  onClose: () => void;
-}) {
-  const feedRef = useRef<HTMLDivElement | null>(null);
-  const IG_URL = "https://www.instagram.com/azkomoly.hu/";
-
-  useEffect(() => {
-    if (!open) return;
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
-    window.addEventListener("keydown", onKey);
-    // Scroll to start index once mounted
-    requestAnimationFrame(() => {
-      const el = feedRef.current;
-      if (!el) return;
-      const target = el.querySelector<HTMLElement>(`[data-idx="${startIndex}"]`);
-      target?.scrollIntoView({ block: "start" });
-    });
-    return () => {
-      document.body.style.overflow = prev;
-      window.removeEventListener("keydown", onKey);
-    };
-  }, [open, startIndex, onClose]);
-
-  if (!open) return null;
-
+function FollowUsRow() {
+  const t = useT();
   return (
-    <div className="fixed inset-0 z-[100] bg-black/85 backdrop-blur-sm animate-fade-in">
-      <div className="absolute inset-0 flex flex-col">
-        {/* Header */}
-        <div className="flex items-center justify-between px-4 py-3 border-b border-white/10 bg-black/70">
-          <a
-            href={IG_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-3 group"
-          >
-            <span className="grid place-items-center h-9 w-9 rounded-full bg-gradient-to-tr from-fire via-pink-500 to-purple-600">
-              <Instagram className="h-5 w-5 text-white" />
-            </span>
-            <div className="flex flex-col leading-tight">
-              <span className="font-sans text-sm text-white font-semibold group-hover:text-fire transition-colors">
-                azkomoly.hu
-              </span>
-              <span className="font-sans text-[11px] text-white/60">Kövess minket Instagramon</span>
-            </div>
-          </a>
-          <button
-            type="button"
-            onClick={onClose}
-            aria-label="Bezárás"
-            className="h-9 w-9 grid place-items-center text-white/80 hover:text-white text-2xl leading-none"
-          >
-            ×
-          </button>
-        </div>
-
-        {/* Feed */}
-        <div
-          ref={feedRef}
-          className="flex-1 overflow-y-auto overscroll-contain snap-y snap-mandatory"
+    <div className="flex items-center justify-center gap-6 py-6 bg-dark-bg/60 border-b border-cardboard/20">
+      <span className="font-sans text-xs tracking-[0.3em] text-foreground/50 hidden sm:inline">
+        {t.footer.follow}
+      </span>
+      {SOCIALS.map(({ label, href, Icon }) => (
+        <a
+          key={label}
+          href={href}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={label}
+          className="h-11 w-11 grid place-items-center border-2 border-cardboard/60 text-cardboard hover:text-fire hover:border-fire hover:-translate-y-0.5 transition-all"
         >
-          <div className="mx-auto max-w-md w-full">
-            {LIFESTYLE_PHOTOS.map((src, i) => (
-              <article
-                key={i}
-                data-idx={i}
-                className="snap-start border-b border-white/10 py-4"
-              >
-                <div className="flex items-center gap-2 px-3 pb-2">
-                  <span className="grid place-items-center h-8 w-8 rounded-full bg-gradient-to-tr from-fire via-pink-500 to-purple-600">
-                    <Instagram className="h-4 w-4 text-white" />
-                  </span>
-                  <a
-                    href={IG_URL}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="font-sans text-sm text-white font-semibold hover:text-fire"
-                  >
-                    azkomoly.hu
-                  </a>
-                </div>
-                <div className="bg-dark-bg">
-                  <img
-                    src={src}
-                    alt=""
-                    className="w-full h-auto object-contain max-h-[75vh] mx-auto"
-                    draggable={false}
-                  />
-                </div>
-                <div className="flex items-center justify-between px-3 pt-3">
-                  <div className="flex items-center gap-4 text-white/90">
-                    <span aria-hidden>♥</span>
-                    <span aria-hidden>💬</span>
-                    <span aria-hidden>↗</span>
-                  </div>
-                  <a
-                    href={IG_URL}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="font-sans text-xs uppercase tracking-widest text-fire hover:underline"
-                  >
-                    Megnyitás Instagramon
-                  </a>
-                </div>
-              </article>
-            ))}
-            <div className="p-6 text-center">
-              <a
-                href={IG_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-5 py-3 bg-fire text-primary-foreground font-display tracking-widest text-sm hover:bg-fire/90 transition-colors"
-              >
-                <Instagram className="h-4 w-4" /> @azkomoly.hu
-              </a>
-            </div>
-          </div>
-        </div>
-      </div>
+          <Icon className="h-5 w-5" />
+        </a>
+      ))}
     </div>
   );
 }
@@ -756,28 +674,56 @@ function HowItWorks() {
 function BigCTA({ onCta }: { onCta: () => void }) {
   const t = useT();
   const lines = t.bigCta.heading.split("\n");
+  const sectionRef = useRef<HTMLElement | null>(null);
+  const [spot, setSpot] = useState({ x: 50, y: 50, active: false });
+  const SPOT_RADIUS = 140; // px
+
+  function onMouseMove(e: React.MouseEvent<HTMLElement>) {
+    const rect = sectionRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    setSpot({ x: e.clientX - rect.left, y: e.clientY - rect.top, active: true });
+  }
+
   return (
-    <section className="relative overflow-hidden">
-      <div
-        className="absolute inset-0"
+    <section
+      ref={sectionRef}
+      onMouseMove={onMouseMove}
+      onMouseLeave={() => setSpot((s) => ({ ...s, active: false }))}
+      className="relative overflow-hidden"
+    >
+      {/* Fondo de abajo: lo que hay adentro de las cajas — solo se ve por el
+          agujero circular que sigue al cursor */}
+      <img
+        src="/boxes inside.jpeg"
+        alt=""
+        aria-hidden="true"
+        className="absolute inset-0 w-full h-full object-cover"
+        draggable={false}
+      />
+      {/* Fondo de arriba: pared de cajas cerradas, con un agujero recortado
+          en el cursor (radial mask) que deja ver la capa de abajo */}
+      <img
+        src="/boxes.jpeg"
+        alt=""
+        aria-hidden="true"
+        className="absolute inset-0 w-full h-full object-cover"
+        draggable={false}
         style={{
-          backgroundImage: [
-            "radial-gradient(circle at 30% 20%, rgba(255,255,255,0.22) 0%, transparent 40%)",
-            "radial-gradient(circle at 70% 80%, rgba(13,13,13,0.35) 0%, transparent 50%)",
-            "linear-gradient(rgba(13,13,13,0.05) 1px, transparent 1px)",
-            "linear-gradient(90deg, rgba(13,13,13,0.05) 1px, transparent 1px)",
-            "linear-gradient(135deg, #7C4FC7 0%, #5B2EA8 50%, #3D1F73 100%)",
-          ].join(", "),
-          backgroundSize: "auto, auto, 35px 35px, 35px 35px, auto",
+          WebkitMaskImage: spot.active
+            ? `radial-gradient(circle ${SPOT_RADIUS}px at ${spot.x}px ${spot.y}px, transparent 0, transparent ${SPOT_RADIUS - 40}px, black ${SPOT_RADIUS}px)`
+            : undefined,
+          maskImage: spot.active
+            ? `radial-gradient(circle ${SPOT_RADIUS}px at ${spot.x}px ${spot.y}px, transparent 0, transparent ${SPOT_RADIUS - 40}px, black ${SPOT_RADIUS}px)`
+            : undefined,
         }}
       />
       <div className="relative mx-auto max-w-7xl px-6 py-20 text-center">
         <img
           src="/azkomoly_new_logo_negativo.png"
           alt="AZKOMOLY"
-          className="h-12 sm:h-14 w-auto mx-auto mb-6"
+          className="h-12 sm:h-14 w-auto mx-auto mb-6 drop-shadow-[0_2px_6px_rgba(0,0,0,0.6)]"
         />
-        <p className="font-display text-primary-foreground text-base sm:text-lg tracking-[0.4em] mb-4">
+        <p className="font-display text-primary-foreground text-base sm:text-lg tracking-[0.4em] mb-4 [text-shadow:0_2px_6px_rgba(0,0,0,0.6)]">
           {t.bigCta.kicker}
         </p>
         <h2 className="font-display text-5xl sm:text-7xl lg:text-8xl text-primary-foreground text-stroke-black leading-[0.9]">
@@ -788,6 +734,16 @@ function BigCTA({ onCta }: { onCta: () => void }) {
             </span>
           ))}
         </h2>
+
+        {/* Hint del efecto de linterna — solo desktop, el hover no aplica en touch */}
+        <div
+          className="hidden sm:inline-flex items-center gap-2 mt-6 px-4 py-2 rounded-full bg-black/35 backdrop-blur-sm"
+          style={{ fontFamily: "'ADLaM Display', var(--font-sans)" }}
+        >
+          <MousePointer2 className="h-4 w-4 text-white animate-bounce-down" style={{ animationDuration: "1.4s" }} />
+          <span className="text-white text-sm tracking-wide">{t.bigCta.hoverHint}</span>
+        </div>
+
         <div className="mt-10 flex flex-wrap justify-center gap-4">
           <a
             href="#termekek"

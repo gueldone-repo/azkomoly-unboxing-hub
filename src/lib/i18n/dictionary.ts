@@ -72,6 +72,7 @@ export type Dict = {
   bigCta: {
     kicker: string;
     heading: string;
+    hoverHint: string;
     showBoxes: string;
     notify: string;
   };
@@ -277,6 +278,7 @@ const hu: Dict = {
   bigCta: {
     kicker: "NE OLVASS · NYISS",
     heading: "A DOBOZ\nMOST INDUL",
+    hoverHint: "Mozgasd az egeret",
     showBoxes: "MUTASD A DOBOZOKAT →",
     notify: "ÉRTESÍTSETEK",
   },
@@ -490,6 +492,7 @@ const en: Dict = {
   bigCta: {
     kicker: "DON'T READ · OPEN",
     heading: "THE BOX\nDROPS NOW",
+    hoverHint: "Move your cursor",
     showBoxes: "SHOW ME THE BOXES →",
     notify: "NOTIFY ME",
   },
