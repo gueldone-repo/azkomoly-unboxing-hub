@@ -1,13 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Instagram, Facebook, Youtube } from "lucide-react";
 import { DripDivider } from "@/components/DripDivider";
-import { useT, readLangCookie } from "@/lib/i18n";
-import { seoLinks } from "@/lib/seo";
+import { useT } from "@/lib/i18n";
+import { seoLinksHuOnly } from "@/lib/seo";
 import logoAsset from "@/assets/azkomoly-logo.png.asset.json";
 
 export const Route = createFileRoute("/about")({
   head: () => {
-    const lang = readLangCookie();
     return {
       meta: [
         { title: "About Us — AZKOMOLY | 100% magyar mystery box" },
@@ -32,7 +31,7 @@ export const Route = createFileRoute("/about")({
           rel: "stylesheet",
           href: "https://fonts.googleapis.com/css2?family=Archivo+Black&family=Poppins:wght@400;500;700;800&display=swap",
         },
-        ...seoLinks("/about", lang),
+        ...seoLinksHuOnly("/about"),
       ],
     };
   },
