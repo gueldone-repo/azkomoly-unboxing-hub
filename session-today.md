@@ -300,6 +300,7 @@ server** antes de dar por bueno cualquier resultado — un `200` no prueba que e
 ### Pendiente (para próximas sesiones)
 
 - [ ] **Sacar la línea recta remanente en las secciones wavy** (ver arriba, sección DripDivider) — es lo primero a resolver la próxima sesión.
+- [ ] **Revisar `public/refrencia hero limpia.png`** — Diego dejó esta imagen de referencia al cerrar la sesión, pidió explícitamente revisarla la próxima sesión (no procesarla ahora). Sin contexto adicional todavía sobre qué cambio implica.
 - [ ] **Nuevas páginas — flujo definido por Diego, pendiente de generar vía Lovable:**
   - **About Us** (página independiente): manifiesto de marca ("Our goal"), historia/equipo ("Who we are"), y una sección "Follow us" con TODOS los logos de redes sociales. Mensaje clave: empresa 100% húngara, solo vende productos **originales** (no de marca/branded — aclarar esta distinción, es intencional y repetida por Diego) y de misterio.
   - **FAQ / Q&A** (página independiente): acordeón de preguntas frecuentes completo (envíos, cómo funcionan las sorpresas, políticas), bloque "Still need help? / Email us!" con contacto directo, footer con redes.
