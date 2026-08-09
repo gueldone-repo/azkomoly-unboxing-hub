@@ -381,6 +381,38 @@ Del batch lanzado, verificar/rehacer:
 8. Footer "taped" (tarjeta blanca con cintas), con enlaces y datos REALES.
 9. Fila de redes bajo reviews: fondo morado + hover con el nombre de la red.
 
+### Actualización 2026-08-10
+
+**Hero, estado final acordado con Diego:**
+- El titular visible es el TEXTO CURVO en movimiento (`CurvedLoop`), morado pleno, arriba.
+- El `<h1>` real sigue existiendo con el mismo texto, oculto a la vista (recortado a 1px,
+  NO `display:none`) para no perder la señal de SEO ni la accesibilidad. Si alguien
+  "limpia" ese h1 pensando que sobra, se pierde posicionamiento.
+- Tipografía del titular: **Bungee** (Anton se veía plana a tamaño grande). Cargada en
+  `index.tsx` y `en.index.tsx`.
+- Fondo del hero: SOLO la onda (`WaveBackdrop.tsx`, path de `wave-haikei.svg` redibujado
+  inline en morado de marca). Nada de degradados ni sombras: Diego los rechazó dos veces.
+- Caja translúcida (cristal) alrededor del H2+CTA: **le gustó, se queda**.
+- La imagen del hero NO lleva sombra. Rechazada explícitamente.
+
+**Otros arreglos:**
+- Carrito: la barra inferior (z-[65]) tapaba el panel del carrito (z-50). Ahora la barra
+  se oculta con el carrito abierto.
+- Velocidad al abrir producto: `defaultPreload: "intent"` + `defaultPreloadStaleTime` de
+  0 a 30s en `src/router.tsx`. En 0 se tiraba lo precargado y se volvía a pedir.
+- Dock de escritorio: ya no salta solo (se quitó el listener global de `pointermove`).
+  Se saca con una lengüeta, colocada a la DERECHA porque en el centro chocaba con el
+  banner de cookies.
+
+**Sobre Codex — leer antes de confiar en una rama suya:**
+La rama `wip-codex-batch3` partía de un estado ANTERIOR y fusionarla habría revertido
+278 líneas de trabajo. Se integraron sólo los 5 componentes nuevos. Y NO contenía el
+footer taped ni los botones 3D pese a habérselos pedido: verificar siempre archivo por
+archivo lo que dice haber hecho.
+
+**Pendiente de decisión del cliente:** el widget de descuento no lleva porcentaje. El
+número es decisión comercial de Diego; cuando lo dé, va a `discountWidget` en hu y en.
+
 ### Aplazado por decisión de Diego
 - **HalftoneReveal** en la sección del CTA doble fondo. Dijo que así ya se ve bien y que sólo
   molestaba el pixelado (resuelto). Retomar sólo si lo pide.
