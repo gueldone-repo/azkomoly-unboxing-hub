@@ -30,6 +30,9 @@ export type PillNavProps = {
   pillColor?: string;
   hoveredPillTextColor?: string;
   pillTextColor?: string;
+  /** Carril detrás de las píldoras. Transparente por defecto: un relleno
+   *  sólido acá se lee como una caja de color pegada bajo los botones. */
+  trackColor?: string;
   initialLoadAnimation?: boolean;
 };
 
@@ -42,6 +45,7 @@ const PillNav = ({
   pillColor = "#120F17",
   hoveredPillTextColor = "#120F17",
   pillTextColor,
+  trackColor = "transparent",
   initialLoadAnimation = false,
 }: PillNavProps) => {
   const resolvedPillTextColor = pillTextColor ?? baseColor;
@@ -147,6 +151,7 @@ const PillNav = ({
 
   const cssVars = {
     ["--base"]: baseColor,
+    ["--track"]: trackColor,
     ["--pill-bg"]: pillColor,
     ["--hover-text"]: hoveredPillTextColor,
     ["--pill-text"]: resolvedPillTextColor,

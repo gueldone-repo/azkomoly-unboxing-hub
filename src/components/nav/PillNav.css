@@ -21,12 +21,14 @@
   box-sizing: border-box;
 }
 
+/* El track (el carril detrás de las píldoras) va transparente: relleno sólido
+   acá era el "fondo negro" que se veía como una caja pegada bajo los botones. */
 .pill-nav-items {
   position: relative;
   display: flex;
   align-items: center;
   height: var(--nav-h);
-  background: var(--base, #000);
+  background: var(--track, transparent);
   border-radius: 9999px;
 }
 

@@ -4,7 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { appendLeadToSheet } from "@/lib/leads.functions";
-import { Instagram, Facebook, Youtube, ShieldCheck, Truck, Sparkles, Menu, X, MousePointer2, ChevronLeft, ChevronRight } from "lucide-react";
+import { ShieldCheck, Truck, Sparkles, Menu, X, MousePointer2, ChevronLeft, ChevronRight } from "lucide-react";
 import { CookieBanner } from "@/components/CookieBanner";
 import { IntroVideoModal } from "@/components/IntroVideoModal";
 
@@ -13,7 +13,8 @@ import { DiscountWidget } from "@/components/DiscountWidget";
 import TextLoop from "@/components/TextLoop";
 import PillNav from "@/components/nav/PillNav";
 import StaggeredMenu from "@/components/nav/StaggeredMenu";
-import { ProductCardWide } from "@/components/shop/ProductCard";
+import { SOCIAL_LINKS, SocialGlyph, SocialRow, SocialRail } from "@/components/social/SocialLogos";
+import { ProductTiltCard } from "@/components/shop/ProductTiltCard";
 import { SocialProof } from "@/components/shop/SocialProof";
 import { LanguageToggle } from "@/components/LanguageToggle";
 import { CartButton } from "@/components/cart/CartSheet";
@@ -127,8 +128,10 @@ export function Landing() {
       <TopNav onCta={() => setOpen(true)} />
 
       <HeroV2 />
+      {/* Pedido de George: que se pueda seguir a AZKOMOLY sin buscar. Columna
+          pegada al borde izquierdo, fuera del camino del CTA de compra. */}
+      <SocialRail />
       <ProductsSection />
-      <BrandWave />
       <LifestyleStrip />
       <FollowUsRow />
       <SocialProof />
@@ -148,54 +151,6 @@ export function Landing() {
   );
 }
 
-const TIKTOK_PATH =
-  "M448,209.9a210.1,210.1,0,0,1-122.8-39.3V349.4A162.6,162.6,0,1,1,185,188.3V278.2a74.6,74.6,0,1,0,52.2,71.2V0h88a121.2,121.2,0,0,0,1.9,22.2h0A122.2,122.2,0,0,0,381,102.4a121.4,121.4,0,0,0,67,20.1Z";
-
-function SocialIcons({ className = "", dark = false }: { className?: string; dark?: boolean }) {
-  const color = dark ? "text-fire/80 hover:text-fire" : "text-white/85 hover:text-white";
-  return (
-    <div className={`flex items-center gap-3 ${className}`}>
-      <a
-        href="#"
-        target="_blank"
-        rel="noopener noreferrer"
-        aria-label="Facebook"
-        className={`${color} transition-colors`}
-      >
-        <Facebook className="h-4 w-4" />
-      </a>
-      <a
-        href="#"
-        target="_blank"
-        rel="noopener noreferrer"
-        aria-label="YouTube"
-        className={`${color} transition-colors`}
-      >
-        <Youtube className="h-4 w-4" />
-      </a>
-      <a
-        href="https://www.instagram.com/azkomoly.hu/"
-        target="_blank"
-        rel="noopener noreferrer"
-        aria-label="Instagram"
-        className={`${color} transition-colors`}
-      >
-        <Instagram className="h-4 w-4" />
-      </a>
-      <a
-        href="#"
-        target="_blank"
-        rel="noopener noreferrer"
-        aria-label="TikTok"
-        className={`${color} transition-colors`}
-      >
-        <svg viewBox="0 0 448 512" className="h-4 w-4" fill="currentColor" aria-hidden="true">
-          <path d={TIKTOK_PATH} />
-        </svg>
-      </a>
-    </div>
-  );
-}
 
 function TopNav({ onCta }: { onCta: () => void }) {
   const t = useT();
@@ -222,35 +177,42 @@ function TopNav({ onCta }: { onCta: () => void }) {
     <>
       {/* z-[70]: por encima del panel del menú (z-60), para que el botón de
           cerrar y el carrito sigan alcanzables con el menú abierto. */}
+      {/* Barra blanca, como en la referencia. Antes era una franja morada
+          maciza que, con el hero también morado de título, cargaba el doble de
+          morado del necesario. En blanco el logo respira y el morado queda
+          reservado para lo que importa: los CTA.
+          z-[70]: por encima del panel del menú (z-60), para que el botón de
+          cerrar y el carrito sigan alcanzables con el menú abierto. */}
       <nav className="fixed top-0 inset-x-0 z-[70] flex flex-col">
-        <div className="bg-fire w-full">
+        <div className="w-full bg-white/90 backdrop-blur-md border-b border-black/[0.07]">
         <div className="mx-auto w-full max-w-7xl px-6 py-3 flex items-center justify-between gap-4">
           <a href="#top" className="shrink-0">
             <img
-              src="/azkomoly_new_logo_negativo.png"
+              src="/azkomoly_new_logo.png"
               alt="AZKOMOLY"
               className="h-10 w-auto"
             />
           </a>
-          {/* Desktop: PillNav. El track negro y el texto morado sobre píldora
-              blanca son los tres colores de marca; al pasar el cursor, el
-              círculo negro sube y el texto pasa a blanco. */}
+          {/* Desktop: PillNav sin carril de fondo. En reposo los links son
+              texto negro sobre la barra; al pasar el cursor sube el círculo
+              morado y el texto pasa a blanco. */}
           <div className="hidden md:block">
             <PillNav
               items={navLinks.map((l) => ({ label: l.label, href: l.href }))}
-              baseColor="#0D0D0D"
-              pillColor="#FFFFFF"
-              pillTextColor="#5B2EA8"
+              baseColor="#5B2EA8"
+              trackColor="transparent"
+              pillColor="transparent"
+              pillTextColor="#0D0D0D"
               hoveredPillTextColor="#FFFFFF"
             />
           </div>
           <div className="flex items-center gap-3 sm:gap-4">
-            <LanguageToggle light className="hidden sm:inline-flex" />
-            <SocialIcons className="hidden md:flex" dark={false} />
-            <CartButton className="!text-white !border-white/40 hover:!text-white hover:!border-white" />
+            <LanguageToggle className="hidden sm:inline-flex" />
+            <SocialRow className="hidden lg:flex !gap-3" iconClassName="h-[18px] w-[18px]" />
+            <CartButton />
             <button
               onClick={onCta}
-              className="hidden sm:inline-block bg-black text-white font-display text-xs px-4 py-2 rounded-full hover:translate-y-[-2px] transition-transform"
+              className="hidden sm:inline-block bg-fire text-white font-sans font-semibold text-xs tracking-wide px-5 py-2.5 rounded-full hover:-translate-y-[2px] transition-transform"
             >
               {t.nav.notify}
             </button>
@@ -259,7 +221,7 @@ function TopNav({ onCta }: { onCta: () => void }) {
               aria-label={menuOpen ? "Bezárás" : "Menü"}
               aria-expanded={menuOpen}
               aria-controls="staggered-menu-panel"
-              className="md:hidden grid place-items-center h-9 w-9 text-white"
+              className="md:hidden grid place-items-center h-9 w-9 text-foreground"
             >
               {menuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </button>
@@ -275,7 +237,7 @@ function TopNav({ onCta }: { onCta: () => void }) {
         open={menuOpen}
         onClose={() => setMenuOpen(false)}
         items={navLinks.map((l) => ({ label: l.label, link: l.href, ariaLabel: l.label }))}
-        socialItems={SOCIALS.map((s) => ({ label: s.label, link: s.href }))}
+        socialItems={SOCIAL_LINKS.map((s) => ({ label: s.label, link: s.href }))}
         socialsTitle={t.footer.follow}
         position="right"
         colors={["#8F78B5", "#5B2EA8"]}
@@ -286,9 +248,11 @@ function TopNav({ onCta }: { onCta: () => void }) {
 }
 
 /**
- * Banda de marca entre productos y el carrusel social — TextLoop de React Bits
- * con la cinta ondulada. Ocupa el sitio que dejó el divisor wavy que quitamos:
- * sigue habiendo una onda separando secciones, pero ahora lleva el nombre.
+ * Banda de marca — TextLoop de React Bits con la cinta ondulada.
+ *
+ * Vive DENTRO de la sección de productos, no entre secciones: suelta sobre el
+ * fondo blanco pasaba desapercibida. Sobre el morado, con la cinta en blanco,
+ * es lo primero que ve el ojo al entrar en la sección.
  *
  * El componente dibuja en un viewBox de 1200x520, así que a ancho completo
  * mediría ~665px de alto. Se recorta a una franja: el contenedor limita la
@@ -299,7 +263,7 @@ function BrandWave() {
   return (
     <div
       aria-hidden="true"
-      className="relative w-full overflow-hidden h-[17vw] min-h-[110px] max-h-[230px] bg-background"
+      className="relative w-full overflow-hidden h-[15vw] min-h-[100px] max-h-[200px]"
     >
       <div className="absolute inset-x-0 top-1/2 -translate-y-1/2">
         <TextLoop
@@ -313,9 +277,9 @@ function BrandWave() {
           fontWeight={800}
           letterSpacing={2}
           uppercase
-          color="#ffffff"
+          color="#5B2EA8"
           ribbon
-          ribbonColor="#5B2EA8"
+          ribbonColor="#FFFFFF"
           ribbonWidth={86}
           pauseOnHover
           style={{ fontFamily: "'Anton', var(--font-display)" }}
@@ -357,6 +321,11 @@ function ProductsSection() {
             {t.products.heading}
           </h2>
         </div>
+
+        {/* La cinta, ya dentro de la sección morada */}
+        <div className="-mx-6 mb-12">
+          <BrandWave />
+        </div>
         {loading ? (
           <div className="flex flex-col gap-6">
             {[...Array(3)].map((_, i) => (
@@ -368,10 +337,12 @@ function ProductsSection() {
             {t.products.empty}
           </p>
         ) : (
-          /* Stack: los productos uno arriba del otro, imagen grande + descripción completa */
-          <div className="flex flex-col gap-6">
+          /* Rejilla de tarjetas con tilt. Se pasa del stack vertical (una card
+             ancha por producto) a una rejilla: con el tilt, las tarjetas piden
+             ser vistas de a varias y comparadas. */
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12">
             {products.map((p) => (
-              <ProductCardWide key={p.node.id} p={p} />
+              <ProductTiltCard key={p.node.id} p={p} />
             ))}
           </div>
         )}
@@ -555,13 +526,10 @@ function LifestyleStrip() {
                 platform === "tiktok" ? "bg-black" : "bg-gradient-to-tr from-fire via-pink-500 to-purple-600"
               }`}
             >
-              {platform === "tiktok" ? (
-                <svg viewBox="0 0 448 512" className="h-4 w-4" fill="white" aria-hidden="true">
-                  <path d={TIKTOK_PATH} />
-                </svg>
-              ) : (
-                <Instagram className="h-4 w-4 text-white" />
-              )}
+              <SocialGlyph
+                path={SOCIAL_LINKS.find((s) => s.key === platform)!.path}
+                className="h-4 w-4 text-white"
+              />
             </span>
           </a>
         ))}
@@ -577,16 +545,17 @@ function FollowUsRow() {
       <span className="font-sans text-xs tracking-[0.3em] text-foreground/50 hidden sm:inline">
         {t.footer.follow}
       </span>
-      {SOCIALS.map(({ label, href, Icon }) => (
+      {SOCIAL_LINKS.map((s) => (
         <a
-          key={label}
-          href={href}
+          key={s.key}
+          href={s.href}
           target="_blank"
           rel="noopener noreferrer"
-          aria-label={label}
-          className="h-11 w-11 grid place-items-center border-2 border-cardboard/60 text-cardboard hover:text-fire hover:border-fire hover:-translate-y-0.5 transition-all"
+          aria-label={s.label}
+          className="h-11 w-11 grid place-items-center rounded-full border-2 border-black/10 bg-white hover:-translate-y-0.5 hover:border-black/20 hover:shadow-[0_6px_16px_rgba(13,13,13,0.12)] transition-all"
+          style={{ color: s.brand }}
         >
-          <Icon className="h-5 w-5" />
+          <SocialGlyph path={s.path} className="h-5 w-5" />
         </a>
       ))}
     </div>
@@ -804,21 +773,6 @@ function FAQSection() {
   );
 }
 
-function TikTokIcon({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" className={className} fill="currentColor" aria-hidden>
-      <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5.8 20.1a6.34 6.34 0 0 0 10.86-4.43V9.01a8.16 8.16 0 0 0 4.77 1.52V7.08a4.85 4.85 0 0 1-1.84-.39z" />
-    </svg>
-  );
-}
-
-const SOCIALS = [
-  { label: "Instagram", href: "https://www.instagram.com/azkomoly.hu/", Icon: Instagram },
-  { label: "TikTok", href: "https://www.tiktok.com/@azkomoly.hu", Icon: TikTokIcon },
-  { label: "YouTube", href: "https://www.youtube.com/@AzKomolyHungary", Icon: Youtube },
-  { label: "Facebook", href: "https://www.facebook.com/profile.php?id=61590505527795", Icon: Facebook },
-];
-
 function Footer() {
   const t = useT();
   return (
@@ -826,16 +780,20 @@ function Footer() {
       <footer id="kapcsolat" className="relative bg-fire px-6 pt-14 pb-12 flex flex-col items-center gap-4">
         <p className="font-display text-white text-lg tracking-wider">{t.footer.follow}</p>
         <div className="flex gap-4 flex-wrap justify-center">
-          {SOCIALS.map(({ label, href, Icon }) => (
+          {/* Fondo blanco en cada botón para que el logo pueda ir en su color
+              oficial: sobre el morado del footer, el negro de TikTok y el azul
+              de Facebook se perderían. */}
+          {SOCIAL_LINKS.map((s) => (
             <a
-              key={label}
-              href={href}
+              key={s.key}
+              href={s.href}
               target="_blank"
               rel="noopener noreferrer"
-              aria-label={label}
-              className="h-12 w-12 grid place-items-center border-2 border-white/50 text-white hover:text-black hover:border-black hover:-translate-y-0.5 transition-all"
+              aria-label={s.label}
+              className="h-12 w-12 grid place-items-center rounded-full bg-white hover:-translate-y-0.5 hover:shadow-[0_8px_20px_rgba(13,13,13,0.25)] transition-all"
+              style={{ color: s.brand }}
             >
-              <Icon className="h-6 w-6" />
+              <SocialGlyph path={s.path} className="h-5 w-5" />
             </a>
           ))}
         </div>
