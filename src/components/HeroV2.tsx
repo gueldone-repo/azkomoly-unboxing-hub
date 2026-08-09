@@ -1,117 +1,148 @@
+import { ChevronDown } from "lucide-react";
+import { motion, useReducedMotion } from "motion/react";
+
 import { useT } from "@/lib/i18n";
+import { CurvedLoop } from "@/components/text/CurvedLoop";
+import { RotatingText } from "@/components/text/RotatingText";
+import { SplitText } from "@/components/text/SplitText";
 
 function scrollToProducts() {
   document.getElementById("termekek")?.scrollIntoView({ behavior: "smooth" });
 }
 
-/**
- * Hero v2 — reconstruido sobre la referencia que pasó Diego.
- *
- * Composición (desktop): el viewport se reparte en zonas que NO se pisan entre
- * texto y texto, y sí se pisan a propósito entre imagen y título.
- *
- *   ┌───────────────────────────────────────────┐
- *   │                        TITULO (arriba dcha)│  <- z-0, es el "fondo"
- *   │        ┌─────────┐                         │
- *   │        │  CAJA   │     tagline + CTA       │  <- CTA en zona limpia
- *   │        │ (z-20)  │     (z-30, dcha)        │
- *   └────────┴────┬────┴─────────────────────────┘
- *                 └── desborda sobre la sección siguiente
- *
- * En móvil no hay solape: el orden es caja, título, CTA, apilados. Intentar
- * mantener la superposición en 390px de ancho sólo produce texto ilegible.
- *
- * Sin listeners de scroll: el hero viejo corría uno por frame para el parallax
- * y re-renderizaba React en cada scroll.
- */
 export function HeroV2() {
   const t = useT();
+  const reduceMotion = useReducedMotion();
   const lines = t.hero.heading.split("\n");
 
   const title = (
-    <h1
-      className="text-fire leading-[0.82] tracking-[-0.02em] select-none"
+    <SplitText
+      as="h1"
+      className="text-fire hero-title relative z-10 leading-[0.82] tracking-normal select-none"
       style={{
-        fontFamily: "'Anton', var(--font-display)",
-        fontSize: "clamp(2.75rem, 8.6vw, 7.5rem)",
+        fontFamily: "var(--font-display)",
+        fontSize: "clamp(2.75rem, 8.15vw, 7.15rem)",
       }}
     >
       {lines.map((line, i) => (
-        <span key={i} className="block">
+        <span key={line} className="block">
           {line}
+          {i < lines.length - 1 ? "\n" : null}
         </span>
       ))}
-    </h1>
+    </SplitText>
   );
 
   const box = (
-    // WebP: el PNG original pesaba 758 KB y es la imagen más grande de la
-    // página, la que marca el LCP. En WebP a 1200px son 86 KB con la misma
-    // transparencia. `width`/`height` reservan el hueco para que el texto no
-    // salte cuando termina de cargar.
-    <img
-      src="/azkomoly_new_HERO_2.webp"
-      alt="AZKOMOLY meglepetés doboz"
-      className="w-full h-auto"
-      width={1200}
-      height={670}
-      draggable={false}
-      fetchPriority="high"
-      decoding="sync"
-    />
+    // Sin sombra: ni el drop-shadow del <img> ni la elipse difusa del
+    // contenedor. La foto ya trae su propia luz y el halo morado del estallido;
+    // añadirle sombra la despegaba del fondo como una calcomanía.
+    <motion.div
+      className="relative"
+      initial={reduceMotion ? false : { opacity: 0, scale: 0.86, rotate: -8, y: 46 }}
+      animate={reduceMotion ? undefined : { opacity: 1, scale: 1, rotate: -1.5, y: 0 }}
+      whileHover={reduceMotion ? undefined : { scale: 1.035, rotate: 1.25, y: -8 }}
+      transition={{ type: "spring", stiffness: 120, damping: 13, mass: 0.9, delay: 0.18 }}
+    >
+      <img
+        src="/azkomoly_new_HERO_2.webp"
+        alt={t.hero.imageAlt}
+        className="relative z-10 h-auto w-full"
+        width={1200}
+        height={670}
+        draggable={false}
+        fetchPriority="high"
+        decoding="sync"
+      />
+    </motion.div>
   );
 
-  const cta = (
-    <div className="flex flex-col items-center lg:items-start gap-5 text-center lg:text-left">
-      <p className="font-sans text-base sm:text-lg text-foreground/70 max-w-[28ch] leading-relaxed">
-        {t.hero.tagline}
-      </p>
-      <button
-        onClick={scrollToProducts}
-        className="bg-fire text-white font-sans font-semibold tracking-wide text-base sm:text-lg px-8 py-4 rounded-full whitespace-nowrap shadow-[0_10px_30px_rgba(91,46,168,0.35)] transition-transform duration-200 hover:-translate-y-1 active:translate-y-0 active:scale-[0.98]"
-      >
-        {t.hero.cta}
-      </button>
+  // Sin panel difuminado detrás del título: ese rectángulo `bg-white/40 blur-2xl`
+  // se veía como una caja gris con bordes que encasillaba el H1 y no encajaba
+  // con nada. El título se sostiene solo por su propio relieve.
+  const titleBlock = (
+    <div className="relative z-20 px-6 pt-24 text-center lg:pointer-events-none lg:absolute lg:right-[3vw] lg:top-[13%] lg:z-30 lg:px-0 lg:pt-0 lg:text-right">
+      <div className="relative [&_h1]:text-center lg:[&_h1]:text-right">{title}</div>
     </div>
   );
 
+  const cta = (
+    <motion.div
+      className="flex flex-col items-center gap-5 text-center lg:items-start lg:text-left"
+      initial={reduceMotion ? false : { opacity: 0, y: 18 }}
+      animate={reduceMotion ? undefined : { opacity: 1, y: 0 }}
+      transition={{ duration: 0.52, ease: [0.22, 1, 0.36, 1], delay: 0.46 }}
+    >
+      <div className="max-w-[30ch] font-sans text-base leading-relaxed text-foreground/76 sm:text-lg">
+        <span className="block">{t.hero.tagline}</span>
+        <RotatingText
+          phrases={t.hero.rotatingTaglines}
+          className="mt-2 font-semibold text-foreground"
+        />
+      </div>
+      <button
+        type="button"
+        onClick={scrollToProducts}
+        className="rounded-full bg-fire px-8 py-4 font-sans text-base font-semibold tracking-wide text-white shadow-[0_16px_32px_rgba(13,13,13,0.18),0_8px_22px_rgba(91,46,168,0.30)] transition-all duration-200 hover:-translate-y-1 hover:bg-[#4c238f] active:translate-y-0 active:scale-[0.98] sm:text-lg"
+      >
+        {t.hero.cta}
+      </button>
+    </motion.div>
+  );
+
+  const scrollCue = (
+    <button
+      type="button"
+      onClick={scrollToProducts}
+      aria-label={t.hero.scrollAria}
+      className="group mx-auto mt-2 grid h-12 w-12 place-items-center rounded-full border border-black/10 bg-white/88 text-fire shadow-[0_12px_24px_rgba(13,13,13,0.12)] backdrop-blur transition-all hover:-translate-y-0.5 hover:border-fire/35 hover:bg-white lg:absolute lg:bottom-6 lg:left-1/2 lg:z-40 lg:-translate-x-1/2"
+    >
+      <ChevronDown
+        aria-hidden="true"
+        className="h-6 w-6 animate-bounce-down transition-transform group-hover:translate-y-0.5 motion-reduce:animate-none"
+        strokeWidth={2.4}
+      />
+    </button>
+  );
+
   return (
-    // z-10 sobre la sección siguiente: sin esto, la caja que desborda hacia
-    // abajo quedaría pintada DEBAJO del bloque de productos y se cortaría.
-    <section className="relative z-10 w-full bg-background overflow-x-clip">
-      {/* ---------- MÓVIL / TABLET: apilado, sin solapes ----------
-          Orden deliberado: título, caja, CTA. Nada se superpone, porque a 390px
-          de ancho el solape sólo produce texto ilegible.
-          La caja iba a 112vw y ESO era lo que hacía que la página se pudiera
-          arrastrar de lado: un hijo más ancho que la pantalla desborda aunque
-          el padre lo recorte. Ahora nunca pasa del ancho disponible. */}
-      <div className="lg:hidden flex flex-col items-center gap-5 px-6 pt-24 pb-0">
-        <div className="w-full text-center [&_h1]:text-center">{title}</div>
-        <div className="w-full max-w-[560px]">{box}</div>
-        <div className="w-full pb-10">{cta}</div>
+    <section
+      id="top"
+      className="relative z-10 w-full overflow-x-clip bg-background"
+    >
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 bg-[linear-gradient(115deg,rgba(13,13,13,0.04)_0%,rgba(13,13,13,0)_38%,rgba(143,120,181,0.14)_100%)]"
+      />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-0 top-20 h-px bg-gradient-to-r from-transparent via-black/12 to-transparent"
+      />
+
+      {titleBlock}
+
+      <div className="relative flex flex-col items-center gap-5 px-6 pb-8 pt-5 lg:hidden">
+        <div className="relative z-20 w-full max-w-[560px]">{box}</div>
+        <div className="relative z-30 w-full pb-4">{cta}</div>
+        <CurvedLoop
+          text={t.hero.marquee}
+          speed={reduceMotion ? 0 : 46}
+          reverse
+          className="z-0 -mt-4 text-fire/16"
+        />
+        {scrollCue}
       </div>
 
-      {/* ---------- DESKTOP: composición por zonas ---------- */}
       <div className="hidden lg:block relative min-h-[100dvh]">
-        {/* Título: cuadrante superior derecho. pointer-events-none para que
-            nunca robe un click al CTA que tiene encima. */}
-        <div className="pointer-events-none absolute top-[15%] right-[3vw] z-0 text-right">
-          {title}
-        </div>
-
-        {/* Caja: entra por la izquierda, sube lo suficiente para morder la
-            esquina del título (ese solape ES el diseño: la imagen es primera
-            capa, el texto es fondo) y baja hasta salirse del hero. El bottom
-            negativo es el desborde sobre la sección siguiente. */}
-        <div className="absolute left-[-1vw] bottom-[-7vw] z-20 w-[74vw] max-w-[1220px]">
+        <div className="absolute bottom-[-7vw] left-[-1vw] z-20 w-[74vw] max-w-[1220px]">
           {box}
         </div>
 
-        {/* Tagline + CTA: banda derecha inferior, donde ni el título ni la
-            caja llegan. Es la única zona del hero con fondo limpio. */}
         <div className="absolute right-[4vw] top-[58%] z-30 w-[32vw] max-w-[430px]">
-          {cta}
+          <div className="border-l-2 border-black/10 pl-7">{cta}</div>
         </div>
+
+        {scrollCue}
       </div>
     </section>
   );

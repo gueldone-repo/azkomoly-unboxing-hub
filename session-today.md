@@ -313,6 +313,89 @@ server** antes de dar por bueno cualquier resultado — un `200` no prueba que e
 
 ---
 
+## 2026-08-09 (Sesión 7) — Rediseño v2 → main. EN CURSO, PAUSADA A MEDIAS
+
+### ⚠️ LEER PRIMERO AL REANUDAR
+
+**Hay trabajo de Codex sin verificar en el working tree.** Se lanzó un batch de 9 tareas
+(`task-msmc8e7m-8rzts9`) que quedó corriendo al pausar. Antes de tocar nada:
+1. `git status` para ver qué dejó.
+2. `npx tsc --noEmit` (los 4 errores de `shop.$slug.tsx`/`en.shop.$slug.tsx` sobre
+   `Property 'product' does not exist on type 'undefined'` son FALSOS: artefacto del dev
+   server regenerando `routeTree.gen.ts`. `git checkout -- src/routeTree.gen.ts` y listo).
+3. Revisar en el navegador ANTES de commitear. Codex ya metió dos veces cambios no pedidos
+   (ver "Vigilar a Codex" abajo).
+
+### Estructura de ramas (cambió)
+- **`main`** = el rediseño nuevo. Es lo que lee Lovable.
+- **`produccion-anterior`** = respaldo de lo que estaba en producción (commit `4da10c1`).
+- `rediseno-v2` = la rama donde nació el rediseño; ya mergeada en main.
+- El worktree `C:\Users\Mariana\Desktop\GUELDOEN\AZKOMOLY-v2` sigue existiendo.
+- Diego **NO ha publicado** todavía: quiere verlo antes en el preview de Lovable.
+
+### Hecho y verificado
+- **Bug del H1 en `/en`** (título gigante hasta recargar): el fallback tipográfico medía
+  **62% más ancho** que Anton. Resuelto con un `@font-face` "AZK Anton Fallback"
+  (`local("Arial Black")` + `size-adjust: 63%`) → desviación al **2%**. Medido con
+  `canvas.measureText`, no a ojo.
+- **Peso del sitio**: `public/` de **13,5 MB → 1,6 MB**. Todo lo que se descarga pasó a WebP
+  redimensionado (hero 758→86 KB, asset widget 706→18 KB, logo 357→15 KB). Borradas las
+  imágenes sin usar y los componentes muertos `HeroOverlay.tsx` y `ScrubBackdrop.tsx`
+  (no los importaba nadie). Las fotos del CTA doble fondo se regeneraron a 1376px q92
+  porque a 900px q82 pixelaban.
+- **Navegación**: dock de escritorio estilo macOS (oculto, asoma al bajar el cursor) + barra
+  inferior móvil + flechas de sección. `/about` y `/faq` por fin enlazadas (antes sólo se
+  llegaba escribiendo la URL). Fuera "Merch", que apuntaba al mismo ancla que "Shop".
+- **Logos oficiales de redes** vía `simple-icons` (antes eran los genéricos de lucide) en
+  `src/components/social/SocialLogos.tsx`. Bug arreglado: tres de los cuatro iconos del
+  navbar tenían `href="#"` y no llevaban a ninguna parte.
+- **Banda AZKOMOLY** (TextLoop): a ancho completo, sin cortarse arriba/abajo, sin pausa al
+  pasar el cursor. El corte venía de un `max-h` fijo con un SVG que escala con el ancho.
+- **Scroll horizontal en móvil**: eliminado (venía de la caja del hero a `112vw`).
+- **Contraste del formulario de registro**: estaba en `text-white` sobre fondo blanco, no se
+  leía lo que uno escribía. **Ese bug sigue vivo en `produccion-anterior`.**
+
+### Vigilar a Codex (ya pasó dos veces)
+- Cambió `--font-display` de "Archivo Black" a "Anton" en `styles.css` sin pedirlo, alterando
+  la tipografía de TODO el sitio. La segunda vez quedó justificado (con cadena de fallback),
+  pero **revisar siempre el diff de `styles.css`**.
+- Dejó un `CurvedLoop` encima del título del hero, ilegible.
+- Puso un panel `bg-white/40 blur-2xl` detrás del H1 que lo encasillaba en una caja gris.
+  Ya retirado, junto con las dos sombras de la imagen del hero (Diego las rechazó).
+
+### Pendiente inmediato (el plan que Diego aprobó)
+Del batch lanzado, verificar/rehacer:
+1. **HERO** — Diego: "todo está empalmado, no sigue los layers para hacer efectos 3D".
+   Necesita planos separados de verdad: escalas y desenfoques distintos por plano, sombras
+   con UNA sola fuente de luz, parallax entre capas con motion values, y que la caja se
+   recorte contra el título en vez de flotar encima. **Sin sombra en la imagen.**
+   Usar `public/wave-haikei.svg` como conexión entre hero y productos (en morado de marca
+   `#5B2EA8`, no el `#63126f` que trae el archivo).
+2. Reloj de cuenta regresiva para urgencia de compra (patrón `SlidingNumber`). Debe ser
+   honesto y no reiniciarse al refrescar.
+3. PixelTransition en el popup de vídeo + botón X para saltar.
+4. Testimonials con marquee 3D vertical (con reviews REALES, no clientes inventados).
+5. Banner ScrollVelocity (distinto de la banda BrandWave que ya existe).
+6. ScrollFloat de cierre antes del footer.
+7. Botones con relieve 3D, unificados (hoy conviven varios estilos).
+8. Footer "taped" (tarjeta blanca con cintas), con enlaces y datos REALES.
+9. Fila de redes bajo reviews: fondo morado + hover con el nombre de la red.
+
+### Aplazado por decisión de Diego
+- **HalftoneReveal** en la sección del CTA doble fondo. Dijo que así ya se ve bien y que sólo
+  molestaba el pixelado (resuelto). Retomar sólo si lo pide.
+
+### Decisiones de diseño de esta sesión
+- Navbar **blanco** (antes franja morada maciza): con el título del hero también morado, se
+  cargaba el doble de morado del necesario. El morado queda para los CTA.
+- Tipografía display del sitio: **Anton** (era Archivo Black).
+- Productos: **lista vertical en móvil**, 3 por fila + carrusel en escritorio. Diego cambió de
+  criterio (antes pidió carrusel horizontal en móvil); manda lo último.
+- Reviews: el marquee 3D es para testimonials; ScrollVelocity pasa a ser banner. También fue
+  una corrección sobre la marcha.
+
+---
+
 <!-- PLANTILLA PARA NUEVAS SESIONES:
 
 ## YYYY-MM-DD (Sesión N)
