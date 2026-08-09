@@ -45,10 +45,16 @@ export function HeroV2() {
   );
 
   const box = (
+    // WebP: el PNG original pesaba 758 KB y es la imagen más grande de la
+    // página, la que marca el LCP. En WebP a 1200px son 86 KB con la misma
+    // transparencia. `width`/`height` reservan el hueco para que el texto no
+    // salte cuando termina de cargar.
     <img
-      src="/azkomoly_new_HERO_2.png"
+      src="/azkomoly_new_HERO_2.webp"
       alt="AZKOMOLY meglepetés doboz"
       className="w-full h-auto"
+      width={1200}
+      height={670}
       draggable={false}
       fetchPriority="high"
       decoding="sync"

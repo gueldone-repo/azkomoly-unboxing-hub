@@ -88,12 +88,16 @@ export function DiscountWidget({ onOpen }: { onOpen: () => void }) {
         </button>
 
         <div className="flex items-center gap-1">
+          {/* WebP de 520px: el PNG original eran 706 KB para enseñarse a
+              104px de ancho. Ahora son 18 KB. */}
           <img
-            src="/asset_azkomoly.png"
+            src="/asset_azkomoly.webp"
             alt=""
             aria-hidden="true"
             loading="lazy"
             draggable={false}
+            width={520}
+            height={290}
             className="w-[104px] shrink-0 -ml-3 -my-2"
           />
           <div className="min-w-0">

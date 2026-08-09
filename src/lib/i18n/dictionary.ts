@@ -30,6 +30,9 @@ export type Dict = {
     notify: string;
     home: string;
     cart: string;
+    prevSection: string;
+    nextSection: string;
+    scrollTop: string;
     /** Etiqueta accesible de la barra inferior. Hay dos <nav> en la página, así
      *  que cada uno necesita nombre propio para los lectores de pantalla. */
     primary: string;
@@ -199,7 +202,7 @@ const hu: Dict = {
     ogTitle: "AZKOMOLY — Mi van a dobozban?",
     ogDescription: "Nem tudod mi van benne. Ez a lényeg.",
   },
-  nav: { shop: "Bolt", merch: "Merch", how: "Hogyan működik", about: "Rólunk", faq: "GYIK", contact: "Kapcsolat", notify: "Értesíts", home: "Főoldal", cart: "Kosár", primary: "Fő navigáció" },
+  nav: { shop: "Bolt", merch: "Merch", how: "Hogyan működik", about: "Rólunk", faq: "GYIK", contact: "Kapcsolat", notify: "Értesíts", home: "Főoldal", cart: "Kosár", prevSection: "Előző szakasz", nextSection: "Következő szakasz", scrollTop: "Vissza a tetejére", primary: "Fő navigáció" },
   hero: {
     est: "EST · MMXXVI",
     index: "/01",
@@ -421,7 +424,7 @@ const en: Dict = {
     ogTitle: "AZKOMOLY — What's in the box?",
     ogDescription: "You don't know what's inside. That's the point.",
   },
-  nav: { shop: "Shop", merch: "Merch", how: "How it works", about: "About", faq: "FAQ", contact: "Contact", notify: "Notify me", home: "Home", cart: "Cart", primary: "Main navigation" },
+  nav: { shop: "Shop", merch: "Merch", how: "How it works", about: "About", faq: "FAQ", contact: "Contact", notify: "Notify me", home: "Home", cart: "Cart", prevSection: "Previous section", nextSection: "Next section", scrollTop: "Back to top", primary: "Main navigation" },
   hero: {
     est: "EST · MMXXVI",
     index: "/01",

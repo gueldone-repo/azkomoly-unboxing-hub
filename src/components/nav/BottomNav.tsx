@@ -1,94 +1,430 @@
-import { Link, useRouterState } from "@tanstack/react-router";
-import { Home, Package, Info, HelpCircle, ShoppingBag } from "lucide-react";
-import { useShopifyCart } from "@/lib/shopify/cart-store";
+import { useCallback, useEffect, useMemo, useRef, useState, type ElementType } from "react";
+import { useRouterState } from "@tanstack/react-router";
+import {
+  ChevronDown,
+  ChevronUp,
+  HelpCircle,
+  Home,
+  Info,
+  Package,
+  ShoppingBag,
+  SkipBack,
+  SkipForward,
+} from "lucide-react";
+import { motion, useReducedMotion } from "motion/react";
+
+import { Dock, DockIcon, DockItem, DockLabel } from "@/components/core/dock";
 import { useT } from "@/lib/i18n";
+import { useShopifyCart } from "@/lib/shopify/cart-store";
+import { cn } from "@/lib/utils";
 
-/**
- * Barra de navegación inferior, al alcance del pulgar.
- *
- * El objetivo es que la gente entre a los productos y se quede: los destinos
- * que hacen ganar dinero (la tienda y el carrito) quedan donde el pulgar llega
- * sin recolocar la mano, en vez de escondidos tras la hamburguesa de arriba.
- *
- * Sólo móvil y tablet (`lg:hidden`). En escritorio el navbar superior ya está
- * a la vista y una barra flotante abajo sólo taparía contenido.
- *
- * Detalles que la hacen sentir nativa:
- *  - `pb-[env(safe-area-inset-bottom)]` para no quedar debajo de la barra de
- *    gestos del iPhone.
- *  - El item activo se resuelve por ruta real, no por estado manual.
- *  - El carrito lleva su contador, igual que el del navbar.
- */
+const LANDING_SECTIONS = ["termekek", "hogyan", "gyik", "kapcsolat"] as const;
+const DESKTOP_REVEAL_DISTANCE = 160;
+const DESKTOP_HIDE_DISTANCE = 220;
+const DESKTOP_HIDE_DELAY = 900;
 
-const ICONS = { home: Home, shop: Package, about: Info, faq: HelpCircle, cart: ShoppingBag };
+type NavKey = "home" | "shop" | "about" | "faq";
+type NavItem = {
+  key: NavKey;
+  label: string;
+  href: string;
+  active: boolean;
+  icon: ElementType<{ className?: string; strokeWidth?: number }>;
+};
+
+function isHomePath(pathname: string): boolean {
+  return pathname === "/" || pathname === "/en";
+}
+
+function getHomeHref(pathname: string): "/" | "/en" {
+  return pathname === "/en" || pathname.startsWith("/en/") ? "/en" : "/";
+}
+
+function getCurrentSectionIndex(): number {
+  const centerY = window.innerHeight / 2;
+  let bestIndex = 0;
+  let bestDistance = Number.POSITIVE_INFINITY;
+
+  LANDING_SECTIONS.forEach((id, index) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const distance = Math.abs(rect.top + rect.height / 2 - centerY);
+    if (distance < bestDistance) {
+      bestDistance = distance;
+      bestIndex = index;
+    }
+  });
+
+  return bestIndex;
+}
+
+function scrollToElement(id: string): void {
+  document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+}
 
 export function BottomNav() {
   const t = useT();
-  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const location = useRouterState({ select: (s) => s.location });
+  const pathname = location.pathname;
+  const hash = location.hash;
+  const homeHref = getHomeHref(pathname);
+  const onHome = isHomePath(pathname);
+  const prefersReducedMotion = useReducedMotion();
   const count = useShopifyCart((s) => s.items.reduce((n, i) => n + i.quantity, 0));
-  // El carrito vive en el store, así que la barra puede abrirlo sin que la
-  // página tenga que pasarle nada.
   const setCartOpen = useShopifyCart((s) => s.setOpen);
+  const [desktopVisible, setDesktopVisible] = useState(false);
+  const lastPointerY = useRef<number | null>(null);
+  const hideTimer = useRef<number | null>(null);
 
-  // `/en` y `/` son la misma home en distinto idioma; el prefijo se conserva
-  // para no sacar al usuario de su idioma al tocar un destino.
-  const isEn = pathname === "/en" || pathname.startsWith("/en/");
-  const base = isEn ? "/en" : "";
-  const isHome = pathname === "/" || pathname === "/en";
+  const navItems = useMemo<NavItem[]>(
+    () => [
+      {
+        key: "home",
+        label: t.nav.home,
+        href: homeHref,
+        active: onHome && hash !== "#termekek",
+        icon: Home,
+      },
+      {
+        key: "shop",
+        label: t.nav.shop,
+        href: `${homeHref}#termekek`,
+        active: onHome && hash === "#termekek",
+        icon: Package,
+      },
+      { key: "about", label: t.nav.about, href: "/about", active: pathname === "/about", icon: Info },
+      { key: "faq", label: t.nav.faq, href: "/faq", active: pathname === "/faq", icon: HelpCircle },
+    ],
+    [hash, homeHref, onHome, pathname, t.nav.about, t.nav.faq, t.nav.home, t.nav.shop],
+  );
 
-  const items = [
-    { key: "home", label: t.nav.home, to: `${base}/` || "/", active: isHome, hash: "" },
-    { key: "shop", label: t.nav.shop, to: `${base}/` || "/", active: false, hash: "#termekek" },
-    { key: "about", label: t.nav.about, to: "/about", active: pathname === "/about", hash: "" },
-    { key: "faq", label: t.nav.faq, to: "/faq", active: pathname === "/faq", hash: "" },
-  ] as const;
+  const clearHideTimer = useCallback(() => {
+    if (hideTimer.current === null) return;
+    window.clearTimeout(hideTimer.current);
+    hideTimer.current = null;
+  }, []);
+
+  const scheduleDesktopHide = useCallback(() => {
+    clearHideTimer();
+    hideTimer.current = window.setTimeout(() => setDesktopVisible(false), DESKTOP_HIDE_DELAY);
+  }, [clearHideTimer]);
+
+  useEffect(() => {
+    const onPointerMove = (event: PointerEvent) => {
+      if (window.innerWidth < 1024) return;
+
+      const fromBottom = window.innerHeight - event.clientY;
+      const previousY = lastPointerY.current;
+      const movingDown = previousY !== null && event.clientY - previousY > 8;
+      lastPointerY.current = event.clientY;
+
+      if (fromBottom <= DESKTOP_REVEAL_DISTANCE || (movingDown && event.clientY > window.innerHeight * 0.65)) {
+        clearHideTimer();
+        setDesktopVisible(true);
+        return;
+      }
+
+      if (fromBottom > DESKTOP_HIDE_DISTANCE) scheduleDesktopHide();
+    };
+
+    window.addEventListener("pointermove", onPointerMove, { passive: true });
+    return () => {
+      window.removeEventListener("pointermove", onPointerMove);
+      clearHideTimer();
+    };
+  }, [clearHideTimer, scheduleDesktopHide]);
+
+  const scrollTop = useCallback(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
+
+  const jumpSection = useCallback((direction: -1 | 1) => {
+    const next = Math.min(
+      LANDING_SECTIONS.length - 1,
+      Math.max(0, getCurrentSectionIndex() + direction),
+    );
+    scrollToElement(LANDING_SECTIONS[next]);
+  }, []);
+
+  const onAnchorClick = useCallback(
+    (event: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+      const [path, anchor] = href.split("#");
+      if (!anchor || path !== homeHref || !onHome) return;
+
+      event.preventDefault();
+      scrollToElement(anchor);
+      window.history.replaceState(null, "", `${homeHref}#${anchor}`);
+    },
+    [homeHref, onHome],
+  );
 
   return (
-    <nav
-      aria-label={t.nav.primary}
-      className="lg:hidden fixed bottom-0 inset-x-0 z-[65] border-t border-black/[0.07] bg-white/95 backdrop-blur-md pb-[env(safe-area-inset-bottom)]"
-    >
-      <ul className="grid grid-cols-5 items-stretch">
-        {items.map((it) => {
-          const Icon = ICONS[it.key];
-          const href = it.hash ? `${it.to}${it.hash}` : it.to;
-          return (
-            <li key={it.key} className="flex">
-              <a
-                href={href}
-                aria-current={it.active ? "page" : undefined}
-                className={`flex flex-1 flex-col items-center justify-center gap-1 py-2.5 transition-colors ${
-                  it.active ? "text-fire" : "text-foreground/55 hover:text-foreground"
-                }`}
-              >
-                <Icon className="h-[22px] w-[22px]" strokeWidth={it.active ? 2.4 : 1.9} />
-                <span className="font-sans text-[10px] font-semibold leading-none">{it.label}</span>
-              </a>
-            </li>
-          );
-        })}
+    <>
+      <nav
+        aria-label={t.nav.primary}
+        className="fixed bottom-4 left-1/2 z-[65] hidden -translate-x-1/2 lg:block"
+        onFocusCapture={() => {
+          clearHideTimer();
+          setDesktopVisible(true);
+        }}
+        onBlurCapture={scheduleDesktopHide}
+        onMouseEnter={() => {
+          clearHideTimer();
+          setDesktopVisible(true);
+        }}
+        onMouseLeave={scheduleDesktopHide}
+      >
+        <motion.div
+          initial={false}
+          animate={{
+            opacity: desktopVisible ? 1 : 0,
+            y: desktopVisible ? 0 : 22,
+            scale: desktopVisible ? 1 : 0.96,
+            pointerEvents: desktopVisible ? "auto" : "none",
+          }}
+          transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.22, ease: "easeOut" }}
+        >
+          <Dock baseSize={48} magnifiedSize={74} distance={155}>
+            <DockAction
+              ariaLabel={t.nav.scrollTop}
+              label={t.nav.scrollTop}
+              icon={ChevronUp}
+              onClick={scrollTop}
+            />
+            {/* About/FAQ do not contain the landing section anchors, so section arrows
+                hide there instead of navigating users away from the page they chose. */}
+            {onHome && (
+              <>
+                <DockAction
+                  ariaLabel={t.nav.prevSection}
+                  label={t.nav.prevSection}
+                  icon={SkipBack}
+                  onClick={() => jumpSection(-1)}
+                />
+                <DockAction
+                  ariaLabel={t.nav.nextSection}
+                  label={t.nav.nextSection}
+                  icon={SkipForward}
+                  onClick={() => jumpSection(1)}
+                />
+              </>
+            )}
+            <span className="mx-1 h-8 w-px self-center bg-black/10" aria-hidden="true" />
+            {navItems.map((item) => (
+              <DockLink key={item.key} item={item} onAnchorClick={onAnchorClick} />
+            ))}
+            <DockCartButton count={count} label={t.nav.cart} onClick={() => setCartOpen(true)} />
+          </Dock>
+        </motion.div>
+      </nav>
 
-        <li className="flex">
-          <button
-            onClick={() => setCartOpen(true)}
-            aria-label={t.nav.cart}
-            className="relative flex flex-1 flex-col items-center justify-center gap-1 py-2.5 text-foreground/55 transition-colors hover:text-foreground"
-          >
-            <span className="relative">
-              <ShoppingBag className="h-[22px] w-[22px]" strokeWidth={1.9} />
-              {count > 0 && (
-                <span className="absolute -right-2 -top-1.5 grid h-4 min-w-4 place-items-center rounded-full bg-fire px-1 font-sans text-[10px] font-bold text-white">
-                  {count}
-                </span>
-              )}
-            </span>
-            <span className="font-sans text-[10px] font-semibold leading-none">{t.nav.cart}</span>
-          </button>
-        </li>
-      </ul>
-    </nav>
+      <nav
+        aria-label={t.nav.primary}
+        className="fixed inset-x-0 bottom-0 z-[65] border-t border-black/[0.07] bg-white/94 px-3 pb-[calc(env(safe-area-inset-bottom)+8px)] pt-2 shadow-[0_-16px_45px_rgba(13,13,13,0.10)] backdrop-blur-xl lg:hidden"
+      >
+        <div className="mx-auto flex max-w-md items-end justify-between gap-1 rounded-[28px] bg-[#0D0D0D]/[0.035] p-1.5">
+          <MobileIconButton ariaLabel={t.nav.scrollTop} icon={ChevronUp} onClick={scrollTop} />
+          {/* About/FAQ do not contain the landing section anchors, so section arrows
+              hide there instead of navigating users away from the page they chose. */}
+          {onHome && (
+            <>
+              <MobileIconButton
+                ariaLabel={t.nav.prevSection}
+                icon={ChevronDown}
+                iconClassName="rotate-90"
+                onClick={() => jumpSection(-1)}
+              />
+              <MobileIconButton
+                ariaLabel={t.nav.nextSection}
+                icon={ChevronDown}
+                iconClassName="-rotate-90"
+                onClick={() => jumpSection(1)}
+              />
+            </>
+          )}
+          {navItems.map((item) => (
+            <MobileNavLink key={item.key} item={item} onAnchorClick={onAnchorClick} />
+          ))}
+          <MobileCartButton count={count} label={t.nav.cart} onClick={() => setCartOpen(true)} />
+        </div>
+      </nav>
+    </>
   );
 }
 
-/** Alias tipado para que TypeScript no se queje del índice de ICONS. */
-export type BottomNavKey = keyof typeof ICONS;
+function DockLink({
+  item,
+  onAnchorClick,
+}: {
+  item: NavItem;
+  onAnchorClick: (event: React.MouseEvent<HTMLAnchorElement>, href: string) => void;
+}) {
+  const Icon = item.icon;
+
+  return (
+    <DockItem>
+      <DockIcon>
+        <a
+          href={item.href}
+          aria-label={item.label}
+          aria-current={item.active ? "page" : undefined}
+          onClick={(event) => onAnchorClick(event, item.href)}
+          className={cn(
+            "grid h-full w-full place-items-center rounded-full border border-black/10 bg-white text-foreground/70 shadow-sm transition-colors hover:text-fire focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fire motion-reduce:transition-none",
+            item.active && "border-fire/40 bg-fire text-white hover:text-white",
+          )}
+        >
+          <Icon className="h-[52%] w-[52%]" strokeWidth={item.active ? 2.5 : 2} />
+        </a>
+      </DockIcon>
+      <DockLabel>{item.label}</DockLabel>
+    </DockItem>
+  );
+}
+
+function DockAction({
+  ariaLabel,
+  label,
+  icon: Icon,
+  onClick,
+}: {
+  ariaLabel: string;
+  label: string;
+  icon: ElementType<{ className?: string; strokeWidth?: number }>;
+  onClick: () => void;
+}) {
+  return (
+    <DockItem>
+      <DockIcon>
+        <button
+          type="button"
+          aria-label={ariaLabel}
+          onClick={onClick}
+          className="grid h-full w-full place-items-center rounded-full border border-black/10 bg-white text-foreground/65 shadow-sm transition-colors hover:text-fire focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fire motion-reduce:transition-none"
+        >
+          <Icon className="h-[50%] w-[50%]" strokeWidth={2.1} />
+        </button>
+      </DockIcon>
+      <DockLabel>{label}</DockLabel>
+    </DockItem>
+  );
+}
+
+function DockCartButton({
+  count,
+  label,
+  onClick,
+}: {
+  count: number;
+  label: string;
+  onClick: () => void;
+}) {
+  return (
+    <DockItem>
+      <DockIcon>
+        <button
+          type="button"
+          aria-label={label}
+          onClick={onClick}
+          className="relative grid h-full w-full place-items-center rounded-full border border-fire/30 bg-fire text-white shadow-sm transition-colors hover:bg-[#4d248f] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fire focus-visible:ring-offset-2 motion-reduce:transition-none"
+        >
+          <ShoppingBag className="h-[50%] w-[50%]" strokeWidth={2.15} />
+          {count > 0 && <Badge count={count} className="-right-1 -top-1" />}
+        </button>
+      </DockIcon>
+      <DockLabel>{label}</DockLabel>
+    </DockItem>
+  );
+}
+
+function MobileNavLink({
+  item,
+  onAnchorClick,
+}: {
+  item: NavItem;
+  onAnchorClick: (event: React.MouseEvent<HTMLAnchorElement>, href: string) => void;
+}) {
+  const Icon = item.icon;
+
+  return (
+    <a
+      href={item.href}
+      aria-label={item.label}
+      aria-current={item.active ? "page" : undefined}
+      onClick={(event) => onAnchorClick(event, item.href)}
+      className={cn(
+        "relative flex h-14 min-w-0 flex-1 flex-col items-center justify-center gap-0.5 rounded-2xl px-1 text-foreground/55 transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fire motion-reduce:transition-none",
+        item.active && "bg-white text-fire shadow-[0_7px_20px_rgba(13,13,13,0.10)]",
+      )}
+    >
+      <Icon className="h-5 w-5" strokeWidth={item.active ? 2.5 : 2} />
+      <span className="max-w-full truncate font-sans text-[9px] font-semibold leading-none">
+        {item.label}
+      </span>
+    </a>
+  );
+}
+
+function MobileIconButton({
+  ariaLabel,
+  icon: Icon,
+  iconClassName,
+  onClick,
+}: {
+  ariaLabel: string;
+  icon: ElementType<{ className?: string; strokeWidth?: number }>;
+  iconClassName?: string;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      aria-label={ariaLabel}
+      onClick={onClick}
+      className="grid h-11 w-9 shrink-0 place-items-center rounded-2xl text-foreground/45 transition-colors hover:bg-white hover:text-fire focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fire motion-reduce:transition-none"
+    >
+      <Icon className={cn("h-4.5 w-4.5", iconClassName)} strokeWidth={2.2} />
+    </button>
+  );
+}
+
+function MobileCartButton({
+  count,
+  label,
+  onClick,
+}: {
+  count: number;
+  label: string;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      aria-label={label}
+      onClick={onClick}
+      className="relative flex h-14 min-w-0 flex-1 flex-col items-center justify-center gap-0.5 rounded-2xl bg-fire px-1 text-white shadow-[0_8px_22px_rgba(91,46,168,0.30)] transition-colors hover:bg-[#4d248f] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fire focus-visible:ring-offset-2 motion-reduce:transition-none"
+    >
+      <span className="relative">
+        <ShoppingBag className="h-5 w-5" strokeWidth={2.2} />
+        {count > 0 && <Badge count={count} className="-right-2 -top-2" />}
+      </span>
+      <span className="max-w-full truncate font-sans text-[9px] font-semibold leading-none">
+        {label}
+      </span>
+    </button>
+  );
+}
+
+function Badge({ count, className }: { count: number; className?: string }) {
+  return (
+    <span
+      className={cn(
+        "absolute grid h-4 min-w-4 place-items-center rounded-full bg-[#0D0D0D] px-1 font-sans text-[10px] font-bold leading-none text-white ring-2 ring-white",
+        className,
+      )}
+    >
+      {count}
+    </span>
+  );
+}

@@ -191,7 +191,7 @@ function TopNav({ onCta }: { onCta: () => void }) {
         <div className="mx-auto w-full max-w-7xl px-6 py-3 flex items-center justify-between gap-4">
           <a href="#top" className="logo-link shrink-0">
             <img
-              src="/azkomoly_new_logo.png"
+              src="/azkomoly_new_logo.webp"
               alt="AZKOMOLY"
               className="logo-mark h-10 w-auto"
             />
@@ -402,12 +402,12 @@ function ProductsSection() {
 
 
 const SOCIAL_REVIEWS: { src: string; href: string; platform: "instagram" | "tiktok" }[] = [
-  { src: "/review1.png", href: "https://www.instagram.com/reel/DbOVwukMheu/?utm_source=ig_web_button_share_sheet&igsh=MzRlODBiNWFlZA==", platform: "instagram" },
-  { src: "/review2.png", href: "https://www.instagram.com/reel/DbAyYwQO_z9/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA==", platform: "instagram" },
-  { src: "/review3.png", href: "https://www.instagram.com/reel/DanS3tFsao4/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA==", platform: "instagram" },
-  { src: "/review4.png", href: "https://www.instagram.com/reel/DaLM-yzsLz_/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA==", platform: "instagram" },
-  { src: "/review5.png", href: "https://www.instagram.com/reel/DaFsFjgKlCR/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA==", platform: "instagram" },
-  { src: "/review6.png", href: "https://www.tiktok.com/@azkomoly.hu/video/7670098419981110550?is_from_webapp=1&sender_device=pc&web_id=7644208246575662593", platform: "tiktok" },
+  { src: "/review1.webp", href: "https://www.instagram.com/reel/DbOVwukMheu/?utm_source=ig_web_button_share_sheet&igsh=MzRlODBiNWFlZA==", platform: "instagram" },
+  { src: "/review2.webp", href: "https://www.instagram.com/reel/DbAyYwQO_z9/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA==", platform: "instagram" },
+  { src: "/review3.webp", href: "https://www.instagram.com/reel/DanS3tFsao4/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA==", platform: "instagram" },
+  { src: "/review4.webp", href: "https://www.instagram.com/reel/DaLM-yzsLz_/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA==", platform: "instagram" },
+  { src: "/review5.webp", href: "https://www.instagram.com/reel/DaFsFjgKlCR/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA==", platform: "instagram" },
+  { src: "/review6.webp", href: "https://www.tiktok.com/@azkomoly.hu/video/7670098419981110550?is_from_webapp=1&sender_device=pc&web_id=7644208246575662593", platform: "tiktok" },
 ];
 
 function LifestyleStrip() {
@@ -700,7 +700,7 @@ function BigCTA({ onCta }: { onCta: () => void }) {
       {/* Fondo de abajo: lo que hay adentro de las cajas — solo se ve por el
           agujero circular que sigue al cursor */}
       <img
-        src="/boxes inside.jpeg"
+        src="/boxes inside.webp"
         alt=""
         aria-hidden="true"
         className="absolute inset-0 w-full h-full object-cover"
@@ -709,7 +709,7 @@ function BigCTA({ onCta }: { onCta: () => void }) {
       {/* Fondo de arriba: pared de cajas cerradas, con un agujero recortado
           en el cursor (radial mask) que deja ver la capa de abajo */}
       <img
-        src="/boxes.jpeg"
+        src="/boxes.webp"
         alt=""
         aria-hidden="true"
         className="absolute inset-0 w-full h-full object-cover"
@@ -725,7 +725,7 @@ function BigCTA({ onCta }: { onCta: () => void }) {
       />
       <div className="relative mx-auto max-w-7xl px-6 py-20 text-center">
         <img
-          src="/azkomoly_new_logo_negativo.png"
+          src="/azkomoly_new_logo_negativo.webp"
           alt="AZKOMOLY"
           className="h-12 sm:h-14 w-auto mx-auto mb-6 drop-shadow-[0_2px_6px_rgba(0,0,0,0.6)]"
         />
