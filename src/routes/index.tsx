@@ -11,6 +11,8 @@ import { IntroVideoModal } from "@/components/IntroVideoModal";
 import { HeroV2 } from "@/components/HeroV2";
 import { DiscountWidget } from "@/components/DiscountWidget";
 import TextLoop from "@/components/TextLoop";
+import PillNav from "@/components/nav/PillNav";
+import StaggeredMenu from "@/components/nav/StaggeredMenu";
 import { ProductCardWide } from "@/components/shop/ProductCard";
 import { SocialProof } from "@/components/shop/SocialProof";
 import { LanguageToggle } from "@/components/LanguageToggle";
@@ -218,7 +220,9 @@ function TopNav({ onCta }: { onCta: () => void }) {
 
   return (
     <>
-      <nav className="fixed top-0 inset-x-0 z-40 flex flex-col">
+      {/* z-[70]: por encima del panel del menú (z-60), para que el botón de
+          cerrar y el carrito sigan alcanzables con el menú abierto. */}
+      <nav className="fixed top-0 inset-x-0 z-[70] flex flex-col">
         <div className="bg-fire w-full">
         <div className="mx-auto w-full max-w-7xl px-6 py-3 flex items-center justify-between gap-4">
           <a href="#top" className="shrink-0">
@@ -228,16 +232,17 @@ function TopNav({ onCta }: { onCta: () => void }) {
               className="h-10 w-auto"
             />
           </a>
-          <div className="hidden md:flex items-center gap-6 font-sans text-sm">
-            {navLinks.map((l, i) => (
-              <a
-                key={i}
-                href={l.href}
-                className="font-extrabold text-white hover:text-black/70 transition-colors"
-              >
-                {l.label}
-              </a>
-            ))}
+          {/* Desktop: PillNav. El track negro y el texto morado sobre píldora
+              blanca son los tres colores de marca; al pasar el cursor, el
+              círculo negro sube y el texto pasa a blanco. */}
+          <div className="hidden md:block">
+            <PillNav
+              items={navLinks.map((l) => ({ label: l.label, href: l.href }))}
+              baseColor="#0D0D0D"
+              pillColor="#FFFFFF"
+              pillTextColor="#5B2EA8"
+              hoveredPillTextColor="#FFFFFF"
+            />
           </div>
           <div className="flex items-center gap-3 sm:gap-4">
             <LanguageToggle light className="hidden sm:inline-flex" />
@@ -250,62 +255,32 @@ function TopNav({ onCta }: { onCta: () => void }) {
               {t.nav.notify}
             </button>
             <button
-              onClick={() => setMenuOpen(true)}
-              aria-label="Menü"
+              onClick={() => setMenuOpen((v) => !v)}
+              aria-label={menuOpen ? "Bezárás" : "Menü"}
+              aria-expanded={menuOpen}
+              aria-controls="staggered-menu-panel"
               className="md:hidden grid place-items-center h-9 w-9 text-white"
             >
-              <Menu className="h-6 w-6" />
+              {menuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </button>
           </div>
         </div>
         </div>
       </nav>
 
-      {/* Menú hamburguesa — overlay a pantalla completa, con el mismo
-          derretido orgánico cerrando el borde inferior de toda la pantalla */}
-      <div
-        className={`fixed inset-0 z-[60] flex flex-col transition-all duration-300 ${
-          menuOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
-        }`}
-      >
-        <div className="bg-fire flex-1 flex flex-col min-h-0">
-          <div className="flex items-center justify-between px-6 py-4">
-            <img src="/azkomoly_new_logo_negativo.png" alt="AZKOMOLY" className="h-9 w-auto" />
-            <button
-              onClick={() => setMenuOpen(false)}
-              aria-label="Bezárás"
-              className="grid place-items-center h-10 w-10 text-white"
-            >
-              <X className="h-7 w-7" />
-            </button>
-          </div>
-          <div className="flex-1 flex flex-col items-center justify-center gap-7 px-6">
-            {navLinks.map((l, i) => (
-              <a
-                key={i}
-                href={l.href}
-                onClick={() => setMenuOpen(false)}
-                className="font-display text-4xl text-white hover:text-black/70 transition-colors"
-              >
-                {l.label}
-              </a>
-            ))}
-            <button
-              onClick={() => {
-                setMenuOpen(false);
-                onCta();
-              }}
-              className="mt-4 bg-black text-white font-display text-base px-8 py-3 rounded-full"
-            >
-              {t.nav.notify}
-            </button>
-            <div className="mt-6 flex items-center gap-6">
-              <LanguageToggle light />
-              <SocialIcons dark={false} className="!gap-5" />
-            </div>
-          </div>
-        </div>
-      </div>
+      {/* Menú móvil — StaggeredMenu: las capas de color entran escalonadas
+          (lavanda y morado de marca) y detrás llega el panel con los items.
+          Va controlado: el botón vive arriba, en el navbar. */}
+      <StaggeredMenu
+        open={menuOpen}
+        onClose={() => setMenuOpen(false)}
+        items={navLinks.map((l) => ({ label: l.label, link: l.href, ariaLabel: l.label }))}
+        socialItems={SOCIALS.map((s) => ({ label: s.label, link: s.href }))}
+        socialsTitle={t.footer.follow}
+        position="right"
+        colors={["#8F78B5", "#5B2EA8"]}
+        accentColor="#5B2EA8"
+      />
     </>
   );
 }

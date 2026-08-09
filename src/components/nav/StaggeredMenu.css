@@ -1,0 +1,213 @@
+/* StaggeredMenu — React Bits. Ajustes respecto al CSS original:
+   - El wrapper original ocupaba `width/height: 100%` dentro del flujo; acá va
+     fijo a pantalla completa sólo cuando hace falta, para no empujar layout.
+   - El panel usa la tipografía y los colores de AZKOMOLY (Anton para los
+     items, morado de marca para el acento).
+   - Añadido bloque de prefers-reduced-motion. */
+
+.staggered-menu-wrapper {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* Cerrado, el wrapper no debe capturar clicks en toda la pantalla: sólo el
+   botón (que vive fuera, en el navbar) abre el menú. */
+.staggered-menu-wrapper:not([data-open]) .staggered-menu-panel,
+.staggered-menu-wrapper:not([data-open]) .sm-prelayers {
+  pointer-events: none;
+}
+
+.staggered-menu-panel {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 100%;
+  height: 100%;
+  background: #ffffff;
+  display: flex;
+  flex-direction: column;
+  padding: 5.5em 1.75em 2em 1.75em;
+  overflow-y: auto;
+  z-index: 10;
+  pointer-events: auto;
+  opacity: 0;
+}
+
+[data-position='left'] .staggered-menu-panel {
+  right: auto;
+  left: 0;
+}
+
+.sm-prelayers {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  pointer-events: none;
+  z-index: 5;
+  opacity: 0;
+}
+
+[data-position='left'] .sm-prelayers {
+  right: auto;
+  left: 0;
+}
+
+.sm-prelayer {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 100%;
+  width: 100%;
+  transform: translateX(0);
+  opacity: 0;
+}
+
+.sm-panel-inner {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.sm-panel-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* overflow-hidden es lo que hace que los items "entren" desde abajo, pero con
+   line-height:1 (el valor del original) Anton se come el remate de las
+   mayúsculas por arriba y por abajo. Un pelo de aire lo resuelve sin perder
+   el efecto de máscara. */
+.sm-panel-itemWrap {
+  position: relative;
+  overflow: hidden;
+  line-height: 1.14;
+  padding-block: 0.04em;
+}
+
+.sm-panel-item {
+  position: relative;
+  color: #0d0d0d;
+  font-family: 'Anton', 'Archivo Black', system-ui, sans-serif;
+  font-weight: 400;
+  font-size: clamp(2.1rem, 11vw, 3.2rem);
+  cursor: pointer;
+  line-height: 1.14;
+  letter-spacing: -1px;
+  text-transform: uppercase;
+  transition: color 0.25s;
+  display: inline-block;
+  text-decoration: none;
+  padding-right: 1.4em;
+}
+
+.sm-panel-itemLabel {
+  display: inline-block;
+  will-change: transform;
+  transform-origin: 50% 100%;
+}
+
+.sm-panel-item:hover,
+.sm-panel-item:focus-visible {
+  color: var(--sm-accent, #5b2ea8);
+}
+
+.sm-panel-list[data-numbering] {
+  counter-reset: smItem;
+}
+
+.sm-panel-list[data-numbering] .sm-panel-item::after {
+  counter-increment: smItem;
+  content: counter(smItem, decimal-leading-zero);
+  position: absolute;
+  top: 0.1em;
+  right: 0.6em;
+  font-family: 'Poppins', system-ui, sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--sm-accent, #5b2ea8);
+  letter-spacing: 0;
+  pointer-events: none;
+  user-select: none;
+  opacity: var(--sm-num-opacity, 0);
+}
+
+.sm-socials {
+  margin-top: auto;
+  padding-top: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.sm-socials-title {
+  margin: 0;
+  font-family: 'Poppins', system-ui, sans-serif;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--sm-accent, #5b2ea8);
+}
+
+.sm-socials-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.sm-socials-link {
+  font-family: 'Poppins', system-ui, sans-serif;
+  font-size: 1.05rem;
+  font-weight: 500;
+  color: #0d0d0d;
+  text-decoration: none;
+  position: relative;
+  padding: 2px 0;
+  display: inline-block;
+  transition:
+    color 0.3s ease,
+    opacity 0.3s ease;
+}
+
+.sm-socials-link:hover {
+  color: var(--sm-accent, #5b2ea8);
+}
+
+.sm-socials-link:focus-visible {
+  outline: 2px solid var(--sm-accent, #5b2ea8);
+  outline-offset: 3px;
+}
+
+.staggered-menu-panel .sm-socials-list .sm-socials-link {
+  opacity: 1;
+}
+
+.staggered-menu-panel .sm-socials-list:hover .sm-socials-link:not(:hover) {
+  opacity: 0.35;
+}
+
+.staggered-menu-panel .sm-socials-list:focus-within .sm-socials-link:not(:focus-visible) {
+  opacity: 0.35;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .staggered-menu-panel,
+  .sm-prelayer {
+    transition: none !important;
+  }
+}
