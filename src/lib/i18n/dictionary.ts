@@ -24,9 +24,15 @@ export type Dict = {
     shop: string;
     merch: string;
     how: string;
+    about: string;
     faq: string;
     contact: string;
     notify: string;
+    home: string;
+    cart: string;
+    /** Etiqueta accesible de la barra inferior. Hay dos <nav> en la página, así
+     *  que cada uno necesita nombre propio para los lectores de pantalla. */
+    primary: string;
   };
   hero: {
     est: string;
@@ -191,7 +197,7 @@ const hu: Dict = {
     ogTitle: "AZKOMOLY — Mi van a dobozban?",
     ogDescription: "Nem tudod mi van benne. Ez a lényeg.",
   },
-  nav: { shop: "Bolt", merch: "Merch", how: "Hogyan működik", faq: "GYIK", contact: "Kapcsolat", notify: "Értesíts" },
+  nav: { shop: "Bolt", merch: "Merch", how: "Hogyan működik", about: "Rólunk", faq: "GYIK", contact: "Kapcsolat", notify: "Értesíts", home: "Főoldal", cart: "Kosár", primary: "Fő navigáció" },
   hero: {
     est: "EST · MMXXVI",
     index: "/01",
@@ -411,7 +417,7 @@ const en: Dict = {
     ogTitle: "AZKOMOLY — What's in the box?",
     ogDescription: "You don't know what's inside. That's the point.",
   },
-  nav: { shop: "Shop", merch: "Merch", how: "How it works", faq: "FAQ", contact: "Contact", notify: "Notify me" },
+  nav: { shop: "Shop", merch: "Merch", how: "How it works", about: "About", faq: "FAQ", contact: "Contact", notify: "Notify me", home: "Home", cart: "Cart", primary: "Main navigation" },
   hero: {
     est: "EST · MMXXVI",
     index: "/01",

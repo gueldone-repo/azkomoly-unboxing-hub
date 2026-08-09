@@ -165,11 +165,14 @@ function TopNav({ onCta }: { onCta: () => void }) {
     };
   }, [menuOpen]);
 
+  // About y GYIK apuntan por fin a sus páginas reales (`/about`, `/faq`), que
+  // Lovable generó y hasta ahora no estaban enlazadas desde ningún sitio: se
+  // llegaba sólo escribiendo la URL a mano.
   const navLinks = [
     { href: "#termekek", label: t.nav.shop },
-    { href: "#termekek", label: t.nav.merch },
     { href: "#hogyan", label: t.nav.how },
-    { href: "#gyik", label: t.nav.faq },
+    { href: "/about", label: t.nav.about },
+    { href: "/faq", label: t.nav.faq },
     { href: "#kapcsolat", label: t.nav.contact },
   ];
 
@@ -186,11 +189,11 @@ function TopNav({ onCta }: { onCta: () => void }) {
       <nav className="fixed top-0 inset-x-0 z-[70] flex flex-col">
         <div className="w-full bg-white/90 backdrop-blur-md border-b border-black/[0.07]">
         <div className="mx-auto w-full max-w-7xl px-6 py-3 flex items-center justify-between gap-4">
-          <a href="#top" className="shrink-0">
+          <a href="#top" className="logo-link shrink-0">
             <img
               src="/azkomoly_new_logo.png"
               alt="AZKOMOLY"
-              className="h-10 w-auto"
+              className="logo-mark h-10 w-auto"
             />
           </a>
           {/* Desktop: PillNav sin carril de fondo. En reposo los links son
@@ -337,12 +340,27 @@ function ProductsSection() {
             {t.products.empty}
           </p>
         ) : (
-          /* Rejilla de tarjetas con tilt. Se pasa del stack vertical (una card
-             ancha por producto) a una rejilla: con el tilt, las tarjetas piden
-             ser vistas de a varias y comparadas. */
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12">
+          /* Móvil: carril horizontal con scroll-snap. Cada caja ocupa casi
+             toda la pantalla y el pulgar la engancha de una en una, en vez de
+             obligar a recorrer una lista larga hacia abajo. Es el gesto que la
+             gente ya trae aprendido de Instagram y TikTok.
+             Desktop: rejilla, donde sí conviene comparar varias a la vez. */
+          <div
+            className="
+              flex snap-x snap-mandatory gap-5 overflow-x-auto scrollbar-none
+              -mx-6 px-6 pb-2
+              sm:mx-0 sm:grid sm:grid-cols-2 sm:gap-x-8 sm:gap-y-12 sm:overflow-visible sm:px-0
+              lg:grid-cols-3
+            "
+            style={{ scrollPaddingInline: "1.5rem" }}
+          >
             {products.map((p) => (
-              <ProductTiltCard key={p.node.id} p={p} />
+              <div
+                key={p.node.id}
+                className="w-[82vw] max-w-[360px] shrink-0 snap-center sm:w-auto sm:max-w-none sm:shrink"
+              >
+                <ProductTiltCard p={p} />
+              </div>
             ))}
           </div>
         )}

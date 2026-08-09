@@ -15,6 +15,7 @@ import { I18nProvider, readLangCookie } from "../lib/i18n";
 import { DICTIONARIES } from "../lib/i18n/dictionary";
 import { SITE_URL, jsonLd, organizationSchema } from "../lib/seo";
 import { CartSheet } from "../components/cart/CartSheet";
+import { BottomNav } from "../components/nav/BottomNav";
 import { useCartSync } from "../hooks/useCartSync";
 import { getStoredConsent } from "../components/CookieBanner";
 import { initClarity } from "../lib/analytics/clarity";
@@ -163,6 +164,10 @@ function RootComponent() {
         {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
         <Outlet />
         <CartSheet />
+        {/* Va en el root, no en cada página: la barra del pulgar tiene que
+            existir en TODAS (landing, producto, About, GYIK, legales), si no
+            el usuario la pierde justo cuando entra a un producto. */}
+        <BottomNav />
       </I18nProvider>
     </QueryClientProvider>
   );
