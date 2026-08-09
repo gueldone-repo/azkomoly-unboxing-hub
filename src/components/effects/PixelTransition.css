@@ -1,0 +1,4 @@
+.pixel-transition span {
+  transform-origin: center;
+  will-change: transform, opacity;
+}
