@@ -219,6 +219,20 @@
   animation: logo-wobble 0.55s ease-in-out;
 }
 
+/* Red de seguridad contra el arrastre lateral: si cualquier pieza se pasa del
+   ancho (una imagen en vw, un título enorme, un carril mal medido), la página
+   entera se podía mover de lado en el móvil. `clip` en vez de `hidden` porque
+   `hidden` en el body rompe position:sticky. Los carriles que SÍ deben
+   desplazarse a lo ancho llevan su propio overflow-x:auto y no se ven
+   afectados. */
+html {
+  overflow-x: clip;
+}
+body {
+  overflow-x: clip;
+  max-width: 100vw;
+}
+
 /* La barra inferior es fija: sin este colchón taparía el final de cada página
    (el footer, el último producto). Va en el body para que valga en TODAS las
    rutas, no sólo en la landing. */

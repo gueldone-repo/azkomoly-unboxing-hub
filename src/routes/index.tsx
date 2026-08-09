@@ -264,10 +264,12 @@ function TopNav({ onCta }: { onCta: () => void }) {
  */
 function BrandWave() {
   return (
-    <div
-      aria-hidden="true"
-      className="relative w-full overflow-hidden h-[15vw] min-h-[100px] max-h-[200px]"
-    >
+    // Sin `max-h`: ese tope fijo era justo lo que cortaba las crestas. El SVG
+    // escala con el ancho de la pantalla, así que en monitores grandes la cinta
+    // crecía más que su caja y se comía los bordes de arriba y abajo. Con la
+    // altura atada al ancho (y un mínimo para el móvil), la proporción se
+    // mantiene y nunca recorta.
+    <div aria-hidden="true" className="relative w-full overflow-hidden h-[14vw] min-h-[104px]">
       <div className="absolute inset-x-0 top-1/2 -translate-y-1/2">
         <TextLoop
           text="Azkomoly"
@@ -275,16 +277,20 @@ function BrandWave() {
           speed={90}
           direction="reverse"
           separator="✦"
-          curviness={38}
-          fontSize={48}
+          /* Onda más baja y cinta más fina: juntas ocupan ~26% del alto del
+             SVG, así entra holgada en la franja en cualquier ancho. */
+          curviness={18}
+          fontSize={34}
           fontWeight={800}
           letterSpacing={2}
           uppercase
           color="#5B2EA8"
           ribbon
           ribbonColor="#FFFFFF"
-          ribbonWidth={86}
-          pauseOnHover
+          ribbonWidth={56}
+          /* No se detiene al pasar el cursor: es una banda decorativa, no algo
+             que haya que leer con calma, y frenarla al rozarla parece un fallo. */
+          pauseOnHover={false}
           style={{ fontFamily: "'Anton', var(--font-display)" }}
         />
       </div>
@@ -292,11 +298,16 @@ function BrandWave() {
   );
 }
 
+/** Cuántas cajas se muestran antes del botón "ver más". */
+const PRODUCTS_PER_PAGE = 6;
+
 function ProductsSection() {
   const t = useT();
   const { lang } = useI18n();
   const [products, setProducts] = useState<ShopifyProduct[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showAll, setShowAll] = useState(false);
+  const visible = showAll ? products : products.slice(0, PRODUCTS_PER_PAGE);
 
   useEffect(() => {
     setLoading(true);
@@ -312,8 +323,11 @@ function ProductsSection() {
           adorno: es el hueco por donde baja la caja del hero, que cae sobre
           esta seccion por la izquierda. */}
       <section id="termekek" className="relative z-0 bg-fire">
-      <div className="mx-auto max-w-7xl px-6 pt-[18vw] sm:pt-[13vw] lg:pt-[9vw] pb-20">
-        <div data-reveal className="mb-12">
+      {/* El colchón sólo hace falta en escritorio, que es donde la caja del
+          hero desborda sobre esta sección. Por debajo de lg el hero apila sin
+          solapes, así que un pt enorme dejaría un agujero morado vacío. */}
+      <div className="mx-auto max-w-7xl px-6 pt-16 lg:pt-[9vw]">
+        <div data-reveal className="mb-10">
           <p className="font-sans text-xs tracking-[0.35em] text-white/70 mb-3">
             {t.products.kicker}
           </p>
@@ -324,11 +338,14 @@ function ProductsSection() {
             {t.products.heading}
           </h2>
         </div>
+      </div>
 
-        {/* La cinta, ya dentro de la sección morada */}
-        <div className="-mx-6 mb-12">
-          <BrandWave />
-        </div>
+      {/* La cinta va FUERA del contenedor centrado: dentro de `max-w-7xl` se
+          quedaba en 1280px y por eso se veía cortada, sin llegar a los bordes
+          de la pantalla. */}
+      <BrandWave />
+
+      <div className="mx-auto max-w-7xl px-6 pt-10 pb-20">
         {loading ? (
           <div className="flex flex-col gap-6">
             {[...Array(3)].map((_, i) => (
@@ -354,14 +371,27 @@ function ProductsSection() {
             "
             style={{ scrollPaddingInline: "1.5rem" }}
           >
-            {products.map((p) => (
+            {visible.map((p) => (
               <div
                 key={p.node.id}
-                className="w-[82vw] max-w-[360px] shrink-0 snap-center sm:w-auto sm:max-w-none sm:shrink"
+                className="w-[82vw] max-w-[340px] shrink-0 snap-center sm:w-auto sm:max-w-none sm:shrink"
               >
                 <ProductTiltCard p={p} />
               </div>
             ))}
+          </div>
+        )}
+
+        {/* "Ver más" sólo aparece si de verdad hay más que ver. Con 20 productos
+            la sección se volvería un muro; con 4 no tiene sentido el botón. */}
+        {!loading && products.length > PRODUCTS_PER_PAGE && (
+          <div className="mt-12 flex justify-center">
+            <button
+              onClick={() => setShowAll((v) => !v)}
+              className="rounded-full border-2 border-white/70 px-8 py-3 font-sans text-sm font-bold uppercase tracking-wide text-white transition-all hover:-translate-y-0.5 hover:bg-white hover:text-fire"
+            >
+              {showAll ? t.products.showLess : `${t.products.showMore} (${products.length - PRODUCTS_PER_PAGE})`}
+            </button>
           </div>
         )}
       </div>

@@ -73,11 +73,16 @@ export function HeroV2() {
     // z-10 sobre la sección siguiente: sin esto, la caja que desborda hacia
     // abajo quedaría pintada DEBAJO del bloque de productos y se cortaría.
     <section className="relative z-10 w-full bg-background overflow-x-clip">
-      {/* ---------- MÓVIL / TABLET: apilado, sin solapes ---------- */}
-      <div className="lg:hidden flex flex-col items-center gap-6 px-6 pt-24 pb-0">
+      {/* ---------- MÓVIL / TABLET: apilado, sin solapes ----------
+          Orden deliberado: título, caja, CTA. Nada se superpone, porque a 390px
+          de ancho el solape sólo produce texto ilegible.
+          La caja iba a 112vw y ESO era lo que hacía que la página se pudiera
+          arrastrar de lado: un hijo más ancho que la pantalla desborda aunque
+          el padre lo recorte. Ahora nunca pasa del ancho disponible. */}
+      <div className="lg:hidden flex flex-col items-center gap-5 px-6 pt-24 pb-0">
         <div className="w-full text-center [&_h1]:text-center">{title}</div>
-        <div className="w-[112vw] max-w-[720px] -mb-[16vw]">{box}</div>
-        <div className="w-full pb-[14vw]">{cta}</div>
+        <div className="w-full max-w-[560px]">{box}</div>
+        <div className="w-full pb-10">{cta}</div>
       </div>
 
       {/* ---------- DESKTOP: composición por zonas ---------- */}
