@@ -170,7 +170,7 @@ export function HeroV2() {
           />
         </div>
 
-        <div className="absolute bottom-[-7vw] left-[-1vw] z-20 w-[74vw] max-w-[1220px]">
+        <div className="absolute bottom-[-3.5vw] left-[-1vw] z-20 w-[74vw] max-w-[1220px]">
           {box}
         </div>
 
@@ -179,8 +179,13 @@ export function HeroV2() {
             bastaba que la onda subiera o bajara un poco para que quedara blanco
             sobre blanco, invisible. Sobre blanco el texto va en su color de
             marca y no depende de dónde caiga la curva. */}
-        <div className="absolute right-[4vw] top-[44%] z-30 w-[32vw] max-w-[430px]">
-          <div className="border-l-2 border-fire/25 pl-7">{renderCta(false)}</div>
+        {/* Caja 3D translúcida (prueba): cristal esmerilado con un borde claro
+            arriba y sombra proyectada abajo, que es lo que da la sensación de
+            volumen. Sustituye al filete lateral. */}
+        <div className="absolute right-[4vw] top-[54%] z-30 w-[34vw] max-w-[460px]">
+          <div className="rounded-3xl border border-white/60 bg-white/45 p-7 shadow-[0_20px_50px_rgba(13,13,13,0.13),inset_0_1px_0_rgba(255,255,255,0.9)] backdrop-blur-xl">
+            {renderCta(false)}
+          </div>
         </div>
 
         {scrollCue}
