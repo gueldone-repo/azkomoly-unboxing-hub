@@ -67,24 +67,40 @@ export function HeroV2() {
     </div>
   );
 
-  const cta = (
+  /**
+   * `onWave` = el bloque se apoya sobre la onda morada.
+   *
+   * En escritorio el texto caía justo encima de la onda: gris oscuro sobre
+   * morado y, peor, el botón morado sobre morado — se perdía entero. Sobre la
+   * onda el orden de capas es: SVG al fondo, letras encima y en blanco, y el
+   * botón invertido (blanco con texto morado) para que sea lo que más resalta.
+   */
+  const renderCta = (onWave: boolean) => (
     <motion.div
       className="flex flex-col items-center gap-5 text-center lg:items-start lg:text-left"
       initial={reduceMotion ? false : { opacity: 0, y: 18 }}
       animate={reduceMotion ? undefined : { opacity: 1, y: 0 }}
       transition={{ duration: 0.52, ease: [0.22, 1, 0.36, 1], delay: 0.46 }}
     >
-      <div className="max-w-[30ch] font-sans text-base leading-relaxed text-foreground/76 sm:text-lg">
+      <div
+        className={`max-w-[30ch] font-sans text-base leading-relaxed sm:text-lg ${
+          onWave ? "text-white/90" : "text-foreground/76"
+        }`}
+      >
         <span className="block">{t.hero.tagline}</span>
         <RotatingText
           phrases={t.hero.rotatingTaglines}
-          className="mt-2 font-semibold text-foreground"
+          className={`mt-2 font-semibold ${onWave ? "text-white" : "text-foreground"}`}
         />
       </div>
       <button
         type="button"
         onClick={scrollToProducts}
-        className="rounded-full bg-fire px-8 py-4 font-sans text-base font-semibold tracking-wide text-white shadow-[0_16px_32px_rgba(13,13,13,0.18),0_8px_22px_rgba(91,46,168,0.30)] transition-all duration-200 hover:-translate-y-1 hover:bg-[#4c238f] active:translate-y-0 active:scale-[0.98] sm:text-lg"
+        className={`rounded-full px-8 py-4 font-sans text-base font-semibold tracking-wide transition-all duration-200 hover:-translate-y-1 active:translate-y-0 active:scale-[0.98] sm:text-lg ${
+          onWave
+            ? "bg-white text-fire shadow-[0_16px_32px_rgba(13,13,13,0.22)] hover:bg-white/92"
+            : "bg-fire text-white shadow-[0_16px_32px_rgba(13,13,13,0.18),0_8px_22px_rgba(91,46,168,0.30)] hover:bg-[#4c238f]"
+        }`}
       >
         {t.hero.cta}
       </button>
@@ -122,7 +138,7 @@ export function HeroV2() {
 
       <div className="relative flex flex-col items-center gap-5 px-6 pb-8 pt-5 lg:hidden">
         <div className="relative z-20 w-full max-w-[560px]">{box}</div>
-        <div className="relative z-30 w-full pb-4">{cta}</div>
+        <div className="relative z-30 w-full pb-4">{renderCta(false)}</div>
         <CurvedLoop
           text={t.hero.marquee}
           speed={reduceMotion ? 0 : 46}
@@ -137,8 +153,10 @@ export function HeroV2() {
           {box}
         </div>
 
-        <div className="absolute right-[4vw] top-[58%] z-30 w-[32vw] max-w-[430px]">
-          <div className="border-l-2 border-black/10 pl-7">{cta}</div>
+        {/* z-30 = por encima de la onda (z-0) y de la caja (z-20). El filete
+            lateral pasa a blanco translúcido para que se lea sobre el morado. */}
+        <div className="absolute right-[4vw] top-[62%] z-30 w-[32vw] max-w-[430px]">
+          <div className="border-l-2 border-white/35 pl-7">{renderCta(true)}</div>
         </div>
 
         {scrollCue}

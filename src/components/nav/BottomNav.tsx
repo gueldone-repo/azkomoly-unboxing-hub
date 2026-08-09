@@ -114,30 +114,12 @@ export function BottomNav() {
     hideTimer.current = window.setTimeout(() => setDesktopVisible(false), DESKTOP_HIDE_DELAY);
   }, [clearHideTimer]);
 
-  useEffect(() => {
-    const onPointerMove = (event: PointerEvent) => {
-      if (window.innerWidth < 1024) return;
-
-      const fromBottom = window.innerHeight - event.clientY;
-      const previousY = lastPointerY.current;
-      const movingDown = previousY !== null && event.clientY - previousY > 8;
-      lastPointerY.current = event.clientY;
-
-      if (fromBottom <= DESKTOP_REVEAL_DISTANCE || (movingDown && event.clientY > window.innerHeight * 0.65)) {
-        clearHideTimer();
-        setDesktopVisible(true);
-        return;
-      }
-
-      if (fromBottom > DESKTOP_HIDE_DISTANCE) scheduleDesktopHide();
-    };
-
-    window.addEventListener("pointermove", onPointerMove, { passive: true });
-    return () => {
-      window.removeEventListener("pointermove", onPointerMove);
-      clearHideTimer();
-    };
-  }, [clearHideTimer, scheduleDesktopHide]);
+  // Antes esto escuchaba `pointermove` en toda la ventana y el dock saltaba
+  // solo al acercar el ratón abajo: intrusivo, aparecía sin que nadie lo
+  // pidiera, y encima corría en cada frame de movimiento. Ahora el dock sólo
+  // sale cuando el usuario lo saca por la lengüeta. Se conserva el temporizador
+  // para replegarlo al alejarse.
+  useEffect(() => clearHideTimer, [clearHideTimer]);
 
   const scrollTop = useCallback(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -183,6 +165,28 @@ export function BottomNav() {
         }}
         onMouseLeave={scheduleDesktopHide}
       >
+        {/* Lengüeta: lo único visible en reposo. Discreta, pegada al borde, y
+            sacas el dock cuando tú quieres — con el cursor o con el teclado. */}
+        <motion.button
+          type="button"
+          aria-label={t.nav.primary}
+          aria-expanded={desktopVisible}
+          onClick={() => {
+            clearHideTimer();
+            setDesktopVisible((v) => !v);
+          }}
+          initial={false}
+          animate={{
+            opacity: desktopVisible ? 0 : 1,
+            y: desktopVisible ? 14 : 0,
+            pointerEvents: desktopVisible ? "none" : "auto",
+          }}
+          transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.18, ease: "easeOut" }}
+          className="absolute bottom-0 left-1/2 grid h-6 w-16 -translate-x-1/2 place-items-center rounded-t-full border border-b-0 border-black/10 bg-white/92 text-foreground/45 shadow-[0_-6px_18px_rgba(13,13,13,0.10)] backdrop-blur transition-colors hover:text-fire"
+        >
+          <ChevronUp className="h-4 w-4" strokeWidth={2.5} aria-hidden="true" />
+        </motion.button>
+
         <motion.div
           initial={false}
           animate={{
