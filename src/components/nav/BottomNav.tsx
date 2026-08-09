@@ -158,7 +158,9 @@ export function BottomNav() {
       {/* El centrado lo hace este contenedor con flex (nada de transform), y
           `motion` sólo anima la opacidad. Antes ambos peleaban por el mismo
           `transform` y la lengüeta acababa descolocada y fuera de pantalla. */}
-      <div className="pointer-events-none fixed inset-x-0 bottom-0 z-[64] hidden justify-center lg:flex">
+      {/* Pegada a la derecha, no centrada: en el centro chocaba con el banner
+          de cookies al entrar (y el widget de descuento ocupa la izquierda). */}
+      <div className="pointer-events-none fixed inset-x-0 bottom-0 z-[64] hidden justify-end pr-10 lg:flex">
         <motion.button
           type="button"
           aria-label={t.nav.primary}

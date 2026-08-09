@@ -37,7 +37,9 @@ export function HeroV2() {
       text={`${t.hero.heading.replace("\n", " ")} ✦ `}
       speed={reduceMotion ? 0 : 38}
       reverse
-      className="font-display text-fire/35 [&_text]:![font-family:'Bungee',var(--font-display)]"
+      // Morado a plena fuerza: al 35% se leía apagado y el titular perdía peso.
+      // El texto sale de `t.hero.heading`, así que sigue traducido (hu/en).
+      className="font-display text-fire [&_text]:![font-family:'Bungee',var(--font-display)]"
     />
   );
 
