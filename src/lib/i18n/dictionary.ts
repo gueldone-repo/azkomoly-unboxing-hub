@@ -43,6 +43,10 @@ export type Dict = {
     mysteryBox: string;
     heading: string;
     tagline: string;
+    rotatingTaglines: string[];
+    imageAlt: string;
+    marquee: string;
+    scrollAria: string;
     scroll: string;
     cta: string;
   };
@@ -208,7 +212,15 @@ const hu: Dict = {
     index: "/01",
     mysteryBox: "MYSTERY · BOX",
     heading: "NYISD\nKI A TITKOT",
-    tagline: "Válassz egy dobozt. Fedezd fel, mi van benne. Minden alkalommal más meglepetés.",
+    tagline: "Válassz egy dobozt. Fedezd fel, mi van benne.",
+    rotatingTaglines: [
+      "Minden alkalommal más meglepetés.",
+      "Eredeti streetwear darabok.",
+      "Nincs két egyforma doboz.",
+    ],
+    imageAlt: "AZKOMOLY mystery box",
+    marquee: "AZKOMOLY · MYSTERY BOX",
+    scrollAria: "Görgess a termékekhez",
     scroll: "GÖRGESS",
     cta: "KINYITOM A DOBOZOM →",
   },
@@ -430,7 +442,15 @@ const en: Dict = {
     index: "/01",
     mysteryBox: "MYSTERY · BOX",
     heading: "OPEN\nTHE MYSTERY",
-    tagline: "Pick a box. Discover what's inside. A new surprise every time.",
+    tagline: "Pick a box. Discover what's inside.",
+    rotatingTaglines: [
+      "A new surprise every time.",
+      "Original streetwear pieces.",
+      "No two boxes are the same.",
+    ],
+    imageAlt: "AZKOMOLY mystery box",
+    marquee: "AZKOMOLY · MYSTERY BOX",
+    scrollAria: "Scroll to the products",
     scroll: "SCROLL",
     cta: "I WANT TO OPEN MY BOX →",
   },
