@@ -82,17 +82,21 @@ export function HeroV2() {
       animate={reduceMotion ? undefined : { opacity: 1, y: 0 }}
       transition={{ duration: 0.52, ease: [0.22, 1, 0.36, 1], delay: 0.46 }}
     >
-      <div
-        className={`max-w-[30ch] font-sans text-base leading-relaxed sm:text-lg ${
+      {/* Sigue siendo un <h2> real: es el subtítulo del hero, no un adorno.
+          La frase que rota va SIEMPRE en morado de marca, que es lo que le da
+          presencia; sobre la onda cambia a blanco sólo porque en morado sobre
+          morado desaparecería. */}
+      <h2
+        className={`max-w-[30ch] font-sans text-base font-normal leading-relaxed sm:text-lg ${
           onWave ? "text-white/90" : "text-foreground/76"
         }`}
       >
         <span className="block">{t.hero.tagline}</span>
         <RotatingText
           phrases={t.hero.rotatingTaglines}
-          className={`mt-2 font-semibold ${onWave ? "text-white" : "text-foreground"}`}
+          className={`mt-2 text-lg font-bold sm:text-xl ${onWave ? "text-white" : "text-fire"}`}
         />
-      </div>
+      </h2>
       <button
         type="button"
         onClick={scrollToProducts}

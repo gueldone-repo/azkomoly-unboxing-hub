@@ -151,6 +151,38 @@ export function BottomNav() {
 
   return (
     <>
+      {/* Lengüeta: lo único visible en reposo. Va FUERA del <nav>, como
+          hermano: el nav lleva `-translate-x-1/2` y cualquier ancestro con
+          `transform` deja de anclar los hijos `fixed` a la ventana, así que
+          dentro la lengüeta se descolocaba respecto al ancho de la página. */}
+      {/* El centrado lo hace este contenedor con flex (nada de transform), y
+          `motion` sólo anima la opacidad. Antes ambos peleaban por el mismo
+          `transform` y la lengüeta acababa descolocada y fuera de pantalla. */}
+      <div className="pointer-events-none fixed inset-x-0 bottom-0 z-[64] hidden justify-center lg:flex">
+        <motion.button
+          type="button"
+          aria-label={t.nav.primary}
+          aria-expanded={desktopVisible}
+          onClick={() => {
+            clearHideTimer();
+            setDesktopVisible((v) => !v);
+          }}
+          onMouseEnter={() => {
+            clearHideTimer();
+            setDesktopVisible(true);
+          }}
+          initial={false}
+          animate={{
+            opacity: desktopVisible ? 0 : 1,
+            pointerEvents: desktopVisible ? "none" : "auto",
+          }}
+          transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.18, ease: "easeOut" }}
+          className="pointer-events-auto grid h-7 w-20 place-items-center rounded-t-xl border border-b-0 border-black/10 bg-white/92 text-foreground/45 shadow-[0_-6px_18px_rgba(13,13,13,0.10)] backdrop-blur transition-colors hover:text-fire"
+        >
+          <ChevronUp className="h-4 w-4" strokeWidth={2.5} aria-hidden="true" />
+        </motion.button>
+      </div>
+
       <nav
         aria-label={t.nav.primary}
         className="fixed bottom-4 left-1/2 z-[65] hidden -translate-x-1/2 lg:block"
@@ -165,28 +197,6 @@ export function BottomNav() {
         }}
         onMouseLeave={scheduleDesktopHide}
       >
-        {/* Lengüeta: lo único visible en reposo. Discreta, pegada al borde, y
-            sacas el dock cuando tú quieres — con el cursor o con el teclado. */}
-        <motion.button
-          type="button"
-          aria-label={t.nav.primary}
-          aria-expanded={desktopVisible}
-          onClick={() => {
-            clearHideTimer();
-            setDesktopVisible((v) => !v);
-          }}
-          initial={false}
-          animate={{
-            opacity: desktopVisible ? 0 : 1,
-            y: desktopVisible ? 14 : 0,
-            pointerEvents: desktopVisible ? "none" : "auto",
-          }}
-          transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.18, ease: "easeOut" }}
-          className="absolute bottom-0 left-1/2 grid h-6 w-16 -translate-x-1/2 place-items-center rounded-t-full border border-b-0 border-black/10 bg-white/92 text-foreground/45 shadow-[0_-6px_18px_rgba(13,13,13,0.10)] backdrop-blur transition-colors hover:text-fire"
-        >
-          <ChevronUp className="h-4 w-4" strokeWidth={2.5} aria-hidden="true" />
-        </motion.button>
-
         <motion.div
           initial={false}
           animate={{
