@@ -92,7 +92,7 @@ export function HeroV2() {
       {/* ---------- MÓVIL / TABLET: apilado, sin solapes ---------- */}
       <div className="lg:hidden flex flex-col items-center gap-6 px-6 pt-24 pb-0">
         <div className="w-full text-center [&_h1]:text-center">{title}</div>
-        <div className="w-[92vw] max-w-[560px] -mb-[12vw]">{box}</div>
+        <div className="w-[112vw] max-w-[720px] -mb-[16vw]">{box}</div>
         <div className="w-full pb-[14vw]">{cta}</div>
       </div>
 
@@ -108,7 +108,7 @@ export function HeroV2() {
             esquina del título (ese solape ES el diseño: la imagen es primera
             capa, el texto es fondo) y baja hasta salirse del hero. El bottom
             negativo es el desborde sobre la sección siguiente. */}
-        <div className="absolute left-[6vw] bottom-[-5vw] z-20 w-[58vw] max-w-[950px]">
+        <div className="absolute left-[-1vw] bottom-[-7vw] z-20 w-[74vw] max-w-[1220px]">
           {box}
         </div>
 
