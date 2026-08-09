@@ -78,19 +78,42 @@ export function DripDivider({
   const rawId = useId();
   const pathId = `drip-${rawId.replace(/[:]/g, "")}`;
   const { path, viewBoxHeight } = VARIANTS[variant];
-  const steps = Array.from({ length: Math.max(1, depth) }, (_, i) => i + 1);
+  const layers = Math.max(1, depth);
+  const steps = Array.from({ length: layers }, (_, i) => i + 1);
+
+  // El relieve 3D son copias del path corridas hacia abajo (translate y = s*1.4).
+  // La copia más profunda cae por debajo del viewBox original, y el SVG recorta
+  // ahí: eso dibujaba una LÍNEA RECTA negra a lo ancho, justo donde los valles
+  // tocaban el borde. Se le da al viewBox exactamente ese aire de más y se
+  // agranda el SVG en la misma proporción, así la onda se ve idéntica (misma
+  // escala vertical) pero ya sin recorte. El sobrante cuelga fuera del alto del
+  // contenedor — es el canto derretido cayendo sobre la sección de abajo, que es
+  // justo lo que se quiere ver.
+  const overhang = layers * 1.4;
+  const svgViewBoxHeight = viewBoxHeight + overhang;
+  const svgHeight = height * (svgViewBoxHeight / viewBoxHeight);
 
   return (
     <div
       aria-hidden="true"
-      className={`relative w-full overflow-hidden pointer-events-none select-none ${className}`}
+      className={`relative w-full pointer-events-none select-none ${className}`}
       style={{ height, opacity, backgroundColor: bgColor, transform: flip ? "scaleY(-1)" : undefined }}
     >
+      {/* Sin overflow-hidden a propósito: recortaba tanto el relieve como el
+          drop-shadow en seco, dejando otra línea recta. Lo que sobresale es
+          transparente salvo la silueta del derretido.
+
+          El -1px de arriba tampoco es capricho: el borde recto del relleno y el
+          fondo del contenedor caían en la misma fila de píxeles (y suelen caer en
+          una fracción, tipo 463.2), así que el antialiasing los mezclaba y pintaba
+          una línea gris de 1px a lo ancho. Subiéndolo, ese borde queda sobre la
+          sección de arriba — que es del mismo color que el derretido — y la mezcla
+          se vuelve invisible. */}
       <svg
-        viewBox={`0 0 1200 ${viewBoxHeight}`}
+        viewBox={`0 0 1200 ${svgViewBoxHeight}`}
         preserveAspectRatio="none"
-        className="absolute inset-0 w-full h-full"
-        style={{ filter: "drop-shadow(0 6px 5px rgba(0,0,0,0.2))" }}
+        className="absolute left-0 w-full"
+        style={{ top: -1, height: svgHeight + 1, filter: "drop-shadow(0 6px 5px rgba(0,0,0,0.2))" }}
       >
         <defs>
           <path id={pathId} d={path} />

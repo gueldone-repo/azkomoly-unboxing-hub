@@ -98,7 +98,10 @@ function AboutHero() {
 function OurGoal() {
   return (
     <>
-      <DripDivider variant="organic" mainColor="#FFFFFF" shadowColor="#0D0D0D" depth={4} height={34} />
+      {/* bgColor = color de la sección de abajo: el morado tiene que empezar
+          DENTRO del divisor, si no la sección arranca después con el borde
+          superior recto y se ve una línea horizontal debajo de la onda. */}
+      <DripDivider variant="organic" mainColor="#FFFFFF" bgColor="#5B2EA8" shadowColor="#0D0D0D" depth={4} height={34} />
       <section className="bg-fire px-6 py-14 sm:py-20">
         <div className="mx-auto max-w-2xl flex flex-col gap-5 text-center sm:text-left">
           <h2
@@ -124,7 +127,7 @@ function OurGoal() {
 function WhoWeAre() {
   return (
     <>
-      <DripDivider variant="organic" mainColor="#5B2EA8" shadowColor="#0D0D0D" depth={4} height={34} />
+      <DripDivider variant="organic" mainColor="#5B2EA8" bgColor="#FFFFFF" shadowColor="#0D0D0D" depth={4} height={34} />
       <section className="bg-background px-6 py-14 sm:py-20">
         <div className="mx-auto max-w-2xl flex flex-col gap-5 text-center sm:text-left">
           <h2
@@ -165,7 +168,7 @@ function WhoWeAre() {
 function FollowUs() {
   return (
     <>
-      <DripDivider variant="organic" mainColor="#FFFFFF" shadowColor="#0D0D0D" depth={4} height={34} />
+      <DripDivider variant="organic" mainColor="#FFFFFF" bgColor="#5B2EA8" shadowColor="#0D0D0D" depth={4} height={34} />
       <section className="bg-fire px-6 py-14 sm:py-20 flex flex-col items-center text-center gap-6">
         <img
           src={logoAsset.url}

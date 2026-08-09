@@ -314,11 +314,12 @@ function TopNav({ onCta }: { onCta: () => void }) {
             </div>
           </div>
         </div>
+        {/* Sin bgColor: un color sólido acá pintaba un rectángulo negro de 40px
+            con el borde de abajo recto. Transparente, sólo se ve el derretido. */}
         <DripDivider
           variant="organic"
           mainColor="#5B2EA8"
-          bgColor="#0D0D0D"
-          shadowColor="#3D2170"
+          shadowColor="#0D0D0D"
           depth={4}
           height={40}
           className="w-full shrink-0"

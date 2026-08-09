@@ -209,7 +209,9 @@ function NeedHelp() {
 
   return (
     <>
-      <DripDivider variant="organic" mainColor="#FFFFFF" shadowColor="#0D0D0D" depth={4} height={34} />
+      {/* bgColor = color de la sección de abajo: sin esto el morado arranca
+          después del divisor con el borde recto y se ve la línea horizontal. */}
+      <DripDivider variant="organic" mainColor="#FFFFFF" bgColor="#5B2EA8" shadowColor="#0D0D0D" depth={4} height={34} />
       <section className="bg-fire px-6 py-14 sm:py-20">
         <div className="mx-auto max-w-xl flex flex-col gap-6 text-center">
           <h2 className="text-white text-3d-fire text-[clamp(2rem,9vw,3.5rem)] uppercase" style={TITLE_STYLE}>
