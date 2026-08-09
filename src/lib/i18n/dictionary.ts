@@ -43,6 +43,10 @@ export type Dict = {
     mysteryBox: string;
     heading: string;
     tagline: string;
+    rotatingTaglines: string[];
+    imageAlt: string;
+    marquee: string;
+    scrollAria: string;
     scroll: string;
     cta: string;
   };
