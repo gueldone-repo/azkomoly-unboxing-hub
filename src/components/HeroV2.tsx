@@ -18,15 +18,11 @@ function scrollToProducts() {
  *   └────────┴────┬────┴─────────────────────────┘
  *                 └── desborda sobre la sección siguiente
  *
- * La caja son dos tomas (cerrada / estallando) apiladas en el MISMO sitio; solo
- * cambia la opacidad, así el objeto no se mueve y se lee "la misma caja late",
- * no "dos fotos distintas". Ver .hero-swap-top en styles.css.
- *
  * En móvil no hay solape: el orden es caja, título, CTA, apilados. Intentar
  * mantener la superposición en 390px de ancho sólo produce texto ilegible.
  *
- * Sin listeners de scroll (el hero viejo corría uno por frame y re-renderizaba
- * React); acá el único movimiento es CSS.
+ * Sin listeners de scroll: el hero viejo corría uno por frame para el parallax
+ * y re-renderizaba React en cada scroll.
  */
 export function HeroV2() {
   const t = useT();
@@ -49,26 +45,14 @@ export function HeroV2() {
   );
 
   const box = (
-    <div className="relative w-full aspect-[1376/768]">
-      <img
-        src="/azkomoly_new_HERO_1.png"
-        alt="AZKOMOLY meglepetés doboz"
-        className="absolute inset-0 h-full w-full object-contain"
-        draggable={false}
-        fetchPriority="high"
-        decoding="sync"
-      />
-      {/* Segunda toma encima, mismo encuadre. aria-hidden: para un lector de
-          pantalla es la misma caja, no contenido nuevo. */}
-      <img
-        src="/azkomoly_new_HERO_2.png"
-        alt=""
-        aria-hidden="true"
-        className="hero-swap-top absolute inset-0 h-full w-full object-contain"
-        draggable={false}
-        decoding="async"
-      />
-    </div>
+    <img
+      src="/azkomoly_new_HERO_2.png"
+      alt="AZKOMOLY meglepetés doboz"
+      className="w-full h-auto"
+      draggable={false}
+      fetchPriority="high"
+      decoding="sync"
+    />
   );
 
   const cta = (
