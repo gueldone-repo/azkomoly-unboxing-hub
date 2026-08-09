@@ -21,8 +21,13 @@ export function HeroV2() {
       as="h1"
       className="text-fire hero-title relative z-10 leading-[0.82] tracking-normal select-none"
       style={{
-        fontFamily: "var(--font-display)",
-        fontSize: "clamp(2.75rem, 8.15vw, 7.15rem)",
+        // Bungee en vez de Anton. Anton es condensada y de trazo uniforme: a
+        // este tamaño se aplana y pierde fuerza. Bungee está hecha para rótulos
+        // urbanos, tiene el trazo mucho más grueso y pega con el logo de
+        // graffiti, así que el peso lo da la propia letra y no hace falta
+        // sombra. Un punto más pequeña porque Bungee ocupa bastante más.
+        fontFamily: "'Bungee', var(--font-display)",
+        fontSize: "clamp(2.4rem, 6.8vw, 6rem)",
       }}
     >
       {lines.map((line, i) => (

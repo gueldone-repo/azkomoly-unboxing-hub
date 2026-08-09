@@ -54,7 +54,7 @@ export const Route = createFileRoute("/")({
         { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
         {
           rel: "stylesheet",
-          href: "https://fonts.googleapis.com/css2?family=Anton&family=Archivo+Black&family=Danfo&family=Nosifer&family=ADLaM+Display&family=Poppins:wght@400;500;700;800&display=swap",
+          href: "https://fonts.googleapis.com/css2?family=Anton&family=Bungee&family=Archivo+Black&family=Danfo&family=Nosifer&family=ADLaM+Display&family=Poppins:wght@400;500;700;800&display=swap",
         },
         // `/` es la versión húngara para crawlers y el x-default.
         ...seoLinks("/", lang),
