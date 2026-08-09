@@ -245,6 +245,7 @@ function TopNav({ onCta }: { onCta: () => void }) {
         position="right"
         colors={["#8F78B5", "#5B2EA8"]}
         accentColor="#5B2EA8"
+        displayItemNumbering={false}
       />
     </>
   );

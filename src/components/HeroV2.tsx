@@ -2,6 +2,7 @@ import { ChevronDown } from "lucide-react";
 import { motion, useReducedMotion } from "motion/react";
 
 import { useT } from "@/lib/i18n";
+import { WaveBackdrop } from "@/components/WaveBackdrop";
 import { CurvedLoop } from "@/components/text/CurvedLoop";
 import { RotatingText } from "@/components/text/RotatingText";
 import { SplitText } from "@/components/text/SplitText";
@@ -110,14 +111,12 @@ export function HeroV2() {
       id="top"
       className="relative z-10 w-full overflow-x-clip bg-background"
     >
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 bg-[linear-gradient(115deg,rgba(13,13,13,0.04)_0%,rgba(13,13,13,0)_38%,rgba(143,120,181,0.14)_100%)]"
-      />
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 top-20 h-px bg-gradient-to-r from-transparent via-black/12 to-transparent"
-      />
+      {/* Fondo del hero: SOLO la onda. Antes había encima un degradado gris en
+          diagonal a pantalla completa y una línea difuminada bajo el navbar;
+          juntos se leían como un rectángulo sucio flotando sobre el hero. La
+          onda es lo único que hace de fondo y, además, es lo que conecta el
+          hero con la sección morada de productos. */}
+      <WaveBackdrop />
 
       {titleBlock}
 

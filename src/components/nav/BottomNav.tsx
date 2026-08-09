@@ -73,6 +73,10 @@ export function BottomNav() {
   const prefersReducedMotion = useReducedMotion();
   const count = useShopifyCart((s) => s.items.reduce((n, i) => n + i.quantity, 0));
   const setCartOpen = useShopifyCart((s) => s.setOpen);
+  // El panel del carrito es `z-50` y esta barra `z-[65]`: se montaba encima y
+  // tapaba el botón de pagar. Con el carrito abierto la barra desaparece — en
+  // ese momento el único trabajo de la pantalla es cerrar la compra.
+  const cartOpen = useShopifyCart((s) => s.isOpen);
   const [desktopVisible, setDesktopVisible] = useState(false);
   const lastPointerY = useRef<number | null>(null);
   const hideTimer = useRef<number | null>(null);
@@ -158,6 +162,10 @@ export function BottomNav() {
     },
     [homeHref, onHome],
   );
+
+  // Con el carrito abierto la navegación estorba: competía por encima del panel
+  // y el usuario tocaba "Inicio" cuando quería pagar.
+  if (cartOpen) return null;
 
   return (
     <>
