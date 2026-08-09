@@ -16,27 +16,29 @@ export function HeroV2() {
   const reduceMotion = useReducedMotion();
   const lines = t.hero.heading.split("\n");
 
-  const title = (
-    <SplitText
-      as="h1"
-      className="text-fire hero-title relative z-10 leading-[0.82] tracking-normal select-none"
-      style={{
-        // Bungee en vez de Anton. Anton es condensada y de trazo uniforme: a
-        // este tamaño se aplana y pierde fuerza. Bungee está hecha para rótulos
-        // urbanos, tiene el trazo mucho más grueso y pega con el logo de
-        // graffiti, así que el peso lo da la propia letra y no hace falta
-        // sombra. Un punto más pequeña porque Bungee ocupa bastante más.
-        fontFamily: "'Bungee', var(--font-display)",
-        fontSize: "clamp(2.4rem, 6.8vw, 6rem)",
-      }}
-    >
-      {lines.map((line, i) => (
-        <span key={line} className="block">
-          {line}
-          {i < lines.length - 1 ? "\n" : null}
-        </span>
-      ))}
-    </SplitText>
+  // El titular pasa a ser el texto curvo en movimiento. Pero ese texto vive
+  // dentro de un <textPath> de SVG y encima con opacidad baja: Google lo indexa
+  // mucho peor que un encabezado normal, y perder el H1 es perder la señal más
+  // fuerte de la página.
+  //
+  // Por eso el <h1> SIGUE EXISTIENDO, con el mismo texto, sólo que oculto a la
+  // vista (no con `display:none`, que lo borraría también para los buscadores,
+  // sino recortado a 1px: la técnica estándar que Google y los lectores de
+  // pantalla sí leen). Diseño intacto, SEO intacto.
+  const seoTitle = (
+    <h1 className="absolute h-px w-px overflow-hidden [clip:rect(0,0,0,0)] whitespace-nowrap border-0 p-0 [clip-path:inset(50%)]">
+      {t.hero.heading.replace("\n", " ")}
+    </h1>
+  );
+
+  // El titular visible: el mismo texto, curvo, en morado translúcido.
+  const curvedTitle = (
+    <CurvedLoop
+      text={`${t.hero.heading.replace("\n", " ")} ✦ `}
+      speed={reduceMotion ? 0 : 38}
+      reverse
+      className="font-display text-fire/35 [&_text]:![font-family:'Bungee',var(--font-display)]"
+    />
   );
 
   const box = (
@@ -61,15 +63,6 @@ export function HeroV2() {
         decoding="sync"
       />
     </motion.div>
-  );
-
-  // Sin panel difuminado detrás del título: ese rectángulo `bg-white/40 blur-2xl`
-  // se veía como una caja gris con bordes que encasillaba el H1 y no encajaba
-  // con nada. El título se sostiene solo por su propio relieve.
-  const titleBlock = (
-    <div className="relative z-20 px-6 pt-24 text-center lg:pointer-events-none lg:absolute lg:right-[3vw] lg:top-[13%] lg:z-30 lg:px-0 lg:pt-0 lg:text-right">
-      <div className="relative [&_h1]:text-center lg:[&_h1]:text-right">{title}</div>
-    </div>
   );
 
   /**
@@ -143,32 +136,19 @@ export function HeroV2() {
           hero con la sección morada de productos. */}
       <WaveBackdrop />
 
-      {titleBlock}
+      {seoTitle}
 
-      <div className="relative flex flex-col items-center gap-5 px-6 pb-8 pt-5 lg:hidden">
-        <div className="relative z-20 w-full max-w-[560px]">{box}</div>
+      <div className="relative flex flex-col items-center gap-5 px-6 pb-8 pt-20 lg:hidden">
+        <div className="relative z-10 w-full">{curvedTitle}</div>
+        <div className="relative z-20 -mt-2 w-full max-w-[560px]">{box}</div>
         <div className="relative z-30 w-full pb-4">{renderCta(false)}</div>
-        <CurvedLoop
-          text={t.hero.marquee}
-          speed={reduceMotion ? 0 : 46}
-          reverse
-          className="z-0 -mt-4 text-fire/16"
-        />
         {scrollCue}
       </div>
 
       <div className="hidden lg:block relative min-h-[100dvh]">
-        {/* Texto de marca curvo, en morado, como capa de fondo. Va en z-[1]:
-            por encima de la onda (z-0) pero por debajo de la caja (z-20) y del
-            texto (z-30), así decora sin competir con nada legible. */}
-        <div className="pointer-events-none absolute inset-x-0 top-[30%] z-[1] opacity-70">
-          <CurvedLoop
-            text={t.hero.marquee}
-            speed={reduceMotion ? 0 : 42}
-            reverse
-            className="text-fire/25"
-          />
-        </div>
+        {/* El titular, ahora en movimiento: mismo texto que el <h1> oculto,
+            curvo y translúcido. Arriba del todo, por encima de la caja. */}
+        <div className="pointer-events-none absolute inset-x-0 top-[9%] z-[1]">{curvedTitle}</div>
 
         <div className="absolute bottom-[-3.5vw] left-[-1vw] z-20 w-[74vw] max-w-[1220px]">
           {box}
@@ -182,7 +162,7 @@ export function HeroV2() {
         {/* Caja 3D translúcida (prueba): cristal esmerilado con un borde claro
             arriba y sombra proyectada abajo, que es lo que da la sensación de
             volumen. Sustituye al filete lateral. */}
-        <div className="absolute right-[4vw] top-[54%] z-30 w-[34vw] max-w-[460px]">
+        <div className="absolute right-[4vw] top-[40%] z-30 w-[34vw] max-w-[460px]">
           <div className="rounded-3xl border border-white/60 bg-white/45 p-7 shadow-[0_20px_50px_rgba(13,13,13,0.13),inset_0_1px_0_rgba(255,255,255,0.9)] backdrop-blur-xl">
             {renderCta(false)}
           </div>
