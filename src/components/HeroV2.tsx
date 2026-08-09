@@ -153,14 +153,29 @@ export function HeroV2() {
       </div>
 
       <div className="hidden lg:block relative min-h-[100dvh]">
+        {/* Texto de marca curvo, en morado, como capa de fondo. Va en z-[1]:
+            por encima de la onda (z-0) pero por debajo de la caja (z-20) y del
+            texto (z-30), así decora sin competir con nada legible. */}
+        <div className="pointer-events-none absolute inset-x-0 top-[30%] z-[1] opacity-70">
+          <CurvedLoop
+            text={t.hero.marquee}
+            speed={reduceMotion ? 0 : 42}
+            reverse
+            className="text-fire/25"
+          />
+        </div>
+
         <div className="absolute bottom-[-7vw] left-[-1vw] z-20 w-[74vw] max-w-[1220px]">
           {box}
         </div>
 
-        {/* z-30 = por encima de la onda (z-0) y de la caja (z-20). El filete
-            lateral pasa a blanco translúcido para que se lea sobre el morado. */}
-        <div className="absolute right-[4vw] top-[62%] z-30 w-[32vw] max-w-[430px]">
-          <div className="border-l-2 border-white/35 pl-7">{renderCta(true)}</div>
+        {/* El bloque se queda SOBRE el blanco, por encima de donde arranca la
+            onda. Ponerlo encima del morado obligaba a pintarlo en blanco, y
+            bastaba que la onda subiera o bajara un poco para que quedara blanco
+            sobre blanco, invisible. Sobre blanco el texto va en su color de
+            marca y no depende de dónde caiga la curva. */}
+        <div className="absolute right-[4vw] top-[44%] z-30 w-[32vw] max-w-[430px]">
+          <div className="border-l-2 border-fire/25 pl-7">{renderCta(false)}</div>
         </div>
 
         {scrollCue}
