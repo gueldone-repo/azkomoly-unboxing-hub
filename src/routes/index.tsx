@@ -9,6 +9,8 @@ import { CookieBanner } from "@/components/CookieBanner";
 import { IntroVideoModal } from "@/components/IntroVideoModal";
 
 import { HeroV2 } from "@/components/HeroV2";
+import { DiscountWidget } from "@/components/DiscountWidget";
+import TextLoop from "@/components/TextLoop";
 import { ProductCardWide } from "@/components/shop/ProductCard";
 import { SocialProof } from "@/components/shop/SocialProof";
 import { LanguageToggle } from "@/components/LanguageToggle";
@@ -124,6 +126,7 @@ export function Landing() {
 
       <HeroV2 />
       <ProductsSection />
+      <BrandWave />
       <LifestyleStrip />
       <FollowUsRow />
       <SocialProof />
@@ -134,6 +137,8 @@ export function Landing() {
       <Footer />
 
       <SignupDialog open={open} onOpenChange={setOpen} />
+      {/* Reusa el mismo SignupDialog de arriba: el widget es sólo el anzuelo. */}
+      <DiscountWidget onOpen={() => setOpen(true)} />
       <IntroVideoModal />
       <CookieBanner />
 
@@ -305,6 +310,46 @@ function TopNav({ onCta }: { onCta: () => void }) {
   );
 }
 
+/**
+ * Banda de marca entre productos y el carrusel social — TextLoop de React Bits
+ * con la cinta ondulada. Ocupa el sitio que dejó el divisor wavy que quitamos:
+ * sigue habiendo una onda separando secciones, pero ahora lleva el nombre.
+ *
+ * El componente dibuja en un viewBox de 1200x520, así que a ancho completo
+ * mediría ~665px de alto. Se recorta a una franja: el contenedor limita la
+ * altura y el SVG va centrado dentro. La cinta cae justo en el centro vertical
+ * del viewBox, así que centrarlo la deja centrada en la franja.
+ */
+function BrandWave() {
+  return (
+    <div
+      aria-hidden="true"
+      className="relative w-full overflow-hidden h-[17vw] min-h-[110px] max-h-[230px] bg-background"
+    >
+      <div className="absolute inset-x-0 top-1/2 -translate-y-1/2">
+        <TextLoop
+          text="Azkomoly"
+          shape="wave"
+          speed={90}
+          direction="reverse"
+          separator="✦"
+          curviness={38}
+          fontSize={48}
+          fontWeight={800}
+          letterSpacing={2}
+          uppercase
+          color="#ffffff"
+          ribbon
+          ribbonColor="#5B2EA8"
+          ribbonWidth={86}
+          pauseOnHover
+          style={{ fontFamily: "'Anton', var(--font-display)" }}
+        />
+      </div>
+    </div>
+  );
+}
+
 function ProductsSection() {
   const t = useT();
   const { lang } = useI18n();
@@ -326,31 +371,16 @@ function ProductsSection() {
           esta seccion por la izquierda. */}
       <section id="termekek" className="relative z-0 bg-fire">
       <div className="mx-auto max-w-7xl px-6 pt-[18vw] sm:pt-[13vw] lg:pt-[9vw] pb-20">
-        {/* Encabezado: titulo a la izquierda, la caja premium cerrando por la
-            derecha para equilibrar el peso de la del hero, que entra por el
-            lado opuesto. */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 items-center gap-8 mb-12">
-          <div data-reveal className="lg:col-span-7">
-            <p className="font-sans text-xs tracking-[0.35em] text-white/70 mb-3">
-              {t.products.kicker}
-            </p>
-            <h2
-              className="text-white leading-[0.85] tracking-[-0.02em] text-[clamp(2.6rem,7vw,5.5rem)]"
-              style={{ fontFamily: "'Anton', var(--font-display)" }}
-            >
-              {t.products.heading}
-            </h2>
-          </div>
-          <div data-reveal data-delay="1" className="lg:col-span-5">
-            <img
-              src="/asset_azkomoly.png"
-              alt=""
-              aria-hidden="true"
-              loading="lazy"
-              className="w-full max-w-[520px] mx-auto lg:ml-auto lg:mr-0 h-auto"
-              draggable={false}
-            />
-          </div>
+        <div data-reveal className="mb-12">
+          <p className="font-sans text-xs tracking-[0.35em] text-white/70 mb-3">
+            {t.products.kicker}
+          </p>
+          <h2
+            className="text-white leading-[0.85] tracking-[-0.02em] text-[clamp(2.6rem,7vw,5.5rem)]"
+            style={{ fontFamily: "'Anton', var(--font-display)" }}
+          >
+            {t.products.heading}
+          </h2>
         </div>
         {loading ? (
           <div className="flex flex-col gap-6">
@@ -930,7 +960,7 @@ function SignupDialog({
 
         <form onSubmit={onSubmit} className="flex flex-col gap-3 sm:gap-4 mt-1">
           <div>
-            <label htmlFor="name" className="block font-sans text-sm text-white mb-1">{t.signup.name}</label>
+            <label htmlFor="name" className="block font-sans text-sm text-foreground mb-1">{t.signup.name}</label>
             <input
               id="name"
               required
@@ -938,12 +968,12 @@ function SignupDialog({
               onChange={(e) => setName(e.target.value)}
               maxLength={120}
               placeholder={t.signup.namePlaceholder}
-              className="w-full bg-background border-2 border-cardboard/60 focus:border-fire text-white px-4 py-3 text-base font-sans focus:outline-none transition-colors"
+              className="w-full bg-background border-2 border-cardboard/60 focus:border-fire text-foreground px-4 py-3 text-base font-sans focus:outline-none transition-colors"
             />
           </div>
 
           <div>
-            <label htmlFor="email" className="block font-sans text-sm text-white mb-1">{t.signup.email}</label>
+            <label htmlFor="email" className="block font-sans text-sm text-foreground mb-1">{t.signup.email}</label>
             <input
               id="email"
               type="email"
@@ -952,20 +982,20 @@ function SignupDialog({
               onChange={(e) => setEmail(e.target.value)}
               maxLength={255}
               placeholder="te@email.hu"
-              className="w-full bg-background border-2 border-cardboard/60 focus:border-fire text-white px-4 py-3 text-base font-sans focus:outline-none transition-colors"
+              className="w-full bg-background border-2 border-cardboard/60 focus:border-fire text-foreground px-4 py-3 text-base font-sans focus:outline-none transition-colors"
             />
           </div>
 
           <div>
-            <label htmlFor="phone" className="block font-sans text-sm text-white mb-1">
+            <label htmlFor="phone" className="block font-sans text-sm text-foreground mb-1">
               {t.signup.phone} <span className="text-muted-foreground">{t.signup.optional}</span>
             </label>
             <div className="flex gap-2">
               <Select value={countryCode} onValueChange={setCountryCode}>
-                <SelectTrigger className="w-[110px] sm:w-[130px] shrink-0 bg-background border-2 border-cardboard/60 text-white font-sans py-3 px-3 text-base min-h-[52px]">
+                <SelectTrigger className="w-[110px] sm:w-[130px] shrink-0 bg-background border-2 border-cardboard/60 text-foreground font-sans py-3 px-3 text-base min-h-[52px]">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent className="bg-dark-bg border-cardboard/60 text-white max-h-72 min-w-[180px]">
+                <SelectContent className="bg-dark-bg border-cardboard/60 text-foreground max-h-72 min-w-[180px]">
                   {COUNTRY_CODES.map((c) => (
                     <SelectItem key={c.code} value={c.code} className="font-sans text-base">
                       <span className="mr-2">{c.flag}</span>
@@ -981,12 +1011,12 @@ function SignupDialog({
                 onChange={(e) => setPhone(e.target.value)}
                 maxLength={32}
                 placeholder={t.signup.phonePlaceholder}
-                className="flex-1 min-w-0 bg-background border-2 border-cardboard/60 focus:border-fire text-white px-4 py-3 text-base font-sans focus:outline-none transition-colors min-h-[52px]"
+                className="flex-1 min-w-0 bg-background border-2 border-cardboard/60 focus:border-fire text-foreground px-4 py-3 text-base font-sans focus:outline-none transition-colors min-h-[52px]"
               />
             </div>
           </div>
 
-          <label className="flex items-start gap-2 text-xs sm:text-sm text-white/90 font-sans">
+          <label className="flex items-start gap-2 text-xs sm:text-sm text-foreground/80 font-sans">
             <input
               type="checkbox"
               checked={consent}

@@ -108,6 +108,12 @@ export type Dict = {
     errorConsent: string;
     errorGeneric: string;
   };
+  discountWidget: {
+    title: string;
+    sub: string;
+    cta: string;
+    close: string;
+  };
   product: {
     back: string;
     size: string;
@@ -322,6 +328,12 @@ const hu: Dict = {
     errorConsent: "El kell fogadnod a feltételeket és az adatvédelmi tájékoztatót.",
     errorGeneric: "Hiba történt. Próbáld újra.",
   },
+  discountWidget: {
+    title: "KEDVEZMÉNY AZ ELSŐ DOBOZODRA",
+    sub: "Hagyd meg az adataid, és elküldjük a kódot.",
+    cta: "KÉREM A KÓDOT",
+    close: "Bezárás",
+  },
   product: {
     back: "Vissza a bolthoz",
     size: "MÉRET",
@@ -535,6 +547,12 @@ const en: Dict = {
     successExisting: "✅ You're already on the list!",
     errorConsent: "You must accept the terms and the privacy policy.",
     errorGeneric: "Something went wrong. Try again.",
+  },
+  discountWidget: {
+    title: "A DISCOUNT ON YOUR FIRST BOX",
+    sub: "Leave your details and we'll send you the code.",
+    cta: "SEND ME THE CODE",
+    close: "Close",
   },
   product: {
     back: "Back to shop",
