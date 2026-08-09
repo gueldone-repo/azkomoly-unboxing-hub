@@ -8,9 +8,7 @@ import { Instagram, Facebook, Youtube, ShieldCheck, Truck, Sparkles, Menu, X, Mo
 import { CookieBanner } from "@/components/CookieBanner";
 import { IntroVideoModal } from "@/components/IntroVideoModal";
 
-import { ScrubBackdrop } from "@/components/ScrubBackdrop";
-import { DripDivider } from "@/components/DripDivider";
-import { HeroOverlay } from "@/components/HeroOverlay";
+import { HeroV2 } from "@/components/HeroV2";
 import { ProductCardWide } from "@/components/shop/ProductCard";
 import { SocialProof } from "@/components/shop/SocialProof";
 import { LanguageToggle } from "@/components/LanguageToggle";
@@ -51,7 +49,7 @@ export const Route = createFileRoute("/")({
         { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
         {
           rel: "stylesheet",
-          href: "https://fonts.googleapis.com/css2?family=Archivo+Black&family=Danfo&family=Nosifer&family=ADLaM+Display&family=Poppins:wght@400;500;700;800&display=swap",
+          href: "https://fonts.googleapis.com/css2?family=Anton&family=Archivo+Black&family=Danfo&family=Nosifer&family=ADLaM+Display&family=Poppins:wght@400;500;700;800&display=swap",
         },
         // `/` es la versión húngara para crawlers y el x-default.
         ...seoLinks("/", lang),
@@ -124,10 +122,8 @@ export function Landing() {
     <main className="relative min-h-screen bg-background text-foreground">
       <TopNav onCta={() => setOpen(true)} />
 
-      <ScrubBackdrop>
-        <HeroOverlay onCta={() => setOpen(true)} />
-        <ProductsSection />
-      </ScrubBackdrop>
+      <HeroV2 />
+      <ProductsSection />
       <LifestyleStrip />
       <FollowUsRow />
       <SocialProof />
@@ -258,16 +254,6 @@ function TopNav({ onCta }: { onCta: () => void }) {
           </div>
         </div>
         </div>
-        {/* Sin bg-fire acá: los "valles" de la onda deben mostrar blanco de
-            verdad (recorte real), no un rectángulo morado escondido detrás. */}
-        <DripDivider
-          variant="organic"
-          mainColor="#5B2EA8"
-          shadowColor="#0D0D0D"
-          depth={4}
-          height={22}
-          className="w-full"
-        />
       </nav>
 
       {/* Menú hamburguesa — overlay a pantalla completa, con el mismo
@@ -314,16 +300,6 @@ function TopNav({ onCta }: { onCta: () => void }) {
             </div>
           </div>
         </div>
-        {/* Sin bgColor: un color sólido acá pintaba un rectángulo negro de 40px
-            con el borde de abajo recto. Transparente, sólo se ve el derretido. */}
-        <DripDivider
-          variant="organic"
-          mainColor="#5B2EA8"
-          shadowColor="#0D0D0D"
-          depth={4}
-          height={40}
-          className="w-full shrink-0"
-        />
       </div>
     </>
   );
@@ -345,26 +321,35 @@ function ProductsSection() {
 
   return (
     <>
-      {/* Prueba de color: blanco (hero) → morado. El derretido se queda
-          blanco (el color de la sección de arriba) y cae sobre el fondo
-          morado, que ya empieza acá (bgColor), no al final de las gotas. */}
-      <DripDivider
-        mainColor="#FFFFFF"
-        bgColor="#5B2EA8"
-        shadowColor="#0D0D0D"
-        height={90}
-        className="w-full -mb-px"
-      />
-      <section id="termekek" className="relative bg-fire">
-      <div className="mx-auto max-w-7xl px-6 py-20">
-        <div data-reveal className="flex items-end justify-between flex-wrap gap-4 mb-10">
-          <div>
-            <p className="font-sans text-xs tracking-[0.35em] text-white/70 mb-2">
+      {/* Corte recto contra el hero, sin onda. El pt grande no es aire de
+          adorno: es el hueco por donde baja la caja del hero, que cae sobre
+          esta seccion por la izquierda. */}
+      <section id="termekek" className="relative z-0 bg-fire">
+      <div className="mx-auto max-w-7xl px-6 pt-[18vw] sm:pt-[13vw] lg:pt-[9vw] pb-20">
+        {/* Encabezado: titulo a la izquierda, la caja premium cerrando por la
+            derecha para equilibrar el peso de la del hero, que entra por el
+            lado opuesto. */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 items-center gap-8 mb-12">
+          <div data-reveal className="lg:col-span-7">
+            <p className="font-sans text-xs tracking-[0.35em] text-white/70 mb-3">
               {t.products.kicker}
             </p>
-            <h2 className="font-display text-3d-fire text-4xl sm:text-5xl text-white">
+            <h2
+              className="text-white leading-[0.85] tracking-[-0.02em] text-[clamp(2.6rem,7vw,5.5rem)]"
+              style={{ fontFamily: "'Anton', var(--font-display)" }}
+            >
               {t.products.heading}
             </h2>
+          </div>
+          <div data-reveal data-delay="1" className="lg:col-span-5">
+            <img
+              src="/asset_azkomoly.png"
+              alt=""
+              aria-hidden="true"
+              loading="lazy"
+              className="w-full max-w-[520px] mx-auto lg:ml-auto lg:mr-0 h-auto"
+              draggable={false}
+            />
           </div>
         </div>
         {loading ? (
@@ -387,8 +372,6 @@ function ProductsSection() {
         )}
       </div>
       </section>
-      {/* Vuelve a blanco: mismas gotas, ahora "cayendo" del morado */}
-      <DripDivider mainColor="#5B2EA8" shadowColor="#0D0D0D" height={90} className="w-full -mt-px" />
     </>
   );
 }
@@ -835,23 +818,7 @@ function Footer() {
   const t = useT();
   return (
     <div className="relative mt-16">
-      {/* Igual patrón que el navbar (morado que gotea/emerge) pero
-          invertido: el borde plano queda pegado al footer sólido de abajo,
-          y las crestas orgánicas moradas apuntan hacia arriba, hacia el
-          blanco de la sección anterior. */}
-      <DripDivider
-        variant="organic"
-        mainColor="#5B2EA8"
-        shadowColor="#0D0D0D"
-        depth={4}
-        height={36}
-        flip
-        className="w-full"
-      />
-      {/* -mt-2 solapa el footer sobre el borde plano del divisor: el redondeo
-          de subpíxeles del SVG a veces deja una línea blanca de 1px entre
-          ambos; el solape la tapa sin depender de que coincidan al pixel. */}
-      <footer id="kapcsolat" className="relative -mt-2 bg-fire px-6 pt-6 pb-12 flex flex-col items-center gap-4">
+      <footer id="kapcsolat" className="relative bg-fire px-6 pt-14 pb-12 flex flex-col items-center gap-4">
         <p className="font-display text-white text-lg tracking-wider">{t.footer.follow}</p>
         <div className="flex gap-4 flex-wrap justify-center">
           {SOCIALS.map(({ label, href, Icon }) => (

@@ -195,6 +195,24 @@
 }
 .animate-bounce-down { animation: bounce-down 1.6s ease-in-out infinite; }
 
+/* Hero v2 — la caja late entre las dos tomas (cerrada/estallando). No es
+   decoracion: la animacion ES el producto, cuenta lo que pasa al abrir la
+   caja antes de que nadie lea una sola palabra. Las dos capas viven una
+   encima de la otra en el mismo sitio, solo cambia la opacidad. */
+@keyframes hero-swap {
+  0%, 40%   { opacity: 0; transform: scale(0.985); }
+  50%, 90%  { opacity: 1; transform: scale(1); }
+  100%      { opacity: 0; transform: scale(0.985); }
+}
+.hero-swap-top {
+  animation: hero-swap 4.6s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+}
+/* Sin movimiento: se queda fija la toma del estallido, que es la que mas
+   cuenta la historia por si sola. */
+@media (prefers-reduced-motion: reduce) {
+  .hero-swap-top { animation: none; opacity: 1; transform: none; }
+}
+
 /* Scroll reveal */
 [data-reveal] {
   opacity: 0;
