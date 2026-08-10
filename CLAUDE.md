@@ -30,9 +30,31 @@ Built for Diego (GUELDONE Agency). Path: `C:\Users\Mariana\Desktop\GUELDOEN\AZKO
 | `--background` | white | Page background |
 | Negro `#0D0D0D` | — | Relieve 3D (texto, botones, dividers), nunca como color de fondo de sección |
 
+> **Actualizado 2026-08-10 (rediseño v2, ya en `main`).** El navbar es BLANCO (era una
+> franja morada maciza), el titular del hero es un texto curvo en movimiento, y la onda
+> `WaveBackdrop` es la única pieza de fondo del hero y la conexión con la sección morada.
+> Respaldo de la versión anterior en la rama `produccion-anterior`.
+
 **Fonts:**
-- `font-display` = Archivo Black (títulos generales)
+- **Bungee** — H1 del hero. Anton se veía plana a tamaño grande; Bungee es de rótulo urbano,
+  tiene el trazo grueso y pega con el logo de graffiti, así que el peso lo da la letra y NO
+  se le añade sombra (Diego la rechazó explícitamente varias veces).
+- `font-display` = **Anton** (títulos de sección, "Our boxes", items del menú)
 - `font-sans` = Poppins (nav, cuerpo, botones)
+- Fallback con métricas ajustadas: `@font-face "AZK Anton Fallback"` con `size-adjust: 63%`
+  en `styles.css`. NO borrarlo: sin él, el fallback mide 62% más ancho y el H1 aparece
+  gigante hasta que carga la fuente (bug real que se veía en `/en`).
+
+**Reglas de marca que Diego ha rechazado más de una vez (no reintroducir):**
+- Sombra en la imagen del hero (ni `drop-shadow` ni elipse difusa detrás).
+- Paneles difuminados o degradados de fondo en el hero: se leen como un rectángulo sucio.
+  El único fondo es la onda.
+- Numeración en los items del menú hamburguesa.
+
+**H1 oculto (NO BORRAR):** el titular visible es un `<textPath>` de SVG, que Google indexa
+mal. Por eso `HeroV2.tsx` mantiene un `<h1>` con el mismo texto recortado a 1px (no
+`display:none`, que lo borraría también para los buscadores). Si se "limpia" por parecer
+código muerto, se pierde la señal SEO más fuerte de la home.
 - **H1 del Hero específicamente**: Danfo (vía `style={{ fontFamily: "'Danfo', var(--font-display)" }}`, no es la variable global) — usar esta misma fuente para títulos de páginas nuevas (About/FAQ) que quieran igualar el estilo del Hero
 - Subtítulos/CTA del Hero y de "Don't read · open": ADLaM Display (mismo patrón inline, no es variable global)
 - Ambas cargadas vía Google Fonts `<link>` en `head()` de cada ruta (ver `src/routes/index.tsx` y `en.index.tsx`)

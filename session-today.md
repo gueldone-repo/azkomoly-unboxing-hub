@@ -413,6 +413,42 @@ archivo lo que dice haber hecho.
 **Pendiente de decisión del cliente:** el widget de descuento no lleva porcentaje. El
 número es decisión comercial de Diego; cuando lo dé, va a `discountWidget` en hu y en.
 
+### Cierre 2026-08-10 — PENDIENTES PARA LA PRÓXIMA SESIÓN
+
+Todo lo hecho está en `main` y subido (`b463c3d`). Nada a medias en el working tree.
+
+**Pendiente pedido por Diego y NO hecho todavía:**
+1. **FOOTER más grande** — le gusta cómo se ve, pero quiere que abarque la sección sin
+   cortarse. Es lo primero de la lista.
+2. **Formulario "Notify me"** (`SignupDialog` en `index.tsx`) — "se ve muy viejo, todo
+   cuadrado". Falta rediseño: bordes, espaciado, estados de foco.
+3. **Tipografía de títulos** — usar en el resto de páginas la misma que "Our boxes" (Anton).
+4. **Sección "STOP GUESSING. OPEN IT."** — demasiado espacio entre secciones y el texto se
+   ve "encerrado en un cuadro".
+5. **VERSIÓN MÓVIL COMPLETA** — Diego: "está fea". El hero móvil apila de forma funcional
+   pero sin ritmo propio; hay que tratarla como diseño aparte, no como escritorio reducido.
+6. **Páginas de producto** — mejorar (siguen igual desde el rediseño).
+7. **Bug de recarga de página** — reportado por Diego, sin diagnosticar aún.
+8. **Porcentaje del descuento** — el widget dice "descuento en tu primera caja" SIN cifra a
+   propósito: el número es decisión comercial de Diego. Cuando lo dé, va a `discountWidget`
+   en hu y en.
+
+**Bugs de capas resueltos (patrón recurrente, revisar siempre el z-index):**
+- Barra inferior (z-65) tapaba el carrito (z-50) → la barra se oculta con el carrito abierto.
+- Banner del contador (z-65) tapaba el menú hamburguesa (z-60) → bajado a z-55.
+- Sticker en sección z-0 no podía superar al hero z-10 → se veía cortado; ahora va dentro.
+- Lengüeta del dock dentro de un ancestro con `transform` → `fixed` dejaba de anclar a la
+  ventana. Sacada fuera del `<nav>`.
+
+**Bugs de contraste (mismo patrón, buscar `text-white` sobre fondo claro):**
+- Páginas legales: cuerpo en `text-white` sobre blanco, parecían VACÍAS. Arreglado.
+- `SignupDialog`: mismo problema, arreglado antes.
+- Ese patrón sigue vivo en la rama `produccion-anterior`.
+
+**Animaciones con `scrub` de GSAP:** atan la animación al scroll y si el usuario no recorre
+ese tramo exacto, el elemento se queda invisible. Pasó con `ScrollFloat`. Para "aparecer al
+entrar en pantalla" usar `once: true` con duración propia, NO `scrub`.
+
 ### Aplazado por decisión de Diego
 - **HalftoneReveal** en la sección del CTA doble fondo. Dijo que así ya se ve bien y que sólo
   molestaba el pixelado (resuelto). Retomar sólo si lo pide.
