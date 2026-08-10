@@ -281,7 +281,9 @@ function UrgencyClock() {
   const seconds = remaining % 60;
 
   return (
-    <section className="sticky top-[65px] z-[65] bg-black text-white shadow-[0_8px_24px_rgba(13,13,13,0.16)]">
+    // z-[55], por DEBAJO del panel del menú (z-60). Estaba en z-[65] y se
+    // montaba encima, tapando las opciones del menú hamburguesa.
+    <section className="sticky top-[65px] z-[55] bg-black text-white shadow-[0_8px_24px_rgba(13,13,13,0.16)]">
       <div className="mx-auto flex min-h-11 max-w-7xl items-center justify-center gap-2 px-4 py-2 text-center font-sans text-[11px] font-semibold uppercase tracking-wide sm:text-xs">
         <span className="text-white/78">{t.urgency.prefix}</span>
         <span className="inline-flex items-center gap-1 rounded-sm bg-white px-2 py-1 text-fire">
@@ -418,7 +420,7 @@ function ProductsSection() {
              saliera por arriba quedaba tapada por el hero y se veía cortada,
              por mucho z-index que se le pusiera al sticker. Aquí abajo se ve
              entero y cubre el hueco que quedaba bajo el CTA. */
-          className="pointer-events-none absolute right-[6vw] top-[3vw] z-10 hidden w-[22vw] max-w-[310px] -rotate-6 drop-shadow-[0_18px_30px_rgba(13,13,13,0.28)] lg:block"
+          className="pointer-events-none absolute right-[12vw] top-[3vw] z-10 hidden w-[22vw] max-w-[310px] -rotate-6 drop-shadow-[0_18px_30px_rgba(13,13,13,0.28)] lg:block"
         />
       {/* El colchón sólo hace falta en escritorio, que es donde la caja del
           hero desborda sobre esta sección. Por debajo de lg el hero apila sin

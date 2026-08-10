@@ -31,3 +31,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Perfiles de Chrome que dejan las verificaciones en navegador
+.chrome-*/
+azkomoly-shopify-theme.zip
