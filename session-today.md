@@ -420,8 +420,20 @@ Todo lo hecho está en `main` y subido (`b463c3d`). Nada a medias en el working 
 **Pendiente pedido por Diego y NO hecho todavía:**
 1. **FOOTER más grande** — le gusta cómo se ve, pero quiere que abarque la sección sin
    cortarse. Es lo primero de la lista.
-2. **Formulario "Notify me"** (`SignupDialog` en `index.tsx`) — "se ve muy viejo, todo
-   cuadrado". Falta rediseño: bordes, espaciado, estados de foco.
+2. **Formulario "Notify me" / contacto** (`SignupDialog` en `index.tsx`) — Diego lo repitió
+   dos veces, así que es prioritario junto con el footer. Textual: *"se ve muy viejo, todo
+   cuadrado, dale estilo"*.
+   Qué mirar en concreto:
+   - Inputs con esquinas rectas y `border-2 border-cardboard/60`: cuadrados y anticuados.
+     El resto del sitio ya usa formas redondeadas (`rounded-full` en botones, `rounded-2xl`
+     en tarjetas), así que el formulario desentona con todo lo demás.
+   - Falta estado de foco visible y coherente con la marca (hoy sólo cambia el borde).
+   - El selector de país + teléfono es una fila apretada de dos cajas sin ritmo.
+   - El botón de envío ya usa `.btn-3d`; el resto del formulario debe estar a esa altura.
+   - Ojo: el contraste ya se arregló (estaba en `text-white` sobre blanco y no se leía lo
+     que escribías). NO reintroducir texto blanco ahí.
+   - Es el formulario que abre también el widget de descuento, así que se ve mucho: toca
+     conversión directa.
 3. **Tipografía de títulos** — usar en el resto de páginas la misma que "Our boxes" (Anton).
 4. **Sección "STOP GUESSING. OPEN IT."** — demasiado espacio entre secciones y el texto se
    ve "encerrado en un cuadro".
