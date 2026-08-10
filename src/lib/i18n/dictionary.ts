@@ -26,6 +26,7 @@ export type Dict = {
     how: string;
     about: string;
     faq: string;
+    reviews: string;
     contact: string;
     notify: string;
     home: string;
@@ -91,6 +92,7 @@ export type Dict = {
   };
   velocity: {
     text: string;
+    textSecondary: string;
   };
   socialProof: {
     kicker: string;
@@ -239,7 +241,7 @@ const hu: Dict = {
     ogTitle: "AZKOMOLY — Mi van a dobozban?",
     ogDescription: "Nem tudod mi van benne. Ez a lényeg.",
   },
-  nav: { shop: "Bolt", merch: "Merch", how: "Hogyan működik", about: "Rólunk", faq: "GYIK", contact: "Kapcsolat", notify: "Értesíts", home: "Főoldal", cart: "Kosár", prevSection: "Előző szakasz", nextSection: "Következő szakasz", scrollTop: "Vissza a tetejére", primary: "Fő navigáció" },
+  nav: { shop: "Bolt", merch: "Merch", how: "Hogyan működik", about: "Rólunk", faq: "GYIK", reviews: "Vélemények", contact: "Kapcsolat", notify: "Értesíts", home: "Főoldal", cart: "Kosár", prevSection: "Előző szakasz", nextSection: "Következő szakasz", scrollTop: "Vissza a tetejére", primary: "Fő navigáció" },
   hero: {
     est: "EST · MMXXVI",
     index: "/01",
@@ -331,6 +333,7 @@ const hu: Dict = {
   },
   velocity: {
     text: "Gyors szállítás · eredeti termékek · garantált meglepetés ·",
+    textSecondary: "Minden doboz más · nyisd ki · oszd meg ·",
   },
   socialProof: {
     kicker: "Valódi nyitások",
@@ -502,7 +505,7 @@ const en: Dict = {
     ogTitle: "AZKOMOLY — What's in the box?",
     ogDescription: "You don't know what's inside. That's the point.",
   },
-  nav: { shop: "Shop", merch: "Merch", how: "How it works", about: "About", faq: "FAQ", contact: "Contact", notify: "Notify me", home: "Home", cart: "Cart", prevSection: "Previous section", nextSection: "Next section", scrollTop: "Back to top", primary: "Main navigation" },
+  nav: { shop: "Shop", merch: "Merch", how: "How it works", about: "About", faq: "FAQ", reviews: "Reviews", contact: "Contact", notify: "Notify me", home: "Home", cart: "Cart", prevSection: "Previous section", nextSection: "Next section", scrollTop: "Back to top", primary: "Main navigation" },
   hero: {
     est: "EST · MMXXVI",
     index: "/01",
@@ -594,6 +597,7 @@ const en: Dict = {
   },
   velocity: {
     text: "Fast shipping · original products · guaranteed surprise ·",
+    textSecondary: "Every box is different · open it · share it ·",
   },
   socialProof: {
     kicker: "Real unboxings",

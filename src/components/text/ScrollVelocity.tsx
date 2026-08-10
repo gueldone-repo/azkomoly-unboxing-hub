@@ -33,7 +33,9 @@ export function ScrollVelocity({
     const factor = velocityFactor.get();
     if (factor < 0) directionRef.current = -1;
     else if (factor > 0) directionRef.current = 1;
-    moveBy += directionRef.current * moveBy * Math.abs(factor);
+    // El empujón del scroll se limita: sin tope, un scroll rápido multiplicaba
+    // la velocidad varias veces y el texto salía disparado.
+    moveBy += directionRef.current * moveBy * Math.min(Math.abs(factor), 1.2);
     baseX.set(baseX.get() + moveBy);
   });
 
@@ -41,7 +43,16 @@ export function ScrollVelocity({
     if (reduceMotion) baseX.set(0);
   }, [baseX, reduceMotion]);
 
-  const x = useTransform(baseX, (v) => `${v % 50 - 50}%`);
+  // El salto venía de aquí: `v % 50 - 50` no casa con las 4 copias del texto.
+  // Con 4 copias iguales, una copia entera son 25% del ancho, así que el bucle
+  // tiene que envolver cada 25% para que el corte sea invisible. Además el
+  // módulo de JS devuelve negativo con entradas negativas, lo que provocaba el
+  // tirón al cambiar de signo; por eso se normaliza a un rango positivo.
+  const x = useTransform(baseX, (v) => {
+    const span = 25;
+    const wrapped = (((v % span) + span) % span) - span;
+    return `${wrapped}%`;
+  });
 
   return (
     <div className={`relative flex overflow-hidden whitespace-nowrap ${className}`}>

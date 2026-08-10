@@ -176,11 +176,14 @@ function TopNav({ onCta }: { onCta: () => void }) {
   // Lovable generó y hasta ahora no estaban enlazadas desde ningún sitio: se
   // llegaba sólo escribiendo la URL a mano.
   const navLinks = [
+    // Fuera "Contacto": no hay página ni sección de contacto real, sólo el
+    // ancla al footer, así que prometía algo que no existe. Las secciones que
+    // sí existen ahora están todas enlazadas.
     { href: "#termekek", label: t.nav.shop },
     { href: "#hogyan", label: t.nav.how },
+    { href: "#velemenyek", label: t.nav.reviews },
     { href: "/about", label: t.nav.about },
     { href: "/faq", label: t.nav.faq },
-    { href: "#kapcsolat", label: t.nav.contact },
   ];
 
   return (
@@ -397,6 +400,26 @@ function ProductsSection() {
           adorno: es el hueco por donde baja la caja del hero, que cae sobre
           esta seccion por la izquierda. */}
       <section id="termekek" className="relative z-0 bg-fire">
+        {/* Sticker de marca, arriba a la derecha: ocupa el hueco que quedaba
+            justo debajo del CTA del hero, en el cuadrante que pidió Diego.
+            z-10 = primera capa sobre el morado; se sale un poco por arriba
+            (`-top`) para que pise el borde entre hero y esta sección, que es
+            lo que le da el efecto de pegatina superpuesta. */}
+        <img
+          src="/sticker-azk.webp"
+          alt=""
+          aria-hidden="true"
+          width={721}
+          height={580}
+          loading="lazy"
+          draggable={false}
+          /* Dentro de la sección morada, no a caballo entre las dos: la sección
+             va en `z-0` y el hero en `z-10`, así que cualquier parte que se
+             saliera por arriba quedaba tapada por el hero y se veía cortada,
+             por mucho z-index que se le pusiera al sticker. Aquí abajo se ve
+             entero y cubre el hueco que quedaba bajo el CTA. */
+          className="pointer-events-none absolute right-[6vw] top-[3vw] z-10 hidden w-[22vw] max-w-[310px] -rotate-6 drop-shadow-[0_18px_30px_rgba(13,13,13,0.28)] lg:block"
+        />
       {/* El colchón sólo hace falta en escritorio, que es donde la caja del
           hero desborda sobre esta sección. Por debajo de lg el hero apila sin
           solapes, así que un pt enorme dejaría un agujero morado vacío. */}
@@ -508,12 +531,24 @@ const SOCIAL_REVIEWS: { src: string; href: string; platform: "instagram" | "tikt
 function VelocityBand() {
   const t = useT();
   return (
-    <section className="overflow-hidden border-y-2 border-black bg-white py-4">
-      <ScrollVelocity
-        text={t.velocity.text}
-        baseVelocity={36}
-        className="font-display text-2xl uppercase text-fire sm:text-4xl"
-      />
+    // Dos líneas en sentidos opuestos, como se pidió: la de arriba en morado
+    // sobre blanco y la de abajo invertida. A 36 pasaba tan rápido que no daba
+    // tiempo a leer; 14 y 11 dejan leerlo sin que parezca parado.
+    <section className="overflow-hidden border-y-2 border-black bg-white">
+      <div className="py-3">
+        <ScrollVelocity
+          text={t.velocity.text}
+          baseVelocity={6}
+          className="font-display text-xl uppercase text-fire sm:text-3xl"
+        />
+      </div>
+      <div className="bg-fire py-3">
+        <ScrollVelocity
+          text={t.velocity.textSecondary}
+          baseVelocity={-5}
+          className="font-display text-xl uppercase text-white sm:text-3xl"
+        />
+      </div>
     </section>
   );
 }
@@ -559,7 +594,7 @@ function SocialProofMarquee() {
   ];
 
   return (
-    <section className="overflow-hidden bg-white py-18 sm:py-24">
+    <section id="velemenyek" className="overflow-hidden bg-white py-18 sm:py-24">
       <div className="mx-auto grid max-w-7xl gap-10 px-6 lg:grid-cols-[0.85fr_1.15fr] lg:items-center">
         <div>
           <p className="mb-3 font-sans text-xs font-bold uppercase tracking-[0.35em] text-fire">

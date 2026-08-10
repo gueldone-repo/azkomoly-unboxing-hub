@@ -152,23 +152,6 @@ export function HeroV2() {
             curvo y translúcido. Arriba del todo, por encima de la caja. */}
         <div className="pointer-events-none absolute inset-x-0 top-[9%] z-[1]">{curvedTitle}</div>
 
-        {/* Sticker de marca en el hueco vacío de la izquierda. z-[2]: sobre la
-            onda y el titular curvo, pero por debajo de la caja (z-20), así
-            acompaña sin robarle protagonismo al producto. Entra ladeado, como
-            una pegatina puesta a mano. */}
-        <motion.img
-          src="/sticker-azk.webp"
-          alt=""
-          aria-hidden="true"
-          width={721}
-          height={580}
-          loading="lazy"
-          draggable={false}
-          className="pointer-events-none absolute left-[3vw] top-[15%] z-[2] w-[17vw] max-w-[240px]"
-          initial={reduceMotion ? false : { opacity: 0, scale: 0.7, rotate: -18 }}
-          animate={reduceMotion ? undefined : { opacity: 1, scale: 1, rotate: -7 }}
-          transition={{ type: "spring", stiffness: 140, damping: 12, delay: 0.55 }}
-        />
 
         <div className="absolute bottom-[-3.5vw] left-[-1vw] z-20 w-[74vw] max-w-[1220px]">
           {box}
