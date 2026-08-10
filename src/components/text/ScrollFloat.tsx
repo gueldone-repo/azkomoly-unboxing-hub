@@ -1,9 +1,8 @@
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { useGSAP } from "@gsap/react";
 
-gsap.registerPlugin(ScrollTrigger, useGSAP);
+gsap.registerPlugin(ScrollTrigger);
 
 export function ScrollFloat({
   text,
@@ -14,36 +13,37 @@ export function ScrollFloat({
 }) {
   const rootRef = useRef<HTMLHeadingElement | null>(null);
 
-  useGSAP(
-    () => {
-      const root = rootRef.current;
-      if (!root) return;
-      const chars = Array.from(root.querySelectorAll<HTMLSpanElement>("[data-char]"));
+  useEffect(() => {
+    const root = rootRef.current;
+    if (!root) return;
+    const chars = Array.from(root.querySelectorAll<HTMLSpanElement>("[data-char]"));
 
-      const mm = gsap.matchMedia();
-      mm.add("(prefers-reduced-motion: no-preference)", () => {
-        gsap.fromTo(
-          chars,
-          { yPercent: 120, rotateX: -46, opacity: 0 },
-          {
-            yPercent: 0,
-            rotateX: 0,
-            opacity: 1,
-            ease: "none",
-            stagger: 0.018,
-            scrollTrigger: {
-              trigger: root,
-              start: "top 88%",
-              end: "bottom 48%",
-              scrub: true,
-            },
-          }
-        );
-      });
-      return () => mm.revert();
-    },
-    { scope: rootRef }
-  );
+    const mm = gsap.matchMedia();
+    mm.add("(prefers-reduced-motion: no-preference)", () => {
+      gsap.fromTo(
+        chars,
+        { yPercent: 120, rotateX: -46, opacity: 0 },
+        {
+          yPercent: 0,
+          rotateX: 0,
+          opacity: 1,
+          ease: "none",
+          stagger: 0.018,
+          scrollTrigger: {
+            trigger: root,
+            start: "top 88%",
+            end: "bottom 48%",
+            scrub: true,
+          },
+        }
+      );
+    });
+    mm.add("(prefers-reduced-motion: reduce)", () => {
+      gsap.set(chars, { yPercent: 0, rotateX: 0, opacity: 1 });
+    });
+
+    return () => mm.revert();
+  }, []);
 
   return (
     <h2 ref={rootRef} className={className} aria-label={text}>

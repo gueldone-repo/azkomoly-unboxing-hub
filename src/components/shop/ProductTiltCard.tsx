@@ -92,7 +92,7 @@ export function ProductTiltCard({ p }: { p: ShopifyProduct }) {
           <Link
             to="/shop/$slug"
             params={{ slug: product.handle }}
-            className="flex-1 rounded-full bg-white px-5 py-3 text-center font-sans text-sm font-bold uppercase tracking-wide text-fire transition-transform duration-200 hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98]"
+            className="btn-3d flex-1 bg-white px-5 py-3 text-center font-sans text-sm font-bold uppercase tracking-wide text-fire"
           >
             {t.products.open}
           </Link>

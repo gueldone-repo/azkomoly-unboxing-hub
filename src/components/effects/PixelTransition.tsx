@@ -20,9 +20,16 @@ export function PixelTransition({
     const root = rootRef.current;
     if (!root) return;
     const pixels = Array.from(root.querySelectorAll<HTMLSpanElement>("[data-pixel]"));
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     if (!active) {
       gsap.set(pixels, { scale: 0, opacity: 0 });
+      return;
+    }
+
+    if (reduceMotion) {
+      gsap.set(pixels, { scale: 1, opacity: 1 });
+      onComplete?.();
       return;
     }
 

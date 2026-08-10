@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, useEffect, useRef, type FormEvent } from "react";
 import { useServerFn } from "@tanstack/react-start";
+import { motion, useReducedMotion } from "motion/react";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { appendLeadToSheet } from "@/lib/leads.functions";
@@ -15,9 +16,12 @@ import PillNav from "@/components/nav/PillNav";
 import StaggeredMenu from "@/components/nav/StaggeredMenu";
 import { SOCIAL_LINKS, SocialGlyph, SocialRow, SocialRail } from "@/components/social/SocialLogos";
 import { ProductTiltCard } from "@/components/shop/ProductTiltCard";
-import { SocialProof } from "@/components/shop/SocialProof";
 import { LanguageToggle } from "@/components/LanguageToggle";
 import { CartButton } from "@/components/cart/CartSheet";
+import { SlidingNumber } from "@/components/core/sliding-number";
+import { ScrollFloat } from "@/components/text/ScrollFloat";
+import { ScrollVelocity } from "@/components/text/ScrollVelocity";
+import { Marquee } from "@/components/ui/marquee";
 import { fetchProducts, type ShopifyProduct } from "@/lib/shopify/client";
 import { useT, useI18n, readLangCookie } from "@/lib/i18n";
 import { DICTIONARIES } from "@/lib/i18n/dictionary";
@@ -127,16 +131,19 @@ export function Landing() {
     <main className="relative min-h-screen bg-background text-foreground">
       <TopNav onCta={() => setOpen(true)} />
 
+      <UrgencyClock />
       <HeroV2 />
       {/* Pedido de George: que se pueda seguir a AZKOMOLY sin buscar. Columna
           pegada al borde izquierdo, fuera del camino del CTA de compra. */}
       <SocialRail />
       <ProductsSection />
+      <VelocityBand />
       <LifestyleStrip />
       <FollowUsRow />
-      <SocialProof />
+      <SocialProofMarquee />
       <HowItWorks />
       <BigCTA onCta={() => setOpen(true)} />
+      <ClosingScrollFloat />
       <FAQSection />
 
       <Footer />
@@ -215,7 +222,7 @@ function TopNav({ onCta }: { onCta: () => void }) {
             <CartButton />
             <button
               onClick={onCta}
-              className="hidden sm:inline-block bg-fire text-white font-sans font-semibold text-xs tracking-wide px-5 py-2.5 rounded-full hover:-translate-y-[2px] transition-transform"
+              className="btn-3d hidden bg-fire px-5 py-2.5 font-sans text-xs font-semibold tracking-wide text-white sm:inline-flex"
             >
               {t.nav.notify}
             </button>
@@ -248,6 +255,42 @@ function TopNav({ onCta }: { onCta: () => void }) {
         displayItemNumbering={false}
       />
     </>
+  );
+}
+
+function getSecondsToMidnight(now = new Date()) {
+  const next = new Date(now);
+  next.setHours(24, 0, 0, 0);
+  return Math.max(0, Math.floor((next.getTime() - now.getTime()) / 1000));
+}
+
+function UrgencyClock() {
+  const t = useT();
+  const [remaining, setRemaining] = useState(() => getSecondsToMidnight());
+
+  useEffect(() => {
+    const timer = window.setInterval(() => setRemaining(getSecondsToMidnight()), 1000);
+    return () => window.clearInterval(timer);
+  }, []);
+
+  const hours = Math.floor(remaining / 3600);
+  const minutes = Math.floor((remaining % 3600) / 60);
+  const seconds = remaining % 60;
+
+  return (
+    <section className="sticky top-[65px] z-[65] bg-black text-white shadow-[0_8px_24px_rgba(13,13,13,0.16)]">
+      <div className="mx-auto flex min-h-11 max-w-7xl items-center justify-center gap-2 px-4 py-2 text-center font-sans text-[11px] font-semibold uppercase tracking-wide sm:text-xs">
+        <span className="text-white/78">{t.urgency.prefix}</span>
+        <span className="inline-flex items-center gap-1 rounded-sm bg-white px-2 py-1 text-fire">
+          <SlidingNumber value={hours} />
+          <span>:</span>
+          <SlidingNumber value={minutes} />
+          <span>:</span>
+          <SlidingNumber value={seconds} />
+        </span>
+        <span className="text-white/78">{t.urgency.suffix}</span>
+      </div>
+    </section>
   );
 }
 
@@ -305,10 +348,28 @@ const PRODUCTS_PER_PAGE = 6;
 function ProductsSection() {
   const t = useT();
   const { lang } = useI18n();
+  const railRef = useRef<HTMLDivElement | null>(null);
   const [products, setProducts] = useState<ShopifyProduct[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAll, setShowAll] = useState(false);
+  const [railState, setRailState] = useState({ canPrev: false, canNext: false });
   const visible = showAll ? products : products.slice(0, PRODUCTS_PER_PAGE);
+
+  const updateRailState = () => {
+    const el = railRef.current;
+    if (!el) return;
+    const max = el.scrollWidth - el.clientWidth;
+    setRailState({
+      canPrev: el.scrollLeft > 4,
+      canNext: el.scrollLeft < max - 4,
+    });
+  };
+
+  const scrollProducts = (direction: 1 | -1) => {
+    const el = railRef.current;
+    if (!el) return;
+    el.scrollBy({ left: direction * Math.max(280, el.clientWidth * 0.82), behavior: "smooth" });
+  };
 
   useEffect(() => {
     setLoading(true);
@@ -317,6 +378,18 @@ function ProductsSection() {
       setLoading(false);
     }).catch(() => setLoading(false));
   }, [lang]);
+
+  useEffect(() => {
+    const el = railRef.current;
+    if (!el) return;
+    updateRailState();
+    el.addEventListener("scroll", updateRailState, { passive: true });
+    window.addEventListener("resize", updateRailState);
+    return () => {
+      el.removeEventListener("scroll", updateRailState);
+      window.removeEventListener("resize", updateRailState);
+    };
+  }, [loading, visible.length]);
 
   return (
     <>
@@ -363,23 +436,44 @@ function ProductsSection() {
              obligar a recorrer una lista larga hacia abajo. Es el gesto que la
              gente ya trae aprendido de Instagram y TikTok.
              Desktop: rejilla, donde sí conviene comparar varias a la vez. */
-          <div
-            className="
-              flex snap-x snap-mandatory gap-5 overflow-x-auto scrollbar-none
-              -mx-6 px-6 pb-2
-              sm:mx-0 sm:grid sm:grid-cols-2 sm:gap-x-8 sm:gap-y-12 sm:overflow-visible sm:px-0
-              lg:grid-cols-3
-            "
-            style={{ scrollPaddingInline: "1.5rem" }}
-          >
-            {visible.map((p) => (
-              <div
-                key={p.node.id}
-                className="w-[82vw] max-w-[340px] shrink-0 snap-center sm:w-auto sm:max-w-none sm:shrink"
-              >
-                <ProductTiltCard p={p} />
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => scrollProducts(-1)}
+              disabled={!railState.canPrev}
+              aria-label={t.products.previous}
+              className="sm:hidden absolute left-1 top-1/2 z-20 grid h-11 w-11 -translate-y-1/2 place-items-center rounded-full border-2 border-black bg-white text-fire shadow-[0_8px_0_#0D0D0D,0_16px_24px_rgba(13,13,13,0.22)] transition-all hover:scale-105 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white/70 active:scale-95 active:shadow-[0_3px_0_#0D0D0D] disabled:pointer-events-none disabled:opacity-35"
+            >
+              <ChevronLeft className="h-6 w-6" />
+            </button>
+            <button
+              type="button"
+              onClick={() => scrollProducts(1)}
+              disabled={!railState.canNext}
+              aria-label={t.products.next}
+              className="sm:hidden absolute right-1 top-1/2 z-20 grid h-11 w-11 -translate-y-1/2 place-items-center rounded-full border-2 border-black bg-white text-fire shadow-[0_8px_0_#0D0D0D,0_16px_24px_rgba(13,13,13,0.22)] transition-all hover:scale-105 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white/70 active:scale-95 active:shadow-[0_3px_0_#0D0D0D] disabled:pointer-events-none disabled:opacity-35"
+            >
+              <ChevronRight className="h-6 w-6" />
+            </button>
+            <div
+              ref={railRef}
+              className="
+                flex snap-x snap-mandatory gap-5 overflow-x-auto scrollbar-none
+                -mx-6 px-6 pb-2
+                sm:mx-0 sm:grid sm:grid-cols-2 sm:gap-x-8 sm:gap-y-12 sm:overflow-visible sm:px-0
+                lg:grid-cols-3
+              "
+              style={{ scrollPaddingInline: "1.5rem" }}
+            >
+              {visible.map((p) => (
+                <div
+                  key={p.node.id}
+                  className="w-[82vw] max-w-[340px] shrink-0 snap-center sm:w-auto sm:max-w-none sm:shrink"
+                >
+                  <ProductTiltCard p={p} />
+                </div>
+              ))}
               </div>
-            ))}
           </div>
         )}
 
@@ -389,7 +483,7 @@ function ProductsSection() {
           <div className="mt-12 flex justify-center">
             <button
               onClick={() => setShowAll((v) => !v)}
-              className="rounded-full border-2 border-white/70 px-8 py-3 font-sans text-sm font-bold uppercase tracking-wide text-white transition-all hover:-translate-y-0.5 hover:bg-white hover:text-fire"
+              className="btn-3d bg-white px-8 py-3 font-sans text-sm font-bold uppercase tracking-wide text-fire"
             >
               {showAll ? t.products.showLess : `${t.products.showMore} (${products.length - PRODUCTS_PER_PAGE})`}
             </button>
@@ -410,6 +504,103 @@ const SOCIAL_REVIEWS: { src: string; href: string; platform: "instagram" | "tikt
   { src: "/review5.webp", href: "https://www.instagram.com/reel/DaFsFjgKlCR/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA==", platform: "instagram" },
   { src: "/review6.webp", href: "https://www.tiktok.com/@azkomoly.hu/video/7670098419981110550?is_from_webapp=1&sender_device=pc&web_id=7644208246575662593", platform: "tiktok" },
 ];
+
+function VelocityBand() {
+  const t = useT();
+  return (
+    <section className="overflow-hidden border-y-2 border-black bg-white py-4">
+      <ScrollVelocity
+        text={t.velocity.text}
+        baseVelocity={36}
+        className="font-display text-2xl uppercase text-fire sm:text-4xl"
+      />
+    </section>
+  );
+}
+
+function ReviewCard({
+  review,
+  index,
+}: {
+  review: (typeof SOCIAL_REVIEWS)[number];
+  index: number;
+}) {
+  const t = useT();
+  const platform = SOCIAL_LINKS.find((s) => s.key === review.platform);
+
+  return (
+    <a
+      href={review.href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="group relative block w-36 overflow-hidden rounded-md border-2 border-black bg-white shadow-[8px_8px_0_#0D0D0D] transition-transform duration-200 hover:-translate-y-1 sm:w-44"
+      aria-label={`${t.socialProof.openOn} ${platform?.label ?? review.platform}`}
+    >
+      <img
+        src={review.src}
+        alt={`${platform?.label ?? review.platform} ${t.socialProof.screenshotAlt} ${index + 1}`}
+        className="aspect-[3/4] h-auto w-full object-cover"
+        loading="lazy"
+        decoding="async"
+      />
+      <span className="absolute left-2 top-2 grid h-8 w-8 place-items-center rounded-full bg-black text-white">
+        {platform && <SocialGlyph path={platform.path} className="h-4 w-4" />}
+      </span>
+    </a>
+  );
+}
+
+function SocialProofMarquee() {
+  const t = useT();
+  const columns = [
+    SOCIAL_REVIEWS.filter((_, i) => i % 3 === 0),
+    SOCIAL_REVIEWS.filter((_, i) => i % 3 === 1),
+    SOCIAL_REVIEWS.filter((_, i) => i % 3 === 2),
+  ];
+
+  return (
+    <section className="overflow-hidden bg-white py-18 sm:py-24">
+      <div className="mx-auto grid max-w-7xl gap-10 px-6 lg:grid-cols-[0.85fr_1.15fr] lg:items-center">
+        <div>
+          <p className="mb-3 font-sans text-xs font-bold uppercase tracking-[0.35em] text-fire">
+            {t.socialProof.kicker}
+          </p>
+          <h2 className="font-display text-4xl leading-none text-black sm:text-6xl">
+            {t.socialProof.heading}
+          </h2>
+          {/* TODO: Replace this with real transcribed creator/customer copy when provided. */}
+          <p className="mt-5 max-w-[34rem] font-sans text-base leading-relaxed text-black/68">
+            {t.socialProof.sub}
+          </p>
+        </div>
+        <div className="relative h-[520px] overflow-hidden [perspective:900px]">
+          <div className="absolute inset-x-0 top-0 z-10 h-24 bg-gradient-to-b from-white to-transparent" />
+          <div className="absolute inset-x-0 bottom-0 z-10 h-24 bg-gradient-to-t from-white to-transparent" />
+          <div className="grid h-full grid-cols-3 gap-3 [transform:rotateX(10deg)_rotateZ(-4deg)_scale(1.03)] sm:gap-5">
+            {columns.map((items, index) => (
+              <Marquee
+                key={index}
+                vertical
+                reverse={index % 2 === 1}
+                pauseOnHover
+                repeat={5}
+                className="[--duration:26s] [--gap:1rem]"
+              >
+                {items.map((review, itemIndex) => (
+                  <ReviewCard
+                    key={`${review.src}-${itemIndex}`}
+                    review={review}
+                    index={SOCIAL_REVIEWS.indexOf(review)}
+                  />
+                ))}
+              </Marquee>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
 
 function LifestyleStrip() {
   const scrollerRef = useRef<HTMLDivElement | null>(null);
@@ -590,8 +781,8 @@ function LifestyleStrip() {
 function FollowUsRow() {
   const t = useT();
   return (
-    <div className="flex items-center justify-center gap-6 py-6 bg-dark-bg/60 border-b border-cardboard/20">
-      <span className="font-sans text-xs tracking-[0.3em] text-foreground/50 hidden sm:inline">
+    <div className="flex flex-wrap items-center justify-center gap-3 bg-fire px-4 py-6">
+      <span className="mr-2 hidden font-sans text-xs font-bold uppercase tracking-[0.3em] text-white/78 sm:inline">
         {t.footer.follow}
       </span>
       {SOCIAL_LINKS.map((s) => (
@@ -601,10 +792,14 @@ function FollowUsRow() {
           target="_blank"
           rel="noopener noreferrer"
           aria-label={s.label}
-          className="h-11 w-11 grid place-items-center rounded-full border-2 border-black/10 bg-white hover:-translate-y-0.5 hover:border-black/20 hover:shadow-[0_6px_16px_rgba(13,13,13,0.12)] transition-all"
-          style={{ color: s.brand }}
+          className="group grid h-11 w-11 place-items-center overflow-hidden rounded-full border-2 border-white/45 bg-white/10 text-white transition-all hover:w-32 hover:-translate-y-0.5 hover:border-white hover:bg-white hover:text-fire focus-visible:w-32 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white/40"
         >
-          <SocialGlyph path={s.path} className="h-5 w-5" />
+          <span className="flex items-center gap-2 whitespace-nowrap px-3">
+            <SocialGlyph path={s.path} className="h-5 w-5 shrink-0" />
+            <span className="max-w-0 overflow-hidden font-sans text-xs font-bold uppercase opacity-0 transition-all group-hover:max-w-24 group-hover:opacity-100 group-focus-visible:max-w-24 group-focus-visible:opacity-100">
+              {s.label}
+            </span>
+          </span>
         </a>
       ))}
     </div>
@@ -641,6 +836,7 @@ function ValueProps() {
 
 function HowItWorks() {
   const t = useT();
+  const reduceMotion = useReducedMotion();
   return (
     <section id="hogyan" className="bg-background">
       <div className="mx-auto max-w-7xl px-6 py-24">
@@ -652,13 +848,29 @@ function HowItWorks() {
             {t.how.heading}
           </h2>
         </div>
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <motion.div
+          className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4"
+          initial={reduceMotion ? false : "hidden"}
+          whileInView={reduceMotion ? undefined : "show"}
+          viewport={{ once: true, amount: 0.25 }}
+          variants={{
+            hidden: {},
+            show: { transition: { staggerChildren: 0.11 } },
+          }}
+        >
           {t.how.steps.map((s, i) => (
-            <div
+            <motion.div
               key={s.n}
-              data-reveal
-              data-delay={String(i + 1)}
               className="relative bg-dark-bg border border-cardboard/30 p-7 overflow-hidden group hover:border-fire/70 hover:-translate-y-1 transition-all duration-300"
+              variants={{
+                hidden: { opacity: 0, y: 28, rotate: i % 2 === 0 ? -1.5 : 1.5 },
+                show: {
+                  opacity: 1,
+                  y: 0,
+                  rotate: 0,
+                  transition: { duration: 0.42, ease: [0.22, 1, 0.36, 1] },
+                },
+              }}
             >
               {/* Watermark number */}
               <span className="absolute -bottom-4 -right-2 font-display leading-none text-fire/25 select-none pointer-events-none"
@@ -670,9 +882,9 @@ function HowItWorks() {
               </span>
               <h3 className="font-display text-2xl text-foreground mb-2">{s.title}</h3>
               <p className="font-sans text-sm text-foreground/60 leading-relaxed">{s.text}</p>
-            </div>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       </div>
     </section>
   );
@@ -760,12 +972,24 @@ function BigCTA({ onCta }: { onCta: () => void }) {
           </a>
           <button
             onClick={onCta}
-            className="inline-block bg-transparent text-primary-foreground font-display text-xl sm:text-2xl px-10 py-5 rounded-2xl border-4 border-dark-bg hover:bg-dark-bg hover:text-fire transition-colors"
+            className="btn-3d bg-fire px-10 py-5 font-display text-xl text-primary-foreground sm:text-2xl"
           >
             {t.bigCta.notify}
           </button>
         </div>
       </div>
+    </section>
+  );
+}
+
+function ClosingScrollFloat() {
+  const t = useT();
+  return (
+    <section className="overflow-hidden bg-white px-4 py-18 text-center sm:py-24">
+      <ScrollFloat
+        text={t.closingFloat.text}
+        className="mx-auto max-w-5xl font-display text-[clamp(2.4rem,9vw,7.2rem)] leading-[0.9] text-fire"
+      />
     </section>
   );
 }
@@ -822,7 +1046,7 @@ function FAQSection() {
   );
 }
 
-function Footer() {
+function LegacyFooter() {
   const t = useT();
   return (
     <div className="relative mt-16">
@@ -856,6 +1080,80 @@ function Footer() {
         <p className="font-sans text-xs text-white/70">
           © 2026 <span className="font-display text-white">AZKOMOLY</span> · {t.footer.rights}
         </p>
+      </footer>
+    </div>
+  );
+}
+
+function Footer() {
+  const t = useT();
+  const links = [
+    { to: "/about", label: t.footer.about },
+    { to: "/faq", label: t.footer.faq },
+    { to: "/privacy", label: t.footer.privacy },
+    { to: "/terms", label: t.footer.terms },
+    { to: "/cookies", label: t.footer.cookies },
+  ] as const;
+  const TapeCorner = ({ className }: { className: string }) => (
+    <svg viewBox="0 0 92 46" aria-hidden="true" className={className}>
+      <path d="M4 12 88 2 82 34 0 44Z" fill="#222222" opacity="0.96" />
+      <path d="M15 13 22 38M42 8 49 35M69 5 75 30" stroke="#3A3A3A" strokeWidth="3" />
+    </svg>
+  );
+
+  return (
+    <div className="relative bg-fire px-4 py-12 sm:px-6 sm:py-16">
+      <footer
+        id="kapcsolat"
+        className="relative mx-auto max-w-6xl rounded-md border-2 border-black bg-white px-5 py-10 text-black shadow-[12px_12px_0_#0D0D0D] sm:px-10"
+      >
+        <TapeCorner className="absolute -left-5 -top-4 h-12 w-24 -rotate-12" />
+        <TapeCorner className="absolute -right-5 -top-4 h-12 w-24 rotate-12" />
+        <TapeCorner className="absolute -bottom-4 -left-5 h-12 w-24 rotate-12" />
+        <TapeCorner className="absolute -bottom-4 -right-5 h-12 w-24 -rotate-12" />
+
+        <div className="grid gap-8 md:grid-cols-[1fr_1.2fr] md:items-end">
+          <div>
+            <img src="/azkomoly_new_logo.webp" alt="AZKOMOLY" className="h-12 w-auto" />
+            <p className="mt-5 max-w-sm font-sans text-sm leading-relaxed text-black/68">
+              {t.footer.tagline}
+            </p>
+            <div className="mt-5 flex flex-wrap gap-3">
+              {SOCIAL_LINKS.map((s) => (
+                <a
+                  key={s.key}
+                  href={s.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={s.label}
+                  className="grid h-11 w-11 place-items-center rounded-full border-2 border-black bg-white transition-all hover:-translate-y-0.5 hover:bg-fire hover:text-white"
+                  style={{ color: s.brand }}
+                >
+                  <SocialGlyph path={s.path} className="h-5 w-5" />
+                </a>
+              ))}
+            </div>
+          </div>
+
+          <div className="md:text-right">
+            <nav className="mb-5 flex flex-wrap gap-x-4 gap-y-2 font-sans text-sm font-bold uppercase tracking-wide md:justify-end">
+              <a href="#termekek" className="hover:text-fire">{t.footer.products}</a>
+              {links.map((link) => (
+                <Link key={link.to} to={link.to} className="hover:text-fire">
+                  {link.label}
+                </Link>
+              ))}
+            </nav>
+            <p className="font-sans text-xs leading-relaxed text-black/62">
+              <strong className="text-black">Oscar Investments Kft.</strong><br />
+              {t.footer.taxNumber}: 32331486-2-09<br />
+              {t.footer.companyNumber}: 09 09 036321
+            </p>
+            <p className="mt-4 font-sans text-xs text-black/54">
+              © 2026 AZKOMOLY. {t.footer.rights}
+            </p>
+          </div>
+        </div>
       </footer>
     </div>
   );
@@ -1018,7 +1316,7 @@ function SignupDialog({
           <button
             type="submit"
             disabled={status === "loading"}
-            className="mt-1 sm:mt-2 bg-fire text-primary-foreground font-display text-lg sm:text-xl px-6 py-4 graffiti-border hover:translate-y-[-2px] transition-transform disabled:opacity-60"
+            className="btn-3d mt-1 bg-fire px-6 py-4 font-display text-lg text-primary-foreground sm:mt-2 sm:text-xl"
           >
             {status === "loading" ? t.signup.sending : t.signup.submit}
           </button>

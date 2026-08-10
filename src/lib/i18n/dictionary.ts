@@ -59,6 +59,18 @@ export type Dict = {
     mins: string;
     secs: string;
   };
+  urgency: {
+    prefix: string;
+    suffix: string;
+  };
+  introVideo: {
+    title: string;
+    copy: string;
+    skip: string;
+    enter: string;
+    mute: string;
+    unmute: string;
+  };
   products: {
     kicker: string;
     heading: string;
@@ -72,8 +84,20 @@ export type Dict = {
     empty: string;
     showMore: string;
     showLess: string;
+    previous: string;
+    next: string;
     rarity: { common: string; rare: string; epic: string; legendary: string };
     items: Record<string, ProductCopy>;
+  };
+  velocity: {
+    text: string;
+  };
+  socialProof: {
+    kicker: string;
+    heading: string;
+    sub: string;
+    openOn: string;
+    screenshotAlt: string;
   };
   values: {
     items: { title: string; text: string }[];
@@ -91,6 +115,9 @@ export type Dict = {
     showBoxes: string;
     notify: string;
   };
+  closingFloat: {
+    text: string;
+  };
   faq: {
     kicker: string;
     heading: string;
@@ -98,9 +125,15 @@ export type Dict = {
   };
   footer: {
     follow: string;
+    products: string;
+    about: string;
+    faq: string;
     privacy: string;
     terms: string;
     cookies: string;
+    tagline: string;
+    taxNumber: string;
+    companyNumber: string;
     rights: string;
   };
   signup: {
@@ -233,6 +266,18 @@ const hu: Dict = {
     mins: "PERC",
     secs: "MP",
   },
+  urgency: {
+    prefix: "Ma rendelsz, holnap indulhat",
+    suffix: "éjfélig",
+  },
+  introVideo: {
+    title: "Kattints, ha ugranál",
+    copy: "A videó után jönnek a dobozok. Az X-szel azonnal továbbmehetsz.",
+    skip: "Intro kihagyása",
+    enter: "TOVÁBB A DOBOZOKHOZ",
+    mute: "Némítás",
+    unmute: "Hang bekapcsolása",
+  },
   products: {
     kicker: "VÁLASZD A TÉTEDET",
     heading: "A dobozaink",
@@ -246,6 +291,8 @@ const hu: Dict = {
     empty: "Hamarosan új dobozok…",
     showMore: "TÖBB DOBOZ",
     showLess: "KEVESEBB",
+    previous: "Előző doboz",
+    next: "Következő doboz",
     rarity: { common: "Sima", rare: "Ritka", epic: "Epikus", legendary: "Legendás" },
     items: {
       mini: {
@@ -282,6 +329,16 @@ const hu: Dict = {
       },
     },
   },
+  velocity: {
+    text: "Gyors szállítás · eredeti termékek · garantált meglepetés ·",
+  },
+  socialProof: {
+    kicker: "Valódi nyitások",
+    heading: "A dobozok már pörögnek",
+    sub: "Instagram és TikTok nyitások a saját csatornáinkról, valós linkekkel.",
+    openOn: "Megnyitás itt:",
+    screenshotAlt: "review képernyőkép",
+  },
   values: {
     items: [
       { title: "TOTÁLIS TITOK", text: "Nem tudod, mi van benne. Ez a lényeg. Amit kapsz, azt kapsz." },
@@ -313,6 +370,9 @@ const hu: Dict = {
     showBoxes: "MUTASD A DOBOZOKAT →",
     notify: "ÉRTESÍTSETEK",
   },
+  closingFloat: {
+    text: "NE TALÁLGASS. NYISD KI.",
+  },
   faq: {
     kicker: "GYAKORI KÉRDÉSEK",
     heading: "Még valami?",
@@ -328,9 +388,15 @@ const hu: Dict = {
   },
   footer: {
     follow: "KÖVESS MINKET",
+    products: "Termékek",
+    about: "Rólunk",
+    faq: "GYIK",
     privacy: "Adatvédelem",
     terms: "Felhasználási feltételek",
     cookies: "Süti szabályzat",
+    tagline: "Mystery box élmény eredeti termékekkel, gyors szállítással és valódi unboxing pillanatokkal.",
+    taxNumber: "Adószám",
+    companyNumber: "Cégjegyzékszám",
     rights: "Minden jog fenntartva",
   },
   signup: {
@@ -463,6 +529,18 @@ const en: Dict = {
     mins: "MIN",
     secs: "SEC",
   },
+  urgency: {
+    prefix: "Order today, it can ship tomorrow",
+    suffix: "until midnight",
+  },
+  introVideo: {
+    title: "Click if you want to skip",
+    copy: "The boxes are right after the video. Hit the X to jump straight in.",
+    skip: "Skip intro",
+    enter: "TAKE ME TO THE BOXES",
+    mute: "Mute",
+    unmute: "Turn sound on",
+  },
   products: {
     kicker: "PICK YOUR STAKE",
     heading: "Our boxes",
@@ -476,6 +554,8 @@ const en: Dict = {
     empty: "New boxes coming soon…",
     showMore: "MORE BOXES",
     showLess: "SHOW LESS",
+    previous: "Previous box",
+    next: "Next box",
     rarity: { common: "Common", rare: "Rare", epic: "Epic", legendary: "Legendary" },
     items: {
       mini: {
@@ -512,6 +592,16 @@ const en: Dict = {
       },
     },
   },
+  velocity: {
+    text: "Fast shipping · original products · guaranteed surprise ·",
+  },
+  socialProof: {
+    kicker: "Real unboxings",
+    heading: "The boxes are already moving",
+    sub: "Instagram and TikTok unboxings from our own channels, linked to the real posts.",
+    openOn: "Open on",
+    screenshotAlt: "review screenshot",
+  },
   values: {
     items: [
       { title: "TOTAL MYSTERY", text: "You don't know what's inside. That's the whole point. What you get, you get." },
@@ -543,6 +633,9 @@ const en: Dict = {
     showBoxes: "SHOW ME THE BOXES →",
     notify: "NOTIFY ME",
   },
+  closingFloat: {
+    text: "STOP GUESSING. OPEN IT.",
+  },
   faq: {
     kicker: "FREQUENT QUESTIONS",
     heading: "Anything else?",
@@ -558,9 +651,15 @@ const en: Dict = {
   },
   footer: {
     follow: "FOLLOW US",
+    products: "Products",
+    about: "About",
+    faq: "FAQ",
     privacy: "Privacy",
     terms: "Terms of use",
     cookies: "Cookie policy",
+    tagline: "Mystery box energy with original products, fast shipping, and real unboxing moments.",
+    taxNumber: "Tax number",
+    companyNumber: "Company registration number",
     rights: "All rights reserved",
   },
   signup: {

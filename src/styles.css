@@ -5,7 +5,7 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  --font-display: "Archivo Black", "Poppins", system-ui, sans-serif;
+  --font-display: "Bungee", "Anton", "Poppins", system-ui, sans-serif;
   --font-sans: "Poppins", system-ui, sans-serif;
 
   --color-cardboard: var(--cardboard);
@@ -164,6 +164,50 @@
   .btn-drip:active {
     box-shadow: 0 1px 0 0 #0D0D0D;
   }
+  .btn-3d {
+    position: relative;
+    display: inline-flex;
+    min-height: 44px;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #0D0D0D;
+    border-radius: 999px;
+    box-shadow:
+      0 7px 0 #0D0D0D,
+      0 13px 22px rgb(13 13 13 / 0.2);
+    transform: translateY(0);
+    transition:
+      transform 140ms ease,
+      box-shadow 140ms ease,
+      background-color 140ms ease,
+      color 140ms ease,
+      border-color 140ms ease;
+  }
+  .btn-3d:hover {
+    transform: translateY(-2px);
+    box-shadow:
+      0 9px 0 #0D0D0D,
+      0 16px 24px rgb(13 13 13 / 0.22);
+  }
+  .btn-3d:active {
+    transform: translateY(5px);
+    box-shadow:
+      0 2px 0 #0D0D0D,
+      0 7px 12px rgb(13 13 13 / 0.18);
+  }
+  .btn-3d:focus-visible {
+    outline: 4px solid rgb(var(--fire-rgb) / 0.32);
+    outline-offset: 4px;
+  }
+  .btn-3d:disabled,
+  .btn-3d[aria-disabled="true"] {
+    cursor: not-allowed;
+    opacity: 0.55;
+    transform: translateY(0);
+    box-shadow:
+      0 4px 0 #0D0D0D,
+      0 8px 14px rgb(13 13 13 / 0.12);
+  }
 }
 
 @keyframes pulse-glow {
@@ -246,6 +290,36 @@ body {
   .logo-mark,
   .logo-link:hover .logo-mark {
     animation: none;
+  }
+  .btn-3d,
+  .btn-3d:hover,
+  .btn-3d:active {
+    transform: none;
+    transition: none;
+  }
+}
+
+.animate-marquee {
+  animation: marquee var(--duration, 34s) linear infinite;
+}
+
+@keyframes marquee-vertical {
+  from { transform: translateY(0); }
+  to { transform: translateY(-50%); }
+}
+
+.animate-marquee-vertical {
+  animation: marquee-vertical var(--duration, 34s) linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-marquee,
+  .animate-marquee-vertical,
+  .animate-bounce-down,
+  .animate-float-piece,
+  .animate-pulse-glow,
+  .animate-fade-up {
+    animation: none !important;
   }
 }
 

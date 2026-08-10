@@ -115,7 +115,7 @@ export function DiscountWidget({ onOpen }: { onOpen: () => void }) {
 
         <button
           onClick={onOpen}
-          className="mt-3 w-full bg-fire text-white font-sans font-semibold text-sm tracking-wide px-4 py-2.5 rounded-full transition-transform duration-200 hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98]"
+          className="btn-3d mt-3 w-full bg-fire px-4 py-2.5 font-sans text-sm font-semibold tracking-wide text-white"
         >
           {t.discountWidget.cta}
         </button>

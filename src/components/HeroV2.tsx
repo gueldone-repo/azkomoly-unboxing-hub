@@ -100,10 +100,10 @@ export function HeroV2() {
       <button
         type="button"
         onClick={scrollToProducts}
-        className={`rounded-full px-8 py-4 font-sans text-base font-semibold tracking-wide transition-all duration-200 hover:-translate-y-1 active:translate-y-0 active:scale-[0.98] sm:text-lg ${
+        className={`btn-3d px-8 py-4 font-sans text-base font-semibold tracking-wide sm:text-lg ${
           onWave
-            ? "bg-white text-fire shadow-[0_16px_32px_rgba(13,13,13,0.22)] hover:bg-white/92"
-            : "bg-fire text-white shadow-[0_16px_32px_rgba(13,13,13,0.18),0_8px_22px_rgba(91,46,168,0.30)] hover:bg-[#4c238f]"
+            ? "bg-white text-fire hover:bg-white/92"
+            : "bg-fire text-white hover:bg-[#4c238f]"
         }`}
       >
         {t.hero.cta}
@@ -151,6 +151,24 @@ export function HeroV2() {
         {/* El titular, ahora en movimiento: mismo texto que el <h1> oculto,
             curvo y translúcido. Arriba del todo, por encima de la caja. */}
         <div className="pointer-events-none absolute inset-x-0 top-[9%] z-[1]">{curvedTitle}</div>
+
+        {/* Sticker de marca en el hueco vacío de la izquierda. z-[2]: sobre la
+            onda y el titular curvo, pero por debajo de la caja (z-20), así
+            acompaña sin robarle protagonismo al producto. Entra ladeado, como
+            una pegatina puesta a mano. */}
+        <motion.img
+          src="/sticker-azk.webp"
+          alt=""
+          aria-hidden="true"
+          width={721}
+          height={580}
+          loading="lazy"
+          draggable={false}
+          className="pointer-events-none absolute left-[3vw] top-[15%] z-[2] w-[17vw] max-w-[240px]"
+          initial={reduceMotion ? false : { opacity: 0, scale: 0.7, rotate: -18 }}
+          animate={reduceMotion ? undefined : { opacity: 1, scale: 1, rotate: -7 }}
+          transition={{ type: "spring", stiffness: 140, damping: 12, delay: 0.55 }}
+        />
 
         <div className="absolute bottom-[-3.5vw] left-[-1vw] z-20 w-[74vw] max-w-[1220px]">
           {box}
