@@ -1,3 +1,6 @@
+import { useCallback, useEffect, useRef, useState } from "react";
+import { ChevronRight } from "lucide-react";
+import { motion, useReducedMotion } from "motion/react";
 import { siInstagram, siTiktok, siYoutube, siFacebook } from "simple-icons";
 
 /**
@@ -99,6 +102,8 @@ export function SocialRow({
   );
 }
 
+const RAIL_HIDE_DELAY = 900;
+
 /**
  * Columna lateral del hero. Pedido de George: que se pueda seguir a AZKOMOLY
  * de inmediato, sin buscar. Queda pegada al borde izquierdo, fuera del camino
@@ -106,23 +111,93 @@ export function SocialRow({
  *
  * Oculta por debajo de lg: en móvil el hero ya va justo de espacio y una
  * columna flotante taparía la caja. Ahí las redes viven en el menú y el footer.
+ *
+ * Antes quedaba siempre visible tapando contenido durante todo el scroll.
+ * Ahora se esconde detrás de una lengüeta — mismo patrón que el dock de
+ * navegación inferior (`BottomNav.tsx`): la lengüeta es lo único visible en
+ * reposo, y el hover/click/foco la revela con un timer de cierre al alejarse.
  */
 export function SocialRail() {
+  const prefersReducedMotion = useReducedMotion();
+  const [visible, setVisible] = useState(false);
+  const hideTimer = useRef<number | null>(null);
+
+  const clearHideTimer = useCallback(() => {
+    if (hideTimer.current === null) return;
+    window.clearTimeout(hideTimer.current);
+    hideTimer.current = null;
+  }, []);
+
+  const scheduleHide = useCallback(() => {
+    clearHideTimer();
+    hideTimer.current = window.setTimeout(() => setVisible(false), RAIL_HIDE_DELAY);
+  }, [clearHideTimer]);
+
+  useEffect(() => clearHideTimer, [clearHideTimer]);
+
   return (
-    <div className="hidden lg:flex fixed left-3 top-1/2 -translate-y-1/2 z-30 flex-col items-center gap-1">
-      {SOCIAL_LINKS.map((s) => (
-        <a
-          key={s.key}
-          href={s.href}
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label={s.label}
-          className="grid place-items-center h-11 w-11 rounded-full bg-white/85 backdrop-blur-sm shadow-[0_4px_14px_rgba(13,13,13,0.10)] transition-all duration-200 hover:scale-110 hover:bg-white hover:shadow-[0_6px_20px_rgba(13,13,13,0.18)]"
-          style={{ color: s.brand }}
+    <>
+      <div className="hidden lg:flex fixed left-0 top-1/2 z-30 -translate-y-1/2">
+        <motion.button
+          type="button"
+          aria-label="Kövess minket"
+          aria-expanded={visible}
+          onClick={() => {
+            clearHideTimer();
+            setVisible((v) => !v);
+          }}
+          onMouseEnter={() => {
+            clearHideTimer();
+            setVisible(true);
+          }}
+          initial={false}
+          animate={{ opacity: visible ? 0 : 1, pointerEvents: visible ? "none" : "auto" }}
+          transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.18, ease: "easeOut" }}
+          className="grid h-14 w-6 place-items-center rounded-r-xl border border-l-0 border-black/10 bg-white/92 text-foreground/45 shadow-[6px_0_18px_rgba(13,13,13,0.10)] backdrop-blur transition-colors hover:text-fire"
         >
-          <SocialGlyph path={s.path} className="h-[18px] w-[18px]" />
-        </a>
-      ))}
-    </div>
+          <ChevronRight className="h-4 w-4" strokeWidth={2.5} aria-hidden="true" />
+        </motion.button>
+      </div>
+
+      <div
+        className="hidden lg:flex fixed left-3 top-1/2 z-30 -translate-y-1/2 flex-col items-center gap-1"
+        onMouseEnter={() => {
+          clearHideTimer();
+          setVisible(true);
+        }}
+        onMouseLeave={scheduleHide}
+        onFocusCapture={() => {
+          clearHideTimer();
+          setVisible(true);
+        }}
+        onBlurCapture={scheduleHide}
+      >
+        <motion.div
+          initial={false}
+          animate={{
+            opacity: visible ? 1 : 0,
+            x: visible ? 0 : -12,
+            scale: visible ? 1 : 0.96,
+            pointerEvents: visible ? "auto" : "none",
+          }}
+          transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.22, ease: "easeOut" }}
+          className="flex flex-col items-center gap-1"
+        >
+          {SOCIAL_LINKS.map((s) => (
+            <a
+              key={s.key}
+              href={s.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={s.label}
+              className="grid place-items-center h-11 w-11 rounded-full bg-white/85 backdrop-blur-sm shadow-[0_4px_14px_rgba(13,13,13,0.10)] transition-all duration-200 hover:scale-110 hover:bg-white hover:shadow-[0_6px_20px_rgba(13,13,13,0.18)]"
+              style={{ color: s.brand }}
+            >
+              <SocialGlyph path={s.path} className="h-[18px] w-[18px]" />
+            </a>
+          ))}
+        </motion.div>
+      </div>
+    </>
   );
 }

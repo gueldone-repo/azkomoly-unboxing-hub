@@ -5,6 +5,7 @@ import { motion, useReducedMotion } from "motion/react";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { appendLeadToSheet } from "@/lib/leads.functions";
+import { getUrgencyDeadline } from "@/lib/urgency.functions";
 import { ShieldCheck, Truck, Sparkles, Menu, X, MousePointer2, ChevronLeft, ChevronRight } from "lucide-react";
 import { CookieBanner } from "@/components/CookieBanner";
 import { IntroVideoModal } from "@/components/IntroVideoModal";
@@ -257,16 +258,6 @@ function TopNav({ onCta }: { onCta: () => void }) {
 // tiempo). Guardado en sessionStorage para que sea honesto: si el usuario
 // refresca, sigue contando desde donde iba, no se reinicia.
 const URGENCY_DURATION_SECONDS = 5 * 60;
-const URGENCY_STORAGE_KEY = "azkomoly-urgency-deadline";
-
-function getUrgencyDeadline(): number {
-  if (typeof window === "undefined") return Date.now() + URGENCY_DURATION_SECONDS * 1000;
-  const stored = Number(window.sessionStorage.getItem(URGENCY_STORAGE_KEY));
-  if (stored && stored > Date.now()) return stored;
-  const deadline = Date.now() + URGENCY_DURATION_SECONDS * 1000;
-  window.sessionStorage.setItem(URGENCY_STORAGE_KEY, String(deadline));
-  return deadline;
-}
 
 function getSecondsRemaining(deadline: number) {
   return Math.max(0, Math.round((deadline - Date.now()) / 1000));
@@ -274,10 +265,25 @@ function getSecondsRemaining(deadline: number) {
 
 function UrgencyClock() {
   const t = useT();
-  const [deadline] = useState(getUrgencyDeadline);
-  const [remaining, setRemaining] = useState(() => getSecondsRemaining(deadline));
+  // El deadline lo decide el servidor por IP (ver urgency.functions.ts), no
+  // el navegador: así cada IP nueva arranca su propio 5:00 y refrescar o
+  // abrir otra pestaña desde la misma IP no lo reinicia gratis.
+  const [deadline, setDeadline] = useState<number | null>(null);
+  const [remaining, setRemaining] = useState(URGENCY_DURATION_SECONDS);
 
   useEffect(() => {
+    let cancelled = false;
+    getUrgencyDeadline().then((res) => {
+      if (!cancelled) setDeadline(res.deadline);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (deadline == null) return;
+    setRemaining(getSecondsRemaining(deadline));
     const timer = window.setInterval(() => setRemaining(getSecondsRemaining(deadline)), 1000);
     return () => window.clearInterval(timer);
   }, [deadline]);
@@ -925,6 +931,7 @@ function BigCTA({ onCta }: { onCta: () => void }) {
   const lines = t.bigCta.heading.split("\n");
   const sectionRef = useRef<HTMLElement | null>(null);
   const [spot, setSpot] = useState({ x: 50, y: 50, active: false });
+  const touchedRef = useRef(false);
   const SPOT_RADIUS = 140; // px
 
   function onMouseMove(e: React.MouseEvent<HTMLElement>) {
@@ -933,11 +940,60 @@ function BigCTA({ onCta }: { onCta: () => void }) {
     setSpot({ x: e.clientX - rect.left, y: e.clientY - rect.top, active: true });
   }
 
+  function onTouchMove(e: React.TouchEvent<HTMLElement>) {
+    const rect = sectionRef.current?.getBoundingClientRect();
+    const touch = e.touches[0];
+    if (!rect || !touch) return;
+    touchedRef.current = true;
+    setSpot({ x: touch.clientX - rect.left, y: touch.clientY - rect.top, active: true });
+  }
+
+  // Sin esto, en touch (sin mousemove) la sección quedaba una foto estática
+  // de cajas cerradas — "no se anima" era literal en móvil/tablet. Al entrar
+  // en pantalla en un dispositivo sin hover hace un barrido automático una
+  // sola vez para mostrar el efecto; si el usuario ya la tocó con el dedo, el
+  // barrido no pisa su control manual.
+  useEffect(() => {
+    const section = sectionRef.current;
+    if (!section) return;
+    if (!window.matchMedia("(hover: none)").matches) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (!entries[0]?.isIntersecting || touchedRef.current) return;
+        touchedRef.current = true;
+        io.disconnect();
+
+        const rect = section.getBoundingClientRect();
+        const duration = 1600;
+        const start = performance.now();
+
+        function step(now: number) {
+          const progress = Math.min(1, (now - start) / duration);
+          const eased = 1 - (1 - progress) * (1 - progress);
+          setSpot({ x: rect.width * (0.18 + eased * 0.64), y: rect.height * 0.42, active: true });
+          if (progress < 1) {
+            requestAnimationFrame(step);
+          } else {
+            window.setTimeout(() => setSpot((s) => ({ ...s, active: false })), 500);
+          }
+        }
+        requestAnimationFrame(step);
+      },
+      { threshold: 0.4 },
+    );
+    io.observe(section);
+    return () => io.disconnect();
+  }, []);
+
   return (
     <section
       ref={sectionRef}
       onMouseMove={onMouseMove}
       onMouseLeave={() => setSpot((s) => ({ ...s, active: false }))}
+      onTouchMove={onTouchMove}
+      onTouchEnd={() => setSpot((s) => ({ ...s, active: false }))}
       className="relative overflow-hidden"
     >
       {/* Fondo de abajo: lo que hay adentro de las cajas — solo se ve por el
@@ -984,9 +1040,13 @@ function BigCTA({ onCta }: { onCta: () => void }) {
           ))}
         </h2>
 
-        {/* Hint del efecto de linterna — solo desktop, el hover no aplica en touch */}
+        {/* Hint del efecto de linterna — sólo en dispositivos con hover real
+            (mouse/trackpad). Antes se ocultaba/mostraba por ancho de pantalla
+            (`sm:`), así que en tablet (touch) decía "mueve el cursor" sobre
+            algo que no responde al cursor porque no hay cursor. En touch el
+            barrido automático hace de pista. */}
         <div
-          className="hidden sm:inline-flex items-center gap-2 mt-6 px-4 py-2 rounded-full bg-black/35 backdrop-blur-sm"
+          className="hidden items-center gap-2 mt-6 px-4 py-2 rounded-full bg-black/35 backdrop-blur-sm [@media(hover:hover)]:inline-flex"
           style={{ fontFamily: "'ADLaM Display', var(--font-sans)" }}
         >
           <MousePointer2 className="h-4 w-4 text-white animate-bounce-down" style={{ animationDuration: "1.4s" }} />
@@ -1015,10 +1075,10 @@ function BigCTA({ onCta }: { onCta: () => void }) {
 function ClosingScrollFloat() {
   const t = useT();
   return (
-    <section className="overflow-hidden bg-white px-4 py-18 text-center sm:py-24">
+    <section className="overflow-hidden bg-white px-4 py-8 text-center sm:py-12">
       <ScrollFloat
         text={t.closingFloat.text}
-        className="mx-auto max-w-5xl font-display text-[clamp(2.4rem,9vw,7.2rem)] leading-[0.9] text-fire"
+        className="mx-auto max-w-3xl font-display text-[clamp(1.6rem,6vw,3.75rem)] leading-[0.95] text-fire"
       />
     </section>
   );
