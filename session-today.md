@@ -476,6 +476,105 @@ entrar en pantalla" usar `once: true` con duración propia, NO `scrub`.
 
 ---
 
+## 2026-08-11 (Sesión 8) ✅ CERRADA
+
+### Lo que se hizo
+
+**Tipografía homogénea en todo el sitio:**
+- Cada ruta pedía un subconjunto distinto de fuentes de Google Fonts (o ninguna, como
+  `shop.$slug`/legales) — según por dónde entrara el usuario, el título caía a Anton, a Poppins
+  o al system-ui del dispositivo. Se centralizó la carga en `__root.tsx` (una sola vez, en todas
+  las rutas). Se sacó `Bungee` de la cadena global `--font-display` (quedaba primero y afectaba
+  TODOS los h1/h2/h3 del sitio, no sólo el título curvo del Hero, que ya la fuerza inline).
+  About/FAQ actualizados de `Archivo Black` (fuente abandonada) a Anton.
+
+**FAQ movido de la home a `/faq`:**
+- Los 7 pares Q/A reales (y su schema `FAQPage`) vivían en la landing; `/faq` sólo tenía texto
+  `[Placeholder]`. Se movió el contenido real tal cual, sin rediseñar — **pendiente: categorizar
+  o rediseñar esa página cuando Diego lo pida.**
+
+**Banda debajo de productos:** eran dos líneas en sentidos opuestos (blanca/morado y
+morado/blanco); queda sólo la morada con texto blanco, más lenta.
+
+**Reloj de urgencia — dos iteraciones:**
+1. Primero: honesto hasta medianoche → pasó a contar 5 minutos reales, persistido en
+   `sessionStorage` (no se reinicia al refrescar).
+2. Diego pidió que el reinicio sea **por IP**, no por sesión de navegador. Se movió el deadline a
+   un server function nuevo (`src/lib/urgency.functions.ts`) que usa `getRequestIP` y lo guarda en
+   un `Map` en memoria del proceso. Cada IP nueva ve 5:00 desde cero; misma IP no lo reinicia
+   refrescando ni en otra pestaña.
+   - **Limitación conocida:** vive en memoria del proceso Node — se resetea si el servidor
+     reinicia/redeploya. Aceptable por ahora (bajo volumen), pero si se necesita que sobreviva
+     redeploys habría que pasarlo a una tabla de Supabase (fuera de alcance de hoy, no se tocó
+     el schema).
+   - **Pendiente real, sin resolver:** el código de descuento de Shopify para quien compre dentro
+     de los 5 minutos. Diego dijo explícitamente que no sabe cómo conectarlo — queda para cuando
+     él decida el % y cómo generarlo en Shopify Admin.
+
+**SocialRail (columna de redes sociales) — oculta tras lengüeta:**
+- Quedaba siempre fija tapando contenido durante todo el scroll de la landing. Ahora se esconde
+  detrás de una lengüeta a la izquierda (mismo patrón que el dock de navegación): hover/click la
+  revela, se retrae sola al alejarse. Verificado con clic real en navegador.
+
+**Menú/dock de navegación inferior — rehecho por completo:**
+- Diego lo encontró molesto. Se sacó del todo en escritorio (Home/Shop/About/FAQ ya están en el
+  navbar de arriba vía PillNav/hamburguesa, y el carrito siempre está en el navbar — nada se
+  pierde). En móvil queda **una sola flecha flotante** que aparece pasado el hero: apunta hacia
+  abajo y avanza a la siguiente sección (en la landing) o baja una pantalla (resto de páginas);
+  cerca del final de la página se voltea hacia arriba y vuelve al tope.
+  - **Sin verificar visualmente en viewport móvil real** — la herramienta de resize de ventana del
+    navegador no tuvo efecto en este entorno (se quedó siempre en ancho de escritorio). La lógica
+    está tipada y sigue el mismo patrón `lg:hidden`/`hidden lg:flex` que ya funcionaba en el dock
+    viejo, pero **revisar en un celular real la próxima sesión.**
+
+**"STOP GUESSING. OPEN IT." (ClosingScrollFloat) — bug real encontrado y arreglado:**
+- Diego: "no se anima, se ve cortado". Causas combinadas:
+  1. Texto/sección demasiado grandes → se cortaba en pantallas angostas. Se redujeron ambos.
+  2. **Bug real de animación:** usaba GSAP ScrollTrigger con `toggleActions` para reaccionar a la
+     dirección de scroll (pedido de Diego: entra al bajar, se retrae al subir). ScrollTrigger
+     cachea posiciones en píxeles al montar; tras un segundo reingreso a la sección (con saltos de
+     scroll grandes) esas posiciones se desalineaban del layout real y el texto se quedaba
+     invisible para siempre. Se reemplazó por un `IntersectionObserver` (sin caché, recalcula en
+     tiempo real) — verificado con saltos de scroll agresivos en ambas direcciones.
+- **Efecto linterna de la sección de arriba (BigCTA) — arreglo relacionado:** no respondía a touch
+  (sólo `mousemove`), así que en móvil/tablet quedaba una foto estática sin animar. Se agregó
+  arrastre por touch + un barrido automático una vez al entrar en pantalla en dispositivos sin
+  mouse. El hint "Move your cursor" ahora sólo aparece en dispositivos con hover real (antes se
+  mostraba por ancho de pantalla, así que salía en tablets táctiles sin sentido).
+
+Todo commiteado y pusheado a `main` (`ca99068`, `969eaec`, `657842a`).
+
+### Pendiente para la próxima sesión
+
+- [ ] **"How it works" — Diego lo quiere con animación.** Sin decidir el formato todavía. Dos
+  caminos: (a) hacemos un video para esa sección, o (b) Diego dice qué quiere mostrar y yo le doy
+  opciones concretas al arrancar la próxima sesión. Ideas ya pensadas para presentarle:
+  - **A. Clips reales en loop por paso** — recortes cortos (GIF/video mudo) de las reels/unboxings
+    reales que ya existen (mismo material que usa el carrousel de reviews), uno por cada uno de
+    los 4 pasos. Más "auténtico", cero diseño nuevo que inventar, pero depende de tener metraje
+    específico por paso (elegir/cortar los clips).
+  - **B. Iconos animados por paso** (SVG/Lottie chiquitos) — ej. paso 1 una caja que "vibra" al
+    entrar en viewport, paso 2 un camión que entra desde el costado, paso 3 la caja abriéndose con
+    partículas, paso 4 un ícono de compartir/notificación. Más liviano, más coherente con el
+    lenguaje 3D/relieve que ya tiene el resto del sitio (DripDivider, `.btn-3d`, etc.), no depende
+    de metraje real.
+  - **C. Una sola secuencia animada por scroll** que atraviesa los 4 pasos (ej. el personaje/caja
+    de "Our boxes" moviéndose de paso en paso a medida que se scrollea) — la más ambigua/ambiciosa
+    de construir, pero la que más "cuenta una historia" en vez de 4 tarjetas sueltas.
+  - Hoy la sección son 4 tarjetas estáticas (`HowItWorks()` en `src/routes/index.tsx:873`) con sólo
+    un fade/rise-in al entrar en viewport (Framer Motion `whileInView`, sin ícono ni video). Punto
+    de partida para cualquiera de las 3 opciones.
+- [ ] Revisar la flecha de navegación móvil (nueva) en un celular real — no se pudo emular
+  viewport móvil con las herramientas de esta sesión.
+- [ ] Código de descuento de Shopify para el reloj de 5 minutos — Diego no sabe cómo conectarlo
+  todavía, retomar cuando decida el % y lo genere en Shopify Admin.
+- [ ] `/faq`: contenido real ya puesto pero sin categorizar/rediseñar (ver arriba).
+- (siguen pendientes de sesiones previas: apex `.com`, handles de producto, `SHOPIFY_ADMIN_TOKEN`,
+  envíos, pagos, ÁFA, sitemap a GSC, blogs SEO, páginas de producto, bug de recarga reportado por
+  Diego sin diagnosticar — ver sesión 7)
+
+---
+
 <!-- PLANTILLA PARA NUEVAS SESIONES:
 
 ## YYYY-MM-DD (Sesión N)
