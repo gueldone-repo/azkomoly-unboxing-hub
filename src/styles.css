@@ -5,7 +5,7 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  --font-display: "Bungee", "Anton", "Poppins", system-ui, sans-serif;
+  --font-display: "Anton", "Poppins", system-ui, sans-serif;
   --font-sans: "Poppins", system-ui, sans-serif;
 
   --color-cardboard: var(--cardboard);

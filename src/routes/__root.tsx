@@ -115,6 +115,16 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         rel: "stylesheet",
         href: appCss,
       },
+      // Fuentes cargadas una sola vez acá (no por ruta) para que la
+      // tipografía sea idéntica en todas las páginas y dispositivos —
+      // antes cada ruta pedía un subconjunto distinto de familias y el
+      // resultado variaba según por dónde entrara el usuario.
+      { rel: "preconnect", href: "https://fonts.googleapis.com" },
+      { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Anton&family=Bungee&family=Danfo&family=ADLaM+Display&family=Poppins:wght@400;500;700;800&display=swap",
+      },
       { rel: "icon", href: "/favicon.ico", sizes: "any" },
       { rel: "icon", type: "image/png", sizes: "16x16", href: "/favicon-16x16.png" },
       { rel: "icon", type: "image/png", sizes: "32x32", href: "/favicon-32x32.png" },

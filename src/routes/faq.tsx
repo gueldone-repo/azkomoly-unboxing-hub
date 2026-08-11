@@ -26,12 +26,7 @@ export const Route = createFileRoute("/faq")({
         { name: "twitter:card", content: "summary_large_image" },
       ],
       links: [
-        { rel: "preconnect", href: "https://fonts.googleapis.com" },
-        { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
-        {
-          rel: "stylesheet",
-          href: "https://fonts.googleapis.com/css2?family=Archivo+Black&family=Poppins:wght@400;500;700;800&display=swap",
-        },
+        // Las fuentes se cargan una sola vez en __root.tsx (ver comentario ahí).
         ...seoLinksHuOnly("/faq"),
       ],
     };
@@ -40,7 +35,7 @@ export const Route = createFileRoute("/faq")({
 });
 
 const TITLE_STYLE = {
-  fontFamily: "'Archivo Black', var(--font-display)",
+  fontFamily: "'Anton', var(--font-display)",
   letterSpacing: "-0.02em",
   lineHeight: 0.85,
 } as const;

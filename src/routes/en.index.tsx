@@ -17,12 +17,7 @@ export const Route = createFileRoute("/en/")({
         { property: "og:locale", content: "en_GB" },
       ],
       links: [
-        { rel: "preconnect", href: "https://fonts.googleapis.com" },
-        { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
-        {
-          rel: "stylesheet",
-          href: "https://fonts.googleapis.com/css2?family=Archivo+Black&family=Danfo&family=Nosifer&family=ADLaM+Display&family=Poppins:wght@400;500;700;800&display=swap",
-        },
+        // Las fuentes se cargan una sola vez en __root.tsx (ver comentario ahí).
         ...seoLinks("/", "en"),
       ],
       scripts: [jsonLd(faqSchema(t.faq.items, "en"))],

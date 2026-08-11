@@ -54,12 +54,7 @@ export const Route = createFileRoute("/")({
         { property: "og:type", content: "website" },
       ],
       links: [
-        { rel: "preconnect", href: "https://fonts.googleapis.com" },
-        { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
-        {
-          rel: "stylesheet",
-          href: "https://fonts.googleapis.com/css2?family=Anton&family=Bungee&family=Archivo+Black&family=Danfo&family=Nosifer&family=ADLaM+Display&family=Poppins:wght@400;500;700;800&display=swap",
-        },
+        // Las fuentes se cargan una sola vez en __root.tsx (ver comentario ahí).
         // `/` es la versión húngara para crawlers y el x-default.
         ...seoLinks("/", lang),
       ],
