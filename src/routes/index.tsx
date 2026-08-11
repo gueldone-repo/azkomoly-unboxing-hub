@@ -25,7 +25,7 @@ import { Marquee } from "@/components/ui/marquee";
 import { fetchProducts, type ShopifyProduct } from "@/lib/shopify/client";
 import { useT, useI18n, readLangCookie } from "@/lib/i18n";
 import { DICTIONARIES } from "@/lib/i18n/dictionary";
-import { seoLinks, jsonLd, faqSchema } from "@/lib/seo";
+import { seoLinks } from "@/lib/seo";
 
 import {
   Dialog,
@@ -58,10 +58,7 @@ export const Route = createFileRoute("/")({
         // `/` es la versión húngara para crawlers y el x-default.
         ...seoLinks("/", lang),
       ],
-      // El FAQ ya existe en el diccionario (7 pares Q/A en hu y en). Exponerlo
-      // como FAQPage es la pieza de mayor impacto para que los motores
-      // generativos citen respuestas de AZKOMOLY textualmente.
-      scripts: [jsonLd(faqSchema(t.faq.items, lang))],
+      // El FAQ (y su schema FAQPage) se mudó a /faq — ver faq.tsx.
     };
   },
   component: Landing,
@@ -139,7 +136,6 @@ export function Landing() {
       <HowItWorks />
       <BigCTA onCta={() => setOpen(true)} />
       <ClosingScrollFloat />
-      <FAQSection />
 
       <Footer />
 
@@ -256,23 +252,37 @@ function TopNav({ onCta }: { onCta: () => void }) {
   );
 }
 
-function getSecondsToMidnight(now = new Date()) {
-  const next = new Date(now);
-  next.setHours(24, 0, 0, 0);
-  return Math.max(0, Math.floor((next.getTime() - now.getTime()) / 1000));
+// Cuenta 5 minutos reales (por ahora — pendiente definir con Diego qué pasa
+// al llegar a 0 y el código de descuento de Shopify para quien compre a
+// tiempo). Guardado en sessionStorage para que sea honesto: si el usuario
+// refresca, sigue contando desde donde iba, no se reinicia.
+const URGENCY_DURATION_SECONDS = 5 * 60;
+const URGENCY_STORAGE_KEY = "azkomoly-urgency-deadline";
+
+function getUrgencyDeadline(): number {
+  if (typeof window === "undefined") return Date.now() + URGENCY_DURATION_SECONDS * 1000;
+  const stored = Number(window.sessionStorage.getItem(URGENCY_STORAGE_KEY));
+  if (stored && stored > Date.now()) return stored;
+  const deadline = Date.now() + URGENCY_DURATION_SECONDS * 1000;
+  window.sessionStorage.setItem(URGENCY_STORAGE_KEY, String(deadline));
+  return deadline;
+}
+
+function getSecondsRemaining(deadline: number) {
+  return Math.max(0, Math.round((deadline - Date.now()) / 1000));
 }
 
 function UrgencyClock() {
   const t = useT();
-  const [remaining, setRemaining] = useState(() => getSecondsToMidnight());
+  const [deadline] = useState(getUrgencyDeadline);
+  const [remaining, setRemaining] = useState(() => getSecondsRemaining(deadline));
 
   useEffect(() => {
-    const timer = window.setInterval(() => setRemaining(getSecondsToMidnight()), 1000);
+    const timer = window.setInterval(() => setRemaining(getSecondsRemaining(deadline)), 1000);
     return () => window.clearInterval(timer);
-  }, []);
+  }, [deadline]);
 
-  const hours = Math.floor(remaining / 3600);
-  const minutes = Math.floor((remaining % 3600) / 60);
+  const minutes = Math.floor(remaining / 60);
   const seconds = remaining % 60;
 
   return (
@@ -282,8 +292,6 @@ function UrgencyClock() {
       <div className="mx-auto flex min-h-11 max-w-7xl items-center justify-center gap-2 px-4 py-2 text-center font-sans text-[11px] font-semibold uppercase tracking-wide sm:text-xs">
         <span className="text-white/78">{t.urgency.prefix}</span>
         <span className="inline-flex items-center gap-1 rounded-sm bg-white px-2 py-1 text-fire">
-          <SlidingNumber value={hours} />
-          <span>:</span>
           <SlidingNumber value={minutes} />
           <span>:</span>
           <SlidingNumber value={seconds} />
@@ -527,25 +535,15 @@ const SOCIAL_REVIEWS: { src: string; href: string; platform: "instagram" | "tikt
 
 function VelocityBand() {
   const t = useT();
+  // Antes eran dos líneas en sentidos opuestos; Diego pidió dejar sólo la
+  // morada con texto blanco, más lenta que antes (-5 → -3).
   return (
-    // Dos líneas en sentidos opuestos, como se pidió: la de arriba en morado
-    // sobre blanco y la de abajo invertida. A 36 pasaba tan rápido que no daba
-    // tiempo a leer; 14 y 11 dejan leerlo sin que parezca parado.
-    <section className="overflow-hidden border-y-2 border-black bg-white">
-      <div className="py-3">
-        <ScrollVelocity
-          text={t.velocity.text}
-          baseVelocity={6}
-          className="font-display text-xl uppercase text-fire sm:text-3xl"
-        />
-      </div>
-      <div className="bg-fire py-3">
-        <ScrollVelocity
-          text={t.velocity.textSecondary}
-          baseVelocity={-5}
-          className="font-display text-xl uppercase text-white sm:text-3xl"
-        />
-      </div>
+    <section className="overflow-hidden border-y-2 border-black bg-fire py-3">
+      <ScrollVelocity
+        text={t.velocity.textSecondary}
+        baseVelocity={-3}
+        className="font-display text-xl uppercase text-white sm:text-3xl"
+      />
     </section>
   );
 }
@@ -1022,58 +1020,6 @@ function ClosingScrollFloat() {
         text={t.closingFloat.text}
         className="mx-auto max-w-5xl font-display text-[clamp(2.4rem,9vw,7.2rem)] leading-[0.9] text-fire"
       />
-    </section>
-  );
-}
-
-function FAQItem({ q, a }: { q: string; a: string }) {
-  const [open, setOpen] = useState(false);
-  return (
-    <div className={`border ${open ? "border-fire/60 bg-fire/5" : "border-cardboard/30 bg-dark-bg"} transition-all duration-300`}>
-      <button
-        className="w-full flex items-center justify-between p-5 text-left gap-4"
-        onClick={() => setOpen(!open)}
-      >
-        <span className="font-display text-lg text-foreground">{q}</span>
-        <span
-          className="shrink-0 font-display text-2xl text-fire transition-transform duration-300"
-          style={{ transform: open ? "rotate(45deg)" : "rotate(0deg)" }}
-        >
-          +
-        </span>
-      </button>
-      <div
-        style={{
-          maxHeight: open ? "600px" : "0",
-          overflow: "hidden",
-          transition: "max-height 0.4s ease-in-out",
-        }}
-      >
-        <p className="px-5 pb-5 font-sans text-sm text-foreground/75 leading-relaxed">{a}</p>
-      </div>
-    </div>
-  );
-}
-
-function FAQSection() {
-  const t = useT();
-  return (
-    <section id="gyik" className="bg-background">
-      <div className="mx-auto max-w-3xl px-6 py-24">
-        <div data-reveal className="text-center mb-12">
-          <p className="font-sans text-xs tracking-[0.4em] text-fire mb-3">
-            {t.faq.kicker}
-          </p>
-          <h2 className="font-display text-4xl sm:text-5xl text-fire">
-            {t.faq.heading}
-          </h2>
-        </div>
-        <div className="space-y-2" data-reveal data-delay="1">
-          {t.faq.items.map((f) => (
-            <FAQItem key={f.q} q={f.q} a={f.a} />
-          ))}
-        </div>
-      </div>
     </section>
   );
 }

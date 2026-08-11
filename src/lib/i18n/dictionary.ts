@@ -269,8 +269,8 @@ const hu: Dict = {
     secs: "MP",
   },
   urgency: {
-    prefix: "Ma rendelsz, holnap indulhat",
-    suffix: "éjfélig",
+    prefix: "Villámajánlat lejár:",
+    suffix: "",
   },
   introVideo: {
     title: "Kattints, ha ugranál",
@@ -533,8 +533,8 @@ const en: Dict = {
     secs: "SEC",
   },
   urgency: {
-    prefix: "Order today, it can ship tomorrow",
-    suffix: "until midnight",
+    prefix: "Flash offer ends in:",
+    suffix: "",
   },
   introVideo: {
     title: "Click if you want to skip",

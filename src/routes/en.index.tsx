@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Landing } from "./index";
 import { DICTIONARIES } from "@/lib/i18n/dictionary";
-import { seoLinks, jsonLd, faqSchema } from "@/lib/seo";
+import { seoLinks } from "@/lib/seo";
 
 /** `/en` — misma landing, metadata y contenido forzados a inglés. */
 export const Route = createFileRoute("/en/")({
@@ -20,7 +20,7 @@ export const Route = createFileRoute("/en/")({
         // Las fuentes se cargan una sola vez en __root.tsx (ver comentario ahí).
         ...seoLinks("/", "en"),
       ],
-      scripts: [jsonLd(faqSchema(t.faq.items, "en"))],
+      // El FAQ (y su schema FAQPage) se mudó a /faq — ver faq.tsx.
     };
   },
   component: Landing,

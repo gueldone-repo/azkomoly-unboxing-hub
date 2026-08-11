@@ -3,7 +3,8 @@ import { useState, type FormEvent } from "react";
 import { Instagram, Facebook, Youtube } from "lucide-react";
 import { DripDivider } from "@/components/DripDivider";
 import { useT } from "@/lib/i18n";
-import { seoLinksHuOnly } from "@/lib/seo";
+import { DICTIONARIES } from "@/lib/i18n/dictionary";
+import { seoLinksHuOnly, jsonLd, faqSchema } from "@/lib/seo";
 import logoAsset from "@/assets/azkomoly-logo.png.asset.json";
 
 export const Route = createFileRoute("/faq")({
@@ -29,6 +30,9 @@ export const Route = createFileRoute("/faq")({
         // Las fuentes se cargan una sola vez en __root.tsx (ver comentario ahí).
         ...seoLinksHuOnly("/faq"),
       ],
+      // El FAQ real (7 pares Q/A del diccionario) vivía como schema en la
+      // landing; se mudó acá con el contenido visible.
+      scripts: [jsonLd(faqSchema(DICTIONARIES.hu.faq.items, "hu"))],
     };
   },
   component: FaqPage,
@@ -41,43 +45,6 @@ const TITLE_STYLE = {
 } as const;
 
 const CONTACT_EMAIL = "azkomoly.hu@gmail.com";
-
-const FAQ_CATEGORIES: { title: string; items: { q: string; a: string }[] }[] = [
-  {
-    title: "Szállítás és határidők",
-    items: [
-      { q: "Mennyi idő alatt érkezik meg a rendelésem?", a: "[Placeholder — szállítási idő napokban, futárszolgálat neve.]" },
-      { q: "Mennyibe kerül a szállítás?", a: "[Placeholder — szállítási díj / ingyenes szállítás értékhatára.]" },
-      { q: "Külföldre is szállítotok?", a: "[Placeholder — mely országokba szállítunk.]" },
-      { q: "Hogyan tudom követni a csomagomat?", a: "[Placeholder — tracking információ.]" },
-    ],
-  },
-  {
-    title: "Hogyan működik a mystery box",
-    items: [
-      { q: "Mi van a dobozban?", a: "[Placeholder — meglepetés tartalom leírása.]" },
-      { q: "Kiválaszthatom a méretet?", a: "[Placeholder — méretválasztás működése.]" },
-      { q: "Eredetiek a termékek?", a: "Igen — minden termékünk eredeti termék. [Placeholder — rövid kiegészítés.]" },
-      { q: "Mennyi a doboz értéke?", a: "[Placeholder — érték/ár arány magyarázata.]" },
-    ],
-  },
-  {
-    title: "Visszaküldés és csere",
-    items: [
-      { q: "Visszaküldhetem a dobozt?", a: "[Placeholder — elállási jog és feltételek.]" },
-      { q: "Mi van, ha sérült a csomag?", a: "[Placeholder — sérült csomag ügymenet.]" },
-      { q: "Lehet méretet cserélni?", a: "[Placeholder — csere feltételei.]" },
-    ],
-  },
-  {
-    title: "Fizetés",
-    items: [
-      { q: "Milyen fizetési módokat fogadtok el?", a: "[Placeholder — kártya, utánvét stb.]" },
-      { q: "Biztonságos a fizetés?", a: "[Placeholder — fizetési szolgáltató és biztonság.]" },
-      { q: "Kapok számlát?", a: "[Placeholder — számlázás menete.]" },
-    ],
-  },
-];
 
 function TikTokIcon({ className }: { className?: string }) {
   return (
@@ -163,23 +130,14 @@ function FAQItem({ q, a }: { q: string; a: string }) {
 }
 
 function FaqAccordion() {
+  // Tal cual salió de la home (mismos 7 pares Q/A del diccionario) —
+  // pendiente de rediseñar/categorizar en una próxima sesión.
+  const t = useT();
   return (
     <section className="bg-background px-6 pb-16">
-      <div className="mx-auto max-w-3xl flex flex-col gap-10">
-        {FAQ_CATEGORIES.map((cat) => (
-          <div key={cat.title} className="flex flex-col gap-3">
-            <h2
-              className="text-fire text-3d-fire text-[clamp(1.5rem,6vw,2.5rem)] uppercase"
-              style={TITLE_STYLE}
-            >
-              {cat.title}
-            </h2>
-            <div className="space-y-2">
-              {cat.items.map((f) => (
-                <FAQItem key={f.q} q={f.q} a={f.a} />
-              ))}
-            </div>
-          </div>
+      <div className="mx-auto max-w-3xl flex flex-col gap-2">
+        {t.faq.items.map((f) => (
+          <FAQItem key={f.q} q={f.q} a={f.a} />
         ))}
       </div>
     </section>
