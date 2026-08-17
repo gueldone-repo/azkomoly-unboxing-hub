@@ -6,7 +6,6 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { SiteNav } from "@/components/nav/SiteNav";
 import { SocialProofMarquee } from "@/components/SocialProofMarquee";
 import { seoLinksHuOnly } from "@/lib/seo";
-import logoAsset from "@/assets/azkomoly-logo.png.asset.json";
 
 export const Route = createFileRoute("/about")({
   head: () => {
@@ -79,10 +78,9 @@ function AboutHero() {
     <section className="bg-background px-6 pt-14 pb-12 sm:pt-20 sm:pb-16 flex flex-col items-center text-center gap-6">
       <Link to="/" aria-label="AZKOMOLY">
         <img
-          src={logoAsset.url}
+          src="/azkomoly_new_logo.webp"
           alt="AZKOMOLY logó"
           className="h-24 sm:h-32 w-auto"
-          style={{ filter: "brightness(0)" }}
         />
       </Link>
       <h1
@@ -180,11 +178,10 @@ function FollowUs() {
       <DripDivider variant="organic" mainColor="#FFFFFF" bgColor="#5B2EA8" shadowColor="#0D0D0D" depth={4} height={34} />
       <section className="bg-fire px-6 py-14 sm:py-20 flex flex-col items-center text-center gap-6">
         <img
-          src={logoAsset.url}
+          src="/azkomoly_new_logo_negativo.webp"
           alt=""
           aria-hidden
           className="h-16 w-auto"
-          style={{ filter: "brightness(0) invert(1)" }}
         />
         <h2
           className="text-white text-3d-fire text-[clamp(2rem,9vw,4rem)] uppercase"

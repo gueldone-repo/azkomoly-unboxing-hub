@@ -7,7 +7,6 @@ import { SiteNav } from "@/components/nav/SiteNav";
 import { useT } from "@/lib/i18n";
 import { DICTIONARIES } from "@/lib/i18n/dictionary";
 import { seoLinksHuOnly, jsonLd, faqSchema } from "@/lib/seo";
-import logoAsset from "@/assets/azkomoly-logo.png.asset.json";
 
 export const Route = createFileRoute("/faq")({
   head: () => {
@@ -66,10 +65,9 @@ function FaqHero() {
     <section className="bg-background px-6 pt-14 pb-10 sm:pt-20 sm:pb-14 flex flex-col items-center text-center gap-6">
       <Link to="/" aria-label="AZKOMOLY">
         <img
-          src={logoAsset.url}
+          src="/azkomoly_new_logo.webp"
           alt="AZKOMOLY logó"
           className="h-24 sm:h-32 w-auto"
-          style={{ filter: "brightness(0)" }}
         />
       </Link>
       <h1 className="text-fire text-3d-fire text-[clamp(3rem,15vw,7rem)] uppercase" style={TITLE_STYLE}>
