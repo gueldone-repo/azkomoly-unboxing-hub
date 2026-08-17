@@ -9,6 +9,7 @@ import { getUrgencyDeadline } from "@/lib/urgency.functions";
 import { ShieldCheck, Truck, Sparkles, Menu, X, MousePointer2, ChevronLeft, ChevronRight } from "lucide-react";
 import { CookieBanner } from "@/components/CookieBanner";
 import { IntroVideoModal } from "@/components/IntroVideoModal";
+import { SiteFooter } from "@/components/SiteFooter";
 
 import { HeroV2 } from "@/components/HeroV2";
 import { DiscountWidget } from "@/components/DiscountWidget";
@@ -138,7 +139,7 @@ export function Landing() {
       <BigCTA onCta={() => setOpen(true)} />
       <ClosingScrollFloat />
 
-      <Footer />
+      <SiteFooter />
 
       <SignupDialog open={open} onOpenChange={setOpen} />
       {/* Reusa el mismo SignupDialog de arriba: el widget es sólo el anzuelo. */}
@@ -153,6 +154,7 @@ export function Landing() {
 
 function TopNav({ onCta }: { onCta: () => void }) {
   const t = useT();
+  const { lang } = useI18n();
   const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
@@ -176,6 +178,9 @@ function TopNav({ onCta }: { onCta: () => void }) {
     { href: "#velemenyek", label: t.nav.reviews },
     { href: "/about", label: t.nav.about },
     { href: "/faq", label: t.nav.faq },
+    // A diferencia de About/FAQ (sólo húngaro por ahora), el blog sí tiene
+    // versión /en propia — enlazamos a la correcta según el idioma activo.
+    { href: lang === "hu" ? "/blog" : "/en/blog", label: t.nav.blog },
   ];
 
   return (
@@ -329,10 +334,14 @@ function BrandWave() {
     // mantiene y nunca recorta.
     <div aria-hidden="true" className="relative w-full overflow-hidden h-[14vw] min-h-[104px]">
       <div className="absolute inset-x-0 top-1/2 -translate-y-1/2">
+        {/* Pedido de Diego: mismo patrón/forma, pero quieta y con el dominio
+            en vez del nombre suelto — `speed={0}` ya hace que TextLoop no
+            arme el tween de GSAP (ver TextLoop.tsx), no hace falta tocar el
+            componente. */}
         <TextLoop
-          text="Azkomoly"
+          text="azkomoly.hu"
           shape="wave"
-          speed={90}
+          speed={0}
           direction="reverse"
           separator="✦"
           /* Onda más baja y cinta más fina: juntas ocupan ~26% del alto del
@@ -609,7 +618,9 @@ function SocialProofMarquee() {
             {t.socialProof.sub}
           </p>
         </div>
-        <div className="relative h-[520px] overflow-hidden [perspective:900px]">
+        {/* Altura fija: en mobile `520px` casi llenaba la pantalla entera —
+            achicada ahí, vuelve al tamaño original desde `sm`. */}
+        <div className="relative h-[360px] sm:h-[520px] overflow-hidden [perspective:900px]">
           <div className="absolute inset-x-0 top-0 z-10 h-24 bg-gradient-to-b from-white to-transparent" />
           <div className="absolute inset-x-0 bottom-0 z-10 h-24 bg-gradient-to-t from-white to-transparent" />
           <div className="grid h-full grid-cols-3 gap-3 [transform:rotateX(10deg)_rotateZ(-4deg)_scale(1.03)] sm:gap-5">
@@ -1031,7 +1042,9 @@ function BigCTA({ onCta }: { onCta: () => void }) {
         <p className="font-display text-primary-foreground text-base sm:text-lg tracking-[0.4em] mb-4 [text-shadow:0_2px_6px_rgba(0,0,0,0.6)]">
           {t.bigCta.kicker}
         </p>
-        <h2 className="font-display text-5xl sm:text-7xl lg:text-8xl text-primary-foreground text-stroke-black leading-[0.9]">
+        {/* `clamp()` en vez de saltos fijos por breakpoint: en 320px el heading
+            de dos líneas se apretaba contra el padding lateral. */}
+        <h2 className="font-display text-[clamp(2.25rem,10vw,6rem)] text-primary-foreground text-stroke-black leading-[0.9]">
           {lines.map((line, i) => (
             <span key={i}>
               {line}
@@ -1118,80 +1131,6 @@ function LegacyFooter() {
         <p className="font-sans text-xs text-white/70">
           © 2026 <span className="font-display text-white">AZKOMOLY</span> · {t.footer.rights}
         </p>
-      </footer>
-    </div>
-  );
-}
-
-function Footer() {
-  const t = useT();
-  const links = [
-    { to: "/about", label: t.footer.about },
-    { to: "/faq", label: t.footer.faq },
-    { to: "/privacy", label: t.footer.privacy },
-    { to: "/terms", label: t.footer.terms },
-    { to: "/cookies", label: t.footer.cookies },
-  ] as const;
-  const TapeCorner = ({ className }: { className: string }) => (
-    <svg viewBox="0 0 92 46" aria-hidden="true" className={className}>
-      <path d="M4 12 88 2 82 34 0 44Z" fill="#222222" opacity="0.96" />
-      <path d="M15 13 22 38M42 8 49 35M69 5 75 30" stroke="#3A3A3A" strokeWidth="3" />
-    </svg>
-  );
-
-  return (
-    <div className="relative bg-fire px-4 py-12 sm:px-6 sm:py-16">
-      <footer
-        id="kapcsolat"
-        className="relative mx-auto max-w-6xl rounded-md border-2 border-black bg-white px-5 py-10 text-black shadow-[12px_12px_0_#0D0D0D] sm:px-10"
-      >
-        <TapeCorner className="absolute -left-5 -top-4 h-12 w-24 -rotate-12" />
-        <TapeCorner className="absolute -right-5 -top-4 h-12 w-24 rotate-12" />
-        <TapeCorner className="absolute -bottom-4 -left-5 h-12 w-24 rotate-12" />
-        <TapeCorner className="absolute -bottom-4 -right-5 h-12 w-24 -rotate-12" />
-
-        <div className="grid gap-8 md:grid-cols-[1fr_1.2fr] md:items-end">
-          <div>
-            <img src="/azkomoly_new_logo.webp" alt="AZKOMOLY" className="h-12 w-auto" />
-            <p className="mt-5 max-w-sm font-sans text-sm leading-relaxed text-black/68">
-              {t.footer.tagline}
-            </p>
-            <div className="mt-5 flex flex-wrap gap-3">
-              {SOCIAL_LINKS.map((s) => (
-                <a
-                  key={s.key}
-                  href={s.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={s.label}
-                  className="grid h-11 w-11 place-items-center rounded-full border-2 border-black bg-white transition-all hover:-translate-y-0.5 hover:bg-fire hover:text-white"
-                  style={{ color: s.brand }}
-                >
-                  <SocialGlyph path={s.path} className="h-5 w-5" />
-                </a>
-              ))}
-            </div>
-          </div>
-
-          <div className="md:text-right">
-            <nav className="mb-5 flex flex-wrap gap-x-4 gap-y-2 font-sans text-sm font-bold uppercase tracking-wide md:justify-end">
-              <a href="#termekek" className="hover:text-fire">{t.footer.products}</a>
-              {links.map((link) => (
-                <Link key={link.to} to={link.to} className="hover:text-fire">
-                  {link.label}
-                </Link>
-              ))}
-            </nav>
-            <p className="font-sans text-xs leading-relaxed text-black/62">
-              <strong className="text-black">Oscar Investments Kft.</strong><br />
-              {t.footer.taxNumber}: 32331486-2-09<br />
-              {t.footer.companyNumber}: 09 09 036321
-            </p>
-            <p className="mt-4 font-sans text-xs text-black/54">
-              © 2026 AZKOMOLY. {t.footer.rights}
-            </p>
-          </div>
-        </div>
       </footer>
     </div>
   );
@@ -1286,7 +1225,7 @@ function SignupDialog({
               onChange={(e) => setName(e.target.value)}
               maxLength={120}
               placeholder={t.signup.namePlaceholder}
-              className="w-full bg-background border-2 border-cardboard/60 focus:border-fire text-foreground px-4 py-3 text-base font-sans focus:outline-none transition-colors"
+              className="w-full rounded-2xl bg-background border-2 border-cardboard/40 focus:border-fire text-foreground px-4 py-3 text-base font-sans focus:outline-none focus:ring-2 focus:ring-fire/25 transition-colors"
             />
           </div>
 
@@ -1300,7 +1239,7 @@ function SignupDialog({
               onChange={(e) => setEmail(e.target.value)}
               maxLength={255}
               placeholder="te@email.hu"
-              className="w-full bg-background border-2 border-cardboard/60 focus:border-fire text-foreground px-4 py-3 text-base font-sans focus:outline-none transition-colors"
+              className="w-full rounded-2xl bg-background border-2 border-cardboard/40 focus:border-fire text-foreground px-4 py-3 text-base font-sans focus:outline-none focus:ring-2 focus:ring-fire/25 transition-colors"
             />
           </div>
 
@@ -1308,12 +1247,14 @@ function SignupDialog({
             <label htmlFor="phone" className="block font-sans text-sm text-foreground mb-1">
               {t.signup.phone} <span className="text-muted-foreground">{t.signup.optional}</span>
             </label>
-            <div className="flex gap-2">
+            {/* Antes era una fila apretada de dos cajas rectas pegadas — ahora
+                separadas (`gap-2.5`) y redondeadas como el resto del form. */}
+            <div className="flex gap-2.5">
               <Select value={countryCode} onValueChange={setCountryCode}>
-                <SelectTrigger className="w-[110px] sm:w-[130px] shrink-0 bg-background border-2 border-cardboard/60 text-foreground font-sans py-3 px-3 text-base min-h-[52px]">
+                <SelectTrigger className="w-[110px] sm:w-[130px] shrink-0 rounded-2xl bg-background border-2 border-cardboard/40 text-foreground font-sans py-3 px-3 text-base min-h-[52px] focus:ring-2 focus:ring-fire/25">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent className="bg-dark-bg border-cardboard/60 text-foreground max-h-72 min-w-[180px]">
+                <SelectContent className="bg-dark-bg border-cardboard/60 text-foreground max-h-72 min-w-[180px] rounded-2xl">
                   {COUNTRY_CODES.map((c) => (
                     <SelectItem key={c.code} value={c.code} className="font-sans text-base">
                       <span className="mr-2">{c.flag}</span>
@@ -1329,7 +1270,7 @@ function SignupDialog({
                 onChange={(e) => setPhone(e.target.value)}
                 maxLength={32}
                 placeholder={t.signup.phonePlaceholder}
-                className="flex-1 min-w-0 bg-background border-2 border-cardboard/60 focus:border-fire text-foreground px-4 py-3 text-base font-sans focus:outline-none transition-colors min-h-[52px]"
+                className="flex-1 min-w-0 rounded-2xl bg-background border-2 border-cardboard/40 focus:border-fire text-foreground px-4 py-3 text-base font-sans focus:outline-none focus:ring-2 focus:ring-fire/25 transition-colors min-h-[52px]"
               />
             </div>
           </div>

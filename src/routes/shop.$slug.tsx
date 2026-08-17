@@ -6,6 +6,7 @@ import { DICTIONARIES, type Lang } from "@/lib/i18n/dictionary";
 import { fetchProductByHandle, formatShopifyPrice, type ShopifyProduct } from "@/lib/shopify/client";
 import { useShopifyCart } from "@/lib/shopify/cart-store";
 import { CartButton } from "@/components/cart/CartSheet";
+import { SiteBreadcrumb } from "@/components/SiteBreadcrumb";
 import { seoLinks, canonicalUrl, jsonLd, productSchema, breadcrumbSchema } from "@/lib/seo";
 
 export const Route = createFileRoute("/shop/$slug")({
@@ -154,7 +155,10 @@ export function ProductPage({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [product]);
 
-  const image = product.images.edges[0]?.node;
+  const images = product.images.edges.map((e: { node: { url: string; altText: string | null } }) => e.node);
+  const [activeImageIdx, setActiveImageIdx] = useState(0);
+  useEffect(() => setActiveImageIdx(0), [product]);
+  const image = images[activeImageIdx] ?? images[0];
   const available = selectedVariant?.availableForSale ?? false;
   const hasVariants = variants.length > 1 || (variants[0]?.title !== "Default Title");
 
@@ -184,26 +188,54 @@ export function ProductPage({
         </Link>
         <CartButton />
       </div>
+      {/* Mismos 2 niveles que `breadcrumbSchema` (JSON-LD) más abajo — sin
+          apuntar al ancla #termekek, que TanStack Link no resuelve como ruta. */}
+      <SiteBreadcrumb
+        trail={[
+          { name: "AZKOMOLY", path: lang === "hu" ? "/" : "/en" },
+          { name: product.title },
+        ]}
+      />
 
       <div className="mx-auto max-w-7xl px-6 pb-20 grid lg:grid-cols-2 gap-10">
         {/* Visual */}
-        <div className="relative aspect-square bg-dark-bg overflow-hidden border-2 border-cardboard/40">
-          {image ? (
-            <img
-              src={image.url}
-              alt={image.altText ?? product.title}
-              className="w-full h-full object-cover"
-            />
-          ) : (
-            <div className="w-full h-full grid place-items-center">
-              <span className="font-display text-fire text-8xl text-fire-glow text-stroke-black select-none">?</span>
+        <div>
+          <div className="relative aspect-square rounded-2xl bg-dark-bg overflow-hidden border-2 border-cardboard/40 shadow-[8px_8px_0_0_#0D0D0D]">
+            {image ? (
+              <img
+                src={image.url}
+                alt={image.altText ?? product.title}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <div className="w-full h-full grid place-items-center">
+                <span className="font-display text-fire text-8xl text-fire-glow text-stroke-black select-none">?</span>
+              </div>
+            )}
+          </div>
+          {/* Galería: antes sólo se mostraba la primera foto (`images.edges[0]`)
+              aunque Shopify trajera más. */}
+          {images.length > 1 && (
+            <div className="mt-3 flex gap-2 overflow-x-auto scrollbar-none">
+              {images.map((img: { url: string; altText: string | null }, i: number) => (
+                <button
+                  key={img.url}
+                  onClick={() => setActiveImageIdx(i)}
+                  aria-label={`${product.title} — ${i + 1}`}
+                  className={`shrink-0 h-16 w-16 rounded-xl overflow-hidden border-2 transition-colors ${
+                    i === activeImageIdx ? "border-fire" : "border-cardboard/40 hover:border-cardboard/70"
+                  }`}
+                >
+                  <img src={img.url} alt="" className="w-full h-full object-cover" />
+                </button>
+              ))}
             </div>
           )}
         </div>
 
         {/* Info */}
         <div>
-          <h1 className="font-display text-5xl sm:text-6xl text-foreground mt-2 leading-none">{product.title}</h1>
+          <h1 className="font-display text-fire text-3d-fire text-5xl sm:text-6xl mt-2 leading-none">{product.title}</h1>
           <div className="flex items-baseline gap-3 mt-5">
             <span className="font-display text-4xl text-fire">
               {selectedVariant
@@ -227,7 +259,7 @@ export function ProductPage({
                     key={v.id}
                     onClick={() => setSelectedVariant(v)}
                     disabled={!v.availableForSale}
-                    className={`h-12 min-w-12 px-3 font-display text-lg border-2 transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${
+                    className={`h-12 min-w-12 px-3 rounded-xl font-display text-lg border-2 transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${
                       selectedVariant?.id === v.id
                         ? "bg-fire text-primary-foreground border-fire"
                         : "border-cardboard/60 text-foreground hover:border-fire"
@@ -242,7 +274,7 @@ export function ProductPage({
 
           {/* Qty + Add */}
           <div className="mt-6 flex gap-3 items-stretch">
-            <div className="flex items-center border-2 border-cardboard/60">
+            <div className="flex items-center rounded-2xl border-2 border-cardboard/60 overflow-hidden">
               <button onClick={() => setQty(Math.max(1, qty - 1))} className="h-14 w-12 font-display text-2xl text-fire">−</button>
               <span className="h-14 w-12 grid place-items-center font-display text-xl">{qty}</span>
               <button onClick={() => setQty(qty + 1)} className="h-14 w-12 font-display text-2xl text-fire">+</button>
@@ -258,23 +290,25 @@ export function ProductPage({
             </button>
           </div>
 
+          {/* Antes era el único CTA de la página sin relieve 3D. */}
           <button
             onClick={handleBuyNow}
             disabled={!available || isLoading}
-            className="mt-3 w-full bg-dark-bg border-2 border-foreground/80 text-foreground font-display text-lg py-3 hover:bg-foreground hover:text-dark-bg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="btn-3d mt-3 w-full bg-dark-bg text-foreground font-display text-lg py-3 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {t.product.buyNow}
           </button>
 
-          {/* Trust */}
+          {/* Trust — antes íconos sueltos sin tarjeta; ahora con la misma
+              sombra dura que ya usan `ReviewCard`/`Footer` en el resto del sitio. */}
           <div className="mt-8 grid grid-cols-3 gap-3 text-center font-sans text-xs text-foreground/70">
-            <div className="flex flex-col items-center gap-1">
+            <div className="flex flex-col items-center gap-1.5 rounded-2xl border-2 border-cardboard/30 bg-dark-bg py-4 shadow-[4px_4px_0_0_#0D0D0D]">
               <ShieldCheck className="h-5 w-5 text-fire" /> {t.product.trustBranded}
             </div>
-            <div className="flex flex-col items-center gap-1">
+            <div className="flex flex-col items-center gap-1.5 rounded-2xl border-2 border-cardboard/30 bg-dark-bg py-4 shadow-[4px_4px_0_0_#0D0D0D]">
               <Truck className="h-5 w-5 text-fire" /> {t.product.trustShipping}
             </div>
-            <div className="flex flex-col items-center gap-1">
+            <div className="flex flex-col items-center gap-1.5 rounded-2xl border-2 border-cardboard/30 bg-dark-bg py-4 shadow-[4px_4px_0_0_#0D0D0D]">
               <Sparkles className="h-5 w-5 text-fire" /> {t.product.trustValue}
             </div>
           </div>

@@ -156,6 +156,32 @@ export function productSchema(p: ProductSchemaInput, lang: Lang = "hu") {
   };
 }
 
+export type BlogPostingInput = {
+  slug: string;
+  title: string;
+  excerpt: string;
+  image?: string;
+  publishedAt: string;
+};
+
+/** BlogPosting — para /blog/$slug. Le da a Google (y a los LLMs) fecha, autor y resumen del post. */
+export function blogPostingSchema(p: BlogPostingInput, lang: Lang = "hu") {
+  const url = canonicalUrl(`/blog/${p.slug}`, lang);
+  return {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    headline: p.title,
+    description: p.excerpt,
+    image: p.image || OG_IMAGE,
+    url,
+    datePublished: p.publishedAt,
+    inLanguage: lang,
+    author: { "@id": ORG_ID },
+    publisher: { "@id": ORG_ID },
+    mainEntityOfPage: url,
+  };
+}
+
 /** BreadcrumbList — ayuda a Google a entender la jerarquía del sitio. */
 export function breadcrumbSchema(
   trail: { name: string; path: string }[],

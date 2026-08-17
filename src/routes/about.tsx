@@ -1,7 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Instagram, Facebook, Youtube } from "lucide-react";
 import { DripDivider } from "@/components/DripDivider";
-import { useT } from "@/lib/i18n";
+import { SiteBreadcrumb } from "@/components/SiteBreadcrumb";
+import { SiteFooter } from "@/components/SiteFooter";
 import { seoLinksHuOnly } from "@/lib/seo";
 import logoAsset from "@/assets/azkomoly-logo.png.asset.json";
 
@@ -57,11 +58,12 @@ const SOCIALS = [
 function AboutPage() {
   return (
     <main className="bg-background">
+      <SiteBreadcrumb trail={[{ name: "AZKOMOLY", path: "/" }, { name: "About Us" }]} />
       <AboutHero />
       <OurGoal />
       <WhoWeAre />
       <FollowUs />
-      <Footer />
+      <SiteFooter productsHref="/#termekek" />
     </main>
   );
 }
@@ -84,7 +86,7 @@ function AboutHero() {
         About Us
       </h1>
       <p className="font-sans text-sm sm:text-base text-foreground/70 max-w-md">
-        [Placeholder: rövid bevezető mondat a márkáról — 1–2 sor.]
+        100% magyar mystery box csapat. Eredeti termékek, valódi meglepetés — semmi extra.
       </p>
     </section>
   );
@@ -106,12 +108,14 @@ function OurGoal() {
             Our Goal
           </h2>
           <p className="font-sans text-white/90 text-base sm:text-lg leading-relaxed">
-            [Placeholder — manifiesto: miért létezik az AZKOMOLY. 2–3 mondat arról, hogy a
-            célunk meglepetés-élményt adni, nem csak terméket eladni.]
+            Az AZKOMOLY azért létezik, mert hiszünk abban, hogy a vásárlás lehet izgalmas is,
+            nem csak praktikus. Minden doboz egy kis kockázat és egy nagy meglepetés — te
+            választod a tétet, mi garantáljuk az értéket.
           </p>
           <p className="font-sans text-white/80 text-sm sm:text-base leading-relaxed">
-            [Placeholder — második bekezdés: milyen érzést akarunk adni minden doboz
-            kinyitásakor.]
+            Nem akarunk még egy webshopot, ahol pontosan tudod, mi érkezik. Azt akarjuk,
+            hogy amikor kibontod a dobozod, tényleg érezd azt a pillanatot — mintha ajándékot
+            kapnál magadtól.
           </p>
         </div>
       </section>
@@ -136,7 +140,11 @@ function WhoWeAre() {
             <strong>eredeti termék</strong>.
           </p>
           <p className="font-sans text-foreground/80 text-base leading-relaxed">
-            [Placeholder — a projekt története: hogyan indult, kik vagyunk, mi hajt minket.]
+            Az AZKOMOLY egy maroknyi magyar csapat ötletéből indult, akiket idegesített, hogy
+            a legtöbb webshopban semmi meglepetés nincs a vásárlásban. Elkezdtünk liquidation
+            és túlkészletezett tételekből válogatni, és mystery boxokba rendezni őket — így
+            minden doboz garantáltan minőségi, eredeti terméket tartalmaz, de sosem tudod
+            pontosan, mit kapsz.
           </p>
           <div className="flex flex-wrap gap-3 justify-center sm:justify-start pt-2">
             <span className="rounded-full bg-fire text-white font-sans text-sm px-5 py-2 btn-drip">
@@ -151,7 +159,7 @@ function WhoWeAre() {
               to="/"
               className="rounded-full bg-fire text-white font-sans font-semibold tracking-wide uppercase px-7 py-3 btn-drip"
             >
-              [Placeholder CTA] — Vissza a boltba
+              Nézd meg a dobozainkat
             </Link>
           </div>
         </div>
@@ -179,7 +187,7 @@ function FollowUs() {
           Follow Us
         </h2>
         <p className="font-sans text-white/85 max-w-md text-sm sm:text-base">
-          [Placeholder — invitación a seguir la comunidad en redes.]
+          Kövesd az AZKOMOLY-t a közösségi médiában — minden unboxingot ott osztunk meg elsőként.
         </p>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 w-full max-w-xl pt-2">
           {SOCIALS.map(({ label, href, Icon }) => (
@@ -201,20 +209,3 @@ function FollowUs() {
   );
 }
 
-function Footer() {
-  const t = useT();
-  return (
-    <footer className="bg-fire px-6 pt-6 pb-12 flex flex-col items-center gap-4">
-      <nav className="flex flex-wrap gap-x-4 gap-y-1 justify-center font-sans text-xs text-white/70">
-        <Link to="/privacy" className="hover:text-white">{t.footer.privacy}</Link>
-        <span>·</span>
-        <Link to="/terms" className="hover:text-white">{t.footer.terms}</Link>
-        <span>·</span>
-        <Link to="/cookies" className="hover:text-white">{t.footer.cookies}</Link>
-      </nav>
-      <p className="font-sans text-xs text-white/70">
-        © 2026 <span className="font-display text-white">AZKOMOLY</span> · {t.footer.rights}
-      </p>
-    </footer>
-  );
-}

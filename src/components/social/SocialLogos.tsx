@@ -103,14 +103,19 @@ export function SocialRow({
 }
 
 const RAIL_HIDE_DELAY = 900;
+/** En touch no hay `mouseleave` que dispare el cierre — se cierra solo tras
+ *  este tiempo desde que se abrió, dando lugar a leer/tocar un ícono. */
+const RAIL_HIDE_DELAY_TOUCH = 2600;
 
 /**
  * Columna lateral del hero. Pedido de George: que se pueda seguir a AZKOMOLY
  * de inmediato, sin buscar. Queda pegada al borde izquierdo, fuera del camino
  * del CTA de compra, así no compiten por el mismo clic.
  *
- * Oculta por debajo de lg: en móvil el hero ya va justo de espacio y una
- * columna flotante taparía la caja. Ahí las redes viven en el menú y el footer.
+ * Visible en todos los tamaños (antes `hidden lg:flex`, sólo mostraba en
+ * desktop). En touch el patrón de hover no existe, así que el tap abre la
+ * lengüeta y un timer más largo (`RAIL_HIDE_DELAY_TOUCH`) la cierra sola en
+ * vez de depender de `mouseleave`, que nunca dispara en un dispositivo táctil.
  *
  * Antes quedaba siempre visible tapando contenido durante todo el scroll.
  * Ahora se esconde detrás de una lengüeta — mismo patrón que el dock de
@@ -120,7 +125,16 @@ const RAIL_HIDE_DELAY = 900;
 export function SocialRail() {
   const prefersReducedMotion = useReducedMotion();
   const [visible, setVisible] = useState(false);
+  const [isTouch, setIsTouch] = useState(false);
   const hideTimer = useRef<number | null>(null);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(hover: none)");
+    setIsTouch(mq.matches);
+    const onChange = (e: MediaQueryListEvent) => setIsTouch(e.matches);
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
+  }, []);
 
   const clearHideTimer = useCallback(() => {
     if (hideTimer.current === null) return;
@@ -128,16 +142,26 @@ export function SocialRail() {
     hideTimer.current = null;
   }, []);
 
-  const scheduleHide = useCallback(() => {
-    clearHideTimer();
-    hideTimer.current = window.setTimeout(() => setVisible(false), RAIL_HIDE_DELAY);
-  }, [clearHideTimer]);
+  const scheduleHide = useCallback(
+    (delay = RAIL_HIDE_DELAY) => {
+      clearHideTimer();
+      hideTimer.current = window.setTimeout(() => setVisible(false), delay);
+    },
+    [clearHideTimer],
+  );
 
   useEffect(() => clearHideTimer, [clearHideTimer]);
 
+  // En touch, abrir programa su propio cierre automático (no hay mouseleave).
+  useEffect(() => {
+    if (!isTouch || !visible) return;
+    scheduleHide(RAIL_HIDE_DELAY_TOUCH);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isTouch, visible]);
+
   return (
     <>
-      <div className="hidden lg:flex fixed left-0 top-1/2 z-30 -translate-y-1/2">
+      <div className="flex fixed left-0 top-1/2 z-30 -translate-y-1/2">
         <motion.button
           type="button"
           aria-label="Kövess minket"
@@ -147,30 +171,35 @@ export function SocialRail() {
             setVisible((v) => !v);
           }}
           onMouseEnter={() => {
+            if (isTouch) return;
             clearHideTimer();
             setVisible(true);
           }}
           initial={false}
           animate={{ opacity: visible ? 0 : 1, pointerEvents: visible ? "none" : "auto" }}
           transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.18, ease: "easeOut" }}
-          className="grid h-14 w-6 place-items-center rounded-r-xl border border-l-0 border-black/10 bg-white/92 text-foreground/45 shadow-[6px_0_18px_rgba(13,13,13,0.10)] backdrop-blur transition-colors hover:text-fire"
+          className="grid h-16 w-8 lg:h-14 lg:w-6 place-items-center rounded-r-xl border border-l-0 border-black/10 bg-white/92 text-foreground/45 shadow-[6px_0_18px_rgba(13,13,13,0.10)] backdrop-blur transition-colors hover:text-fire"
         >
           <ChevronRight className="h-4 w-4" strokeWidth={2.5} aria-hidden="true" />
         </motion.button>
       </div>
 
       <div
-        className="hidden lg:flex fixed left-3 top-1/2 z-30 -translate-y-1/2 flex-col items-center gap-1"
+        className="flex fixed left-3 top-1/2 z-30 -translate-y-1/2 flex-col items-center gap-1"
         onMouseEnter={() => {
+          if (isTouch) return;
           clearHideTimer();
           setVisible(true);
         }}
-        onMouseLeave={scheduleHide}
+        onMouseLeave={() => {
+          if (isTouch) return;
+          scheduleHide();
+        }}
         onFocusCapture={() => {
           clearHideTimer();
           setVisible(true);
         }}
-        onBlurCapture={scheduleHide}
+        onBlurCapture={() => scheduleHide()}
       >
         <motion.div
           initial={false}

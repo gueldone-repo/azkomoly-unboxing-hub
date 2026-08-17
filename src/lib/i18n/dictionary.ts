@@ -26,6 +26,7 @@ export type Dict = {
     how: string;
     about: string;
     faq: string;
+    blog: string;
     reviews: string;
     contact: string;
     notify: string;
@@ -125,11 +126,24 @@ export type Dict = {
     heading: string;
     items: { q: string; a: string }[];
   };
+  blog: {
+    kicker: string;
+    heading: string;
+    sub: string;
+    readMore: string;
+    backToBlog: string;
+    publishedOn: string;
+    empty: string;
+    relatedHeading: string;
+    relatedShop: string;
+    relatedFaq: string;
+  };
   footer: {
     follow: string;
     products: string;
     about: string;
     faq: string;
+    blog: string;
     privacy: string;
     terms: string;
     cookies: string;
@@ -241,7 +255,7 @@ const hu: Dict = {
     ogTitle: "AZKOMOLY — Mi van a dobozban?",
     ogDescription: "Nem tudod mi van benne. Ez a lényeg.",
   },
-  nav: { shop: "Bolt", merch: "Merch", how: "Hogyan működik", about: "Rólunk", faq: "GYIK", reviews: "Vélemények", contact: "Kapcsolat", notify: "Értesíts", home: "Főoldal", cart: "Kosár", prevSection: "Előző szakasz", nextSection: "Következő szakasz", scrollTop: "Vissza a tetejére", primary: "Fő navigáció" },
+  nav: { shop: "Bolt", merch: "Merch", how: "Hogyan működik", about: "Rólunk", faq: "GYIK", blog: "Blog", reviews: "Vélemények", contact: "Kapcsolat", notify: "Feliratkozás", home: "Főoldal", cart: "Kosár", prevSection: "Előző szakasz", nextSection: "Következő szakasz", scrollTop: "Vissza a tetejére", primary: "Fő navigáció" },
   hero: {
     est: "EST · MMXXVI",
     index: "/01",
@@ -371,7 +385,7 @@ const hu: Dict = {
     heading: "A DOBOZ\nMOST INDUL",
     hoverHint: "Mozgasd az egeret",
     showBoxes: "MUTASD A DOBOZOKAT →",
-    notify: "ÉRTESÍTSETEK",
+    notify: "FELIRATKOZÁS",
   },
   closingFloat: {
     text: "NE TALÁLGASS. NYISD KI.",
@@ -389,11 +403,24 @@ const hu: Dict = {
       { q: "Melyik futárszolgálat szállítja a csomagot?", a: "Ez attól függ, hogy házhoz kéred vagy csomagpontra. Mindig a legjobb elérhető megoldást választjuk, és ha csomagpontra megy, mindig a hozzád legközelebbi pontot jelöljük ki." },
     ],
   },
+  blog: {
+    kicker: "AZKOMOLY BLOG",
+    heading: "Cikkek & sztorik",
+    sub: "Mystery box tippek, unboxing sztorik és minden, amit a dobozok mögött érdemes tudni.",
+    readMore: "Elolvasom",
+    backToBlog: "Vissza a bloghoz",
+    publishedOn: "Közzétéve",
+    empty: "Hamarosan új cikkek…",
+    relatedHeading: "Ehhez kapcsolódik",
+    relatedShop: "Nézd meg a dobozainkat",
+    relatedFaq: "Gyakori kérdések",
+  },
   footer: {
     follow: "KÖVESS MINKET",
     products: "Termékek",
     about: "Rólunk",
     faq: "GYIK",
+    blog: "Blog",
     privacy: "Adatvédelem",
     terms: "Felhasználási feltételek",
     cookies: "Süti szabályzat",
@@ -505,7 +532,7 @@ const en: Dict = {
     ogTitle: "AZKOMOLY — What's in the box?",
     ogDescription: "You don't know what's inside. That's the point.",
   },
-  nav: { shop: "Shop", merch: "Merch", how: "How it works", about: "About", faq: "FAQ", reviews: "Reviews", contact: "Contact", notify: "Notify me", home: "Home", cart: "Cart", prevSection: "Previous section", nextSection: "Next section", scrollTop: "Back to top", primary: "Main navigation" },
+  nav: { shop: "Shop", merch: "Merch", how: "How it works", about: "About", faq: "FAQ", blog: "Blog", reviews: "Reviews", contact: "Contact", notify: "Subscribe", home: "Home", cart: "Cart", prevSection: "Previous section", nextSection: "Next section", scrollTop: "Back to top", primary: "Main navigation" },
   hero: {
     est: "EST · MMXXVI",
     index: "/01",
@@ -635,7 +662,7 @@ const en: Dict = {
     heading: "THE BOX\nDROPS NOW",
     hoverHint: "Move your cursor",
     showBoxes: "SHOW ME THE BOXES →",
-    notify: "NOTIFY ME",
+    notify: "SUBSCRIBE",
   },
   closingFloat: {
     text: "STOP GUESSING. OPEN IT.",
@@ -653,11 +680,24 @@ const en: Dict = {
       { q: "Which delivery company will bring my order?", a: "It depends on whether you choose home delivery or a pickup point. Either way, we always select the best available option — and if it's a pickup point, we assign the one closest to your address." },
     ],
   },
+  blog: {
+    kicker: "AZKOMOLY BLOG",
+    heading: "Articles & stories",
+    sub: "Mystery box tips, unboxing stories, and everything worth knowing behind the boxes.",
+    readMore: "Read more",
+    backToBlog: "Back to the blog",
+    publishedOn: "Published on",
+    empty: "New articles coming soon…",
+    relatedHeading: "Related",
+    relatedShop: "Check out our boxes",
+    relatedFaq: "Frequently asked questions",
+  },
   footer: {
     follow: "FOLLOW US",
     products: "Products",
     about: "About",
     faq: "FAQ",
+    blog: "Blog",
     privacy: "Privacy",
     terms: "Terms of use",
     cookies: "Cookie policy",

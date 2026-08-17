@@ -25,9 +25,21 @@ const API = "2025-07";
  */
 const STATIC_ROUTES = [
   ["/", "1.0", "daily", true],
+  ["/blog", "0.7", "weekly", true],
   ["/privacy", "0.3", "yearly", false],
   ["/terms", "0.3", "yearly", false],
   ["/cookies", "0.3", "yearly", false],
+];
+
+/**
+ * Posts del blog (`src/content/blog/posts.ts`). Este script es un `.mjs` plano
+ * corrido con `node` (sin loader de TS), así que no puede importar ese archivo
+ * directamente — se mantiene esta lista a mano, igual que ya se hace acá para
+ * las rutas estáticas. RECORDAR: agregar acá cada post nuevo al publicarlo.
+ */
+const BLOG_ROUTES = [
+  ["/blog/mi-az-a-mystery-box", "2026-08-17", "0.6", "monthly"],
+  ["/blog/honnan-szarmaznak-a-termekeink", "2026-08-17", "0.6", "monthly"],
 ];
 
 async function fetchProducts() {
@@ -86,6 +98,8 @@ const entries = [
       changefreq: "weekly",
       hasEn: true,
     })),
+  ...BLOG_ROUTES.map(([path, publishedAt, priority, changefreq]) =>
+    urlEntry(path, { lastmod: publishedAt, priority, changefreq, hasEn: true })),
 ];
 
 const xml = `<?xml version="1.0" encoding="UTF-8"?>
@@ -98,6 +112,6 @@ ${entries.join("\n")}
 writeFileSync("public/sitemap.xml", xml, "utf8");
 console.log(
   `sitemap.xml -> ${entries.length} URLs ` +
-  `(${STATIC_ROUTES.length} estáticas + ${products.length} productos), ` +
+  `(${STATIC_ROUTES.length} estáticas + ${products.length} productos + ${BLOG_ROUTES.length} posts), ` +
   `cada una con hreflang hu/en/x-default`,
 );

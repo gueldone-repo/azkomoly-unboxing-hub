@@ -1,7 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, type FormEvent } from "react";
-import { Instagram, Facebook, Youtube } from "lucide-react";
 import { DripDivider } from "@/components/DripDivider";
+import { SiteBreadcrumb } from "@/components/SiteBreadcrumb";
+import { SiteFooter } from "@/components/SiteFooter";
 import { useT } from "@/lib/i18n";
 import { DICTIONARIES } from "@/lib/i18n/dictionary";
 import { seoLinksHuOnly, jsonLd, faqSchema } from "@/lib/seo";
@@ -46,28 +47,14 @@ const TITLE_STYLE = {
 
 const CONTACT_EMAIL = "azkomoly.hu@gmail.com";
 
-function TikTokIcon({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" className={className} fill="currentColor" aria-hidden>
-      <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5.8 20.1a6.34 6.34 0 0 0 10.86-4.43V9.01a8.16 8.16 0 0 0 4.77 1.52V7.08a4.85 4.85 0 0 1-1.84-.39z" />
-    </svg>
-  );
-}
-
-const SOCIALS = [
-  { label: "Instagram", href: "https://www.instagram.com/azkomoly.hu/", Icon: Instagram },
-  { label: "TikTok", href: "https://www.tiktok.com/@azkomoly.hu", Icon: TikTokIcon },
-  { label: "YouTube", href: "https://www.youtube.com/@AzKomolyHungary", Icon: Youtube },
-  { label: "Facebook", href: "https://www.facebook.com/profile.php?id=61590505527795", Icon: Facebook },
-];
-
 function FaqPage() {
   return (
     <main className="bg-background">
+      <SiteBreadcrumb trail={[{ name: "AZKOMOLY", path: "/" }, { name: "FAQ" }]} />
       <FaqHero />
       <FaqAccordion />
       <NeedHelp />
-      <Footer />
+      <SiteFooter productsHref="/#termekek" />
     </main>
   );
 }
@@ -87,7 +74,8 @@ function FaqHero() {
         FAQ
       </h1>
       <p className="font-sans text-sm sm:text-base text-foreground/70 max-w-md">
-        [Placeholder — rövid bevezető: itt megtalálod a leggyakoribb kérdéseket.]
+        Minden, amit a mystery boxokról tudni érdemes — szállítás, méret, tartalom és minden,
+        ami eddig kérdés volt.
       </p>
     </section>
   );
@@ -171,7 +159,7 @@ function NeedHelp() {
             Still need help?
           </h2>
           <p className="font-sans text-white/85 text-sm sm:text-base">
-            [Placeholder — írj nekünk, és 24 órán belül válaszolunk.]
+            Nem találtad meg a válaszod? Írj nekünk, és 24 órán belül válaszolunk.
           </p>
 
           <form onSubmit={onSubmit} className="flex flex-col gap-3 text-left">
@@ -205,7 +193,7 @@ function NeedHelp() {
 
           {sent && (
             <p className="font-sans text-xs text-white/80">
-              [Placeholder — megnyitottuk a levelezőprogramod. Ha nem indult el, írj ide:]{" "}
+              Megnyitottuk a leveleződ. Ha nem indult el automatikusan, írj ide közvetlenül:{" "}
               <a href={`mailto:${CONTACT_EMAIL}`} className="underline">
                 {CONTACT_EMAIL}
               </a>
@@ -224,35 +212,3 @@ function NeedHelp() {
   );
 }
 
-function Footer() {
-  const t = useT();
-  return (
-    <footer className="bg-fire px-6 pt-6 pb-12 flex flex-col items-center gap-4">
-      <p className="font-display text-white text-lg tracking-wider">{t.footer.follow}</p>
-      <div className="flex gap-4 flex-wrap justify-center">
-        {SOCIALS.map(({ label, href, Icon }) => (
-          <a
-            key={label}
-            href={href}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label={label}
-            className="h-12 w-12 rounded-2xl grid place-items-center border-2 border-white/50 text-white hover:text-black hover:border-black hover:-translate-y-0.5 transition-all"
-          >
-            <Icon className="h-6 w-6" />
-          </a>
-        ))}
-      </div>
-      <nav className="flex flex-wrap gap-x-4 gap-y-1 justify-center font-sans text-xs text-white/70 mt-2">
-        <Link to="/privacy" className="hover:text-white">{t.footer.privacy}</Link>
-        <span>·</span>
-        <Link to="/terms" className="hover:text-white">{t.footer.terms}</Link>
-        <span>·</span>
-        <Link to="/cookies" className="hover:text-white">{t.footer.cookies}</Link>
-      </nav>
-      <p className="font-sans text-xs text-white/70">
-        © 2026 <span className="font-display text-white">AZKOMOLY</span> · {t.footer.rights}
-      </p>
-    </footer>
-  );
-}

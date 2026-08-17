@@ -575,6 +575,145 @@ Todo commiteado y pusheado a `main` (`ca99068`, `969eaec`, `657842a`).
 
 ---
 
+## 2026-08-17 (Sesión 9) — Blog + breadcrumbs visibles
+
+### Lo que se hizo
+
+**Blog nuevo (pendiente desde la sesión del 2026-07-17, "Blogs con enlazado interno"):**
+- Contenido en el repo, sin CMS ni tabla nueva de Supabase: `src/content/blog/posts.ts`
+  (tipo `BlogPost`, contenido hu/en por post, `BLOG_POSTS` array). Sembrados **2 posts
+  placeholder** (mismo patrón `[Placeholder]` que ya usan `about.tsx`/`faq.tsx`) — Diego
+  reemplaza el contenido real editando ese archivo.
+- Rutas nuevas: `/blog`, `/blog/$slug`, `/en/blog`, `/en/blog/$slug` (mismo patrón de
+  props-por-loader que ya usa `/shop/$slug` para compartir componente entre hu/en).
+- Componentes: `src/components/blog/BlogPostBody.tsx` (renderiza bloques tipados de
+  contenido), `BlogCard.tsx` (listado).
+- SEO: `blogPostingSchema()` nuevo en `seo.ts` (JSON-LD `BlogPosting`), reusa `seoLinks`/
+  `breadcrumbSchema` ya existentes. Cada post trae 1-2 links de enlazado interno real al
+  final (a `/shop`/`#termekek` y a `/faq`) — es literalmente lo que pedía el pendiente.
+- `scripts/generate-sitemap.mjs`: agregado `/blog` + un `BLOG_ROUTES` mantenido a mano
+  (mismo patrón que ya usaba el script para rutas estáticas) — **recordar sumar ahí cada
+  post nuevo al publicarlo**. Sitemap regenerado y verificado (13 URLs).
+- Nav: "Blog" sumado al navbar (`index.tsx`) y al footer de `about.tsx`/`faq.tsx`.
+- `nav.blog` y bloque `blog.*` agregados a `dictionary.ts` en hu **y** en.
+
+**Breadcrumb visible (antes sólo existía como JSON-LD invisible):**
+- `src/components/SiteBreadcrumb.tsx`, wrapper fino sobre el `Breadcrumb` de shadcn que
+  ya estaba en el repo sin usar (`src/components/ui/breadcrumb.tsx`). Fila de texto chica,
+  no compite visualmente con nada.
+- Agregado en `/shop/$slug` (y por herencia `/en/shop/$slug`, mismo componente
+  `ProductPage`), `/about`, `/faq`, y las páginas del blog.
+
+**Verificado de verdad (no sólo "compila"):**
+- `npm run dev` + `curl` a `/`, `/en`, `/about`, `/faq`, `/blog`, `/blog/$slug`,
+  `/en/blog/$slug`, `/shop/$slug` → todas 200, breadcrumb presente en el HTML, JSON-LD
+  `BlogPosting` presente, `<title>` correcto por página.
+- `node scripts/generate-sitemap.mjs` → `/blog` y los 2 posts aparecen con hreflang.
+
+### Hallazgo sin resolver (pre-existente, no lo causó esta sesión)
+- ⚠️ **`npx tsc --noEmit` marca 6 falsos positivos** tipo
+  `Property 'product'/'post' does not exist on type 'undefined'` en las 4 páginas que usan
+  `Route.useLoaderData()` (`shop.$slug`, `en.shop.$slug`, y los 2 nuevos `blog.$slug`,
+  `en.blog.$slug`, que siguen el mismo patrón). Se confirmó con `git stash` que **ya
+  pasaba en el HEAD original, sin ninguno de los cambios de esta sesión** — es decir, el
+  gotcha documentado en CLAUDE.md ("`git checkout -- src/routeTree.gen.ts` deja `tsc` en
+  0") **ya no alcanza para arreglarlo** con las versiones actuales de
+  `@tanstack/react-router`/`@tanstack/react-start` instaladas. No afecta el sitio real (se
+  verificó en el navegador/dev server que las páginas cargan bien) — es sólo el chequeo de
+  tipos. Pendiente investigar si es un tema de versión a fijar o hay que anotar los tipos
+  del loader a mano.
+
+### Pendiente
+- [ ] Diego: reemplazar el contenido `[Placeholder]` de los 2 posts sembrados por texto real
+  (`src/content/blog/posts.ts`), y sumar más posts cuando estén listos.
+- [ ] Investigar el falso positivo de `tsc` sobre `Route.useLoaderData()` (ver arriba) —
+  no bloquea nada hoy, pero conviene resolverlo antes de que se acumule.
+- (siguen pendientes de sesiones previas: apex `.com`, handles de producto,
+  `SHOPIFY_ADMIN_TOKEN`, envíos, pagos, ÁFA, "How it works" con animación, `shopify-theme/`
+  sin trackear, versión móvil, páginas de producto — ver sesiones 6-8)
+
+---
+
+## 2026-08-17 (Sesión 9, continuación) — Ronda grande: mobile + conversión
+
+Plan completo (10 puntos de Diego + apéndice de video) guardado en
+`C:\Users\Mariana\.claude\plans\iterative-pondering-sparkle.md`. Prioridad que dio Diego:
+mobile → conversión → SEO. Se hicieron Fase 1 (mobile) y Fase 2 (conversión) completas;
+Fase 3 (estudio de keywords + blogs) y el video de "How it works" quedan para la próxima.
+
+### Fase 1 — Mobile
+- **SocialRail** (`src/components/social/SocialLogos.tsx`): ya no es `hidden lg:flex` —
+  visible en todos los tamaños. En touch (`matchMedia("hover:none")`) el tap abre la
+  lengüeta y se cierra sola a los 2.6s (antes dependía de `mouseleave`, que no existe en
+  touch). Lengüeta un poco más grande en mobile (`h-16 w-8`) para que sea más fácil de tocar.
+- **Responsividad general** (`index.tsx`): `SocialProofMarquee` ya no ocupa `520px` fijos
+  en mobile (`h-[360px] sm:h-[520px]`); título de `BigCTA` pasó a `clamp()` en vez de saltos
+  fijos por breakpoint.
+- **Carrito** (`CartSheet.tsx`): targets táctiles de +/−/eliminar de `h-7 w-7` (28px, por
+  debajo del mínimo recomendado) a `h-9 w-9` + padding invisible en el botón de eliminar.
+  Limpiada una clase redundante (`sm:flex-col sm:space-x-0`).
+- **Botón de navegación mobile**: ya existía (`BottomNav`, flecha flotante única,
+  no intrusiva) — no se tocó, cumple lo pedido.
+
+### Fase 2 — Conversión
+- **Banner "AZKOMOLY" en movimiento** (`BrandWave` en `index.tsx`): mismo patrón/forma,
+  ahora quieto (`speed={0}`, `TextLoop` ya soportaba esto sin tocar el componente) y dice
+  "azkomoly.hu" en vez de "Azkomoly".
+- **Página de producto** (`shop.$slug.tsx`, compartida con `/en/shop/$slug`): era la más
+  "plana" del sitio. Agregada galería real (antes sólo mostraba `images.edges[0]` aunque
+  Shopify trajera más fotos — ahora hay thumbnails clickeables), `text-3d-fire` en el H1,
+  `rounded-2xl`/`rounded-xl` en imagen/variantes/cantidad (antes bordes rectos), botón
+  "Buy now" con `.btn-3d` (antes era el único CTA sin relieve), badges de confianza ahora
+  en tarjetas con sombra dura (antes íconos sueltos).
+- **About/FAQ — contenido real**: reemplazados los 9 `[Placeholder]` (6 en `about.tsx`,
+  3 en `faq.tsx`) con un primer borrador de copy (manifiesto, historia, bio corta, CTAs) —
+  **pendiente que Diego lo revise y ajuste**, es un borrador mío, no texto suyo.
+- **Footer compartido**: `about.tsx`/`faq.tsx` tenían un footer viejo simple (`bg-fire`
+  plano) mientras Home ya tenía uno "taped" con cinta y sombra dura. Se extrajo el de Home a
+  `src/components/SiteFooter.tsx` y ahora las 4 páginas (Home, About, FAQ, Blog) usan el
+  mismo. De paso el footer ahora enlaza también a `/blog` en todas partes.
+- **CTA "Notify me" → "Subscribe"**: investigado el cableado real — el botón **ya abría
+  `SignupDialog`** (un formulario, no el video intro como se sospechaba al principio), pero
+  el texto del botón ("Értesíts"/"Notify me") no coincidía con el título del propio diálogo
+  (`t.signup.title`, que ya decía "FELIRATKOZÁS"/"SUBSCRIBE"). Se alinearon los 2 textos del
+  botón (`nav.notify`, `bigCta.notify`) al wording del formulario — sin tocar a qué abre.
+  De paso, `SignupDialog` rediseñado: inputs/selector de país+teléfono pasaron de
+  `border-2 border-cardboard/60` recto a `rounded-2xl` con `focus:ring-2 focus:ring-fire/25`,
+  mismo lenguaje que ya usa el resto del sitio.
+- **"Real unboxings"**: no se tocó — ya tiene el marquee 3D vertical con perspectiva que
+  sesión 7 había anotado como pendiente (estaba mejor resuelto de lo que decía la nota
+  vieja). Recomendación dada a Diego: dejarlo donde está (prueba social justo antes de
+  comprar), sólo refrescar las 6 imágenes cuando haya contenido nuevo.
+
+### Verificado
+- `npx tsc --noEmit` → 0 (recordado revertir el bloque `Register` de `routeTree.gen.ts`,
+  que el dev server reinyecta cada vez que corre — gotcha de siempre).
+- `npm run dev` + recorrido real: `/`, `/about`, `/faq`, `/blog`, `/shop/$slug` → 200,
+  copy real presente (cero `Placeholder` en el HTML), footer "taped" presente en About/FAQ,
+  `text-3d-fire`/`btn-3d` presentes en la página de producto, texto "azkomoly.hu" estático
+  en la banda de productos, "FELIRATKOZÁS" en el botón del navbar.
+
+### Pendiente para la próxima sesión
+- [ ] **Diego: revisar/ajustar el copy borrador de About/FAQ** — es un primer intento mío,
+  no texto suyo.
+- [ ] **Fase 3 del plan** (no empezada): estudio de keywords para mystery boxes en Europa +
+  escribir blogs reales apuntando a esas keywords (`src/content/blog/posts.ts` sigue con
+  contenido placeholder).
+- [ ] **Video "How it works"** (apéndice del plan): guion de 4 escenas + prompts para
+  Google Flow ya escritos en el plan — falta que Diego genere los clips (con sus imágenes
+  de referencia de caja/logo) y yo los integre en `HowItWorks()`.
+- [ ] **Newsletter/descuento**: Diego va a dar acceso a un conector/MCP de Shopify para
+  configurar el código de descuento y las novedades de drops que promete el formulario de
+  "Subscribe" — sin eso, el formulario sigue guardando el lead en Supabase pero no dispara
+  ningún código automático todavía.
+- [ ] Verificar en un celular real (no sólo devtools) el `SocialRail` ahora visible en
+  mobile — el comportamiento de auto-cierre por touch está tipado pero no se probó en un
+  dispositivo táctil real esta sesión.
+- (siguen pendientes de sesiones previas: apex `.com`, handles de producto,
+  `SHOPIFY_ADMIN_TOKEN`, envíos, pagos, ÁFA, `shopify-theme/` sin trackear)
+
+---
+
 <!-- PLANTILLA PARA NUEVAS SESIONES:
 
 ## YYYY-MM-DD (Sesión N)

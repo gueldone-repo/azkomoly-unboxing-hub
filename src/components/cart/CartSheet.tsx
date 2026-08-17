@@ -61,10 +61,12 @@ function LineItem({ item }: { item: CartItem }) {
               </p>
             )}
           </div>
+          {/* h-9 w-9 (36px) + el padding del botón acercan el target táctil a
+              las 44px recomendadas — antes era un ícono de 16px sin padding. */}
           <button
             onClick={() => removeItem(item.variantId)}
             aria-label={t.cart.remove}
-            className="shrink-0 text-foreground/40 hover:text-destructive transition-colors"
+            className="shrink-0 grid place-items-center h-9 w-9 -m-1.5 text-foreground/40 hover:text-destructive transition-colors"
           >
             <X className="h-4 w-4" />
           </button>
@@ -74,17 +76,17 @@ function LineItem({ item }: { item: CartItem }) {
           <div className="flex items-center border-2 border-cardboard/50">
             <button
               onClick={() => updateQuantity(item.variantId, item.quantity - 1)}
-              className="h-7 w-7 grid place-items-center text-fire hover:bg-cardboard/10"
+              className="h-9 w-9 grid place-items-center text-fire hover:bg-cardboard/10"
               aria-label="−"
             >
               <Minus className="h-3.5 w-3.5" />
             </button>
-            <span className="h-7 w-8 grid place-items-center font-display text-sm">
+            <span className="h-9 w-8 grid place-items-center font-display text-sm">
               {item.quantity}
             </span>
             <button
               onClick={() => updateQuantity(item.variantId, item.quantity + 1)}
-              className="h-7 w-7 grid place-items-center text-fire hover:bg-cardboard/10"
+              className="h-9 w-9 grid place-items-center text-fire hover:bg-cardboard/10"
               aria-label="+"
             >
               <Plus className="h-3.5 w-3.5" />
@@ -159,7 +161,7 @@ export function CartSheet() {
               </button>
             </ul>
 
-            <SheetFooter className="px-5 py-4 border-t-2 border-cardboard/30 flex-col gap-3 sm:flex-col sm:space-x-0">
+            <SheetFooter className="px-5 py-4 border-t-2 border-cardboard/30 flex-col gap-3">
               <div className="flex items-baseline justify-between w-full">
                 <span className="font-sans text-sm text-foreground/70">
                   {t.cart.subtotal}
