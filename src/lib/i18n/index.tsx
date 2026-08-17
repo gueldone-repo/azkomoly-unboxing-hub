@@ -58,7 +58,14 @@ export function I18nProvider({
   forceLang?: Lang;
 }) {
   const [cookieLang, setLangState] = useState<Lang>(() => readLangCookie());
-  const lang = forceLang ?? cookieLang;
+  // Las URLs `/en/*` mandan sobre la cookie incluso en este provider raíz:
+  // los overlays globales (SignupDialog, CartSheet, BottomNav) viven en
+  // `__root.tsx`, FUERA del provider de `/en`, así que sin esto salían en
+  // húngaro para un usuario que está navegando la versión inglesa.
+  const routePathname = useRouterState({ select: (s) => s.location.pathname });
+  const pathLang: Lang | undefined =
+    routePathname === "/en" || routePathname.startsWith("/en/") ? "en" : undefined;
+  const lang = forceLang ?? pathLang ?? cookieLang;
 
   const setLang = useCallback((next: Lang) => {
     setLangState(next);
@@ -73,7 +80,7 @@ export function I18nProvider({
   // usa su PROPIO provider (forceLang="en"), así que este nunca se entera
   // del cambio de cookie por sí solo. Releerla en cada cambio de ruta evita
   // que "/" se quede mostrando el idioma viejo tras volver de /en.
-  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const pathname = routePathname;
   useEffect(() => {
     if (forceLang) return;
     setLangState(readLangCookie());

@@ -155,7 +155,7 @@ export function SignupDialog() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               maxLength={255}
-              placeholder="te@email.hu"
+              placeholder={t.signup.emailPlaceholder}
               className="w-full rounded-2xl bg-background border-2 border-cardboard/40 focus:border-fire text-foreground px-4 py-3 text-base font-sans focus:outline-none focus:ring-2 focus:ring-fire/25 transition-colors"
             />
           </div>
