@@ -71,27 +71,26 @@ export function SiteNav({ isHome = false }: { isHome?: boolean }) {
                 hoveredPillTextColor="#FFFFFF"
               />
             </div>
-            <div className="flex items-center gap-3 sm:gap-4">
+            <div className="flex items-center gap-2 sm:gap-4">
               <LanguageToggle className="hidden sm:inline-flex" />
-              {/* Desde tablet (md) hay lugar para los íconos en la barra —
-                  antes arrancaba recién en desktop (lg). En mobile viven
-                  adentro del menú hamburguesa en vez de acá. */}
               <SocialRow className="hidden md:flex !gap-3" iconClassName="h-[18px] w-[18px]" />
               <CartButton />
-              <button
-                onClick={() => setSignupOpen(true)}
-                className="btn-3d hidden bg-fire px-5 py-2.5 font-sans text-xs font-semibold tracking-wide text-white sm:inline-flex"
-              >
-                {t.nav.notify}
-              </button>
+              <div className="hidden sm:contents">
+                <button
+                  onClick={() => setSignupOpen(true)}
+                  className="btn-3d bg-fire px-5 py-2.5 font-sans text-xs font-semibold tracking-wide text-white"
+                >
+                  {t.nav.notify}
+                </button>
+              </div>
               <button
                 onClick={() => setMenuOpen((v) => !v)}
                 aria-label={menuOpen ? "Bezárás" : "Menü"}
                 aria-expanded={menuOpen}
                 aria-controls="staggered-menu-panel"
-                className="lg:hidden grid place-items-center h-9 w-9 text-foreground"
+                className="lg:hidden grid place-items-center h-11 w-11 rounded-full border-2 border-black bg-white text-foreground shadow-[0_3px_0_#0D0D0D] active:translate-y-[2px] active:shadow-none transition-transform"
               >
-                {menuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+                {menuOpen ? <X className="h-7 w-7" /> : <Menu className="h-7 w-7" />}
               </button>
             </div>
           </div>
