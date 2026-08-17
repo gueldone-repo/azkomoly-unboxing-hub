@@ -1,3 +1,5 @@
+// Estado: provider/hooks de idioma (cookie azkomoly_lang) — envuelve el
+// diccionario de dictionary.ts y decide qué idioma ve cada request.
 import {
   createContext,
   useCallback,

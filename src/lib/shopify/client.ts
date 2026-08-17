@@ -1,5 +1,6 @@
-// Shopify Storefront API client + cart mutations.
-// Public credentials are safe to expose; the Storefront token is read-only.
+// Capa de datos: cliente Storefront API — todo acceso a productos/carrito de
+// Shopify pasa por acá. Public credentials are safe to expose; the Storefront
+// token is read-only.
 export const SHOPIFY_API_VERSION = "2025-07";
 export const SHOPIFY_STORE_PERMANENT_DOMAIN = "ipqptg-19.myshopify.com";
 export const SHOPIFY_STOREFRONT_TOKEN = "88a7bc92a4e3b38691a12713f4a7ac34";

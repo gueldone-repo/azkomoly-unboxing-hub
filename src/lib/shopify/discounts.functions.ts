@@ -1,3 +1,5 @@
+// Server function: lee price_rules del Admin API (BoxSpinner, feature en
+// pausa — ver comentario en routes/index.tsx).
 import { createServerFn } from "@tanstack/react-start";
 
 const STORE = "ipqptg-19.myshopify.com";

@@ -1,3 +1,5 @@
+// Capa de datos: diccionario tipado hu/en — fuente única de todo el copy del
+// sitio. Al agregar texto nuevo, sumarlo acá en ambos idiomas.
 export type Lang = "hu" | "en";
 
 export const LANGS: { code: Lang; label: string; short: string; flag: string }[] = [

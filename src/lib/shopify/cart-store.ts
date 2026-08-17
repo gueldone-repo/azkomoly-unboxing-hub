@@ -1,3 +1,5 @@
+// Estado: carrito global (Zustand + localStorage), orquesta las mutaciones
+// de `client.ts` — único lugar que sabe cómo se arma/persiste el carrito.
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import {
