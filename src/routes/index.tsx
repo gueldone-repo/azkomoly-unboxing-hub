@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, useEffect, useRef, lazy, Suspense } from "react";
 import { motion, useReducedMotion } from "motion/react";
 import { getUrgencyDeadline } from "@/lib/urgency.functions";
-import { ShieldCheck, Truck, Sparkles, MousePointer2, ChevronLeft, ChevronRight } from "lucide-react";
+import { MousePointer2, ChevronLeft, ChevronRight } from "lucide-react";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SOCIAL_REVIEWS } from "@/components/SocialProofMarquee";
 import { SiteNav } from "@/components/nav/SiteNav";
@@ -657,34 +657,6 @@ function FollowUsRow() {
   );
 }
 
-function ValueProps() {
-  const t = useT();
-  const icons = [ShieldCheck, Sparkles, Truck];
-  return (
-    <section className="bg-dark-bg border-y border-cardboard/20 py-16">
-      <div className="mx-auto max-w-4xl px-6 grid sm:grid-cols-3 gap-px bg-cardboard/20">
-        {t.values.items.map((item, i) => {
-          const Icon = icons[i];
-          return (
-            <div
-              key={item.title}
-              data-reveal
-              data-delay={String(i + 1)}
-              className="flex flex-col items-center text-center p-8 bg-dark-bg group hover:bg-fire/5 transition-colors duration-300"
-            >
-              <span className="grid place-items-center h-14 w-14 border-2 border-fire/50 text-fire mb-5 group-hover:border-fire group-hover:bg-fire/10 transition-all duration-300">
-                <Icon className="h-7 w-7" />
-              </span>
-              <h3 className="font-display text-xl text-foreground tracking-wider mb-2">{item.title}</h3>
-              <p className="font-sans text-sm text-foreground/60 leading-relaxed">{item.text}</p>
-            </div>
-          );
-        })}
-      </div>
-    </section>
-  );
-}
-
 /**
  * Un mascota 3D por paso, en vez del video: el video quedaba encajonado en un
  * marco con borde/sombra dura que competía con el fondo blanco del sitio
@@ -1016,45 +988,6 @@ function ClosingScrollFloat() {
         className="mx-auto max-w-3xl font-display text-[clamp(1.6rem,6vw,3.75rem)] leading-[0.95] text-fire"
       />
     </section>
-  );
-}
-
-function LegacyFooter() {
-  const t = useT();
-  return (
-    <div className="relative mt-16">
-      <footer id="kapcsolat" className="relative bg-fire px-6 pt-14 pb-12 flex flex-col items-center gap-4">
-        <p className="font-display text-white text-lg tracking-wider">{t.footer.follow}</p>
-        <div className="flex gap-4 flex-wrap justify-center">
-          {/* Fondo blanco en cada botón para que el logo pueda ir en su color
-              oficial: sobre el morado del footer, el negro de TikTok y el azul
-              de Facebook se perderían. */}
-          {SOCIAL_LINKS.map((s) => (
-            <a
-              key={s.key}
-              href={s.href}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label={s.label}
-              className="h-12 w-12 grid place-items-center rounded-full bg-white hover:-translate-y-0.5 hover:shadow-[0_8px_20px_rgba(13,13,13,0.25)] transition-all"
-              style={{ color: s.brand }}
-            >
-              <SocialGlyph path={s.path} className="h-5 w-5" />
-            </a>
-          ))}
-        </div>
-        <nav className="flex flex-wrap gap-x-4 gap-y-1 justify-center font-sans text-xs text-white/70 mt-2">
-          <Link to="/privacy" className="hover:text-white">{t.footer.privacy}</Link>
-          <span>·</span>
-          <Link to="/terms" className="hover:text-white">{t.footer.terms}</Link>
-          <span>·</span>
-          <Link to="/cookies" className="hover:text-white">{t.footer.cookies}</Link>
-        </nav>
-        <p className="font-sans text-xs text-white/70">
-          © 2026 <span className="font-display text-white">AZKOMOLY</span> · {t.footer.rights}
-        </p>
-      </footer>
-    </div>
   );
 }
 
