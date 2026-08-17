@@ -881,6 +881,55 @@ function ValueProps() {
   );
 }
 
+/**
+ * El video/poster muestran el recorrido completo (bodega → van → puerta →
+ * unboxing) en una sola pieza — no hace falta un clip por paso. Las 4
+ * tarjetas de antes quedan como una fila de referencia chica debajo, no como
+ * protagonistas: el video ya cuenta la historia.
+ */
+function HowItWorksVideo() {
+  const reduceMotion = useReducedMotion();
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const [inView, setInView] = useState(false);
+
+  useEffect(() => {
+    const el = videoRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      ([entry]) => setInView(entry.isIntersecting),
+      { threshold: 0.4 },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
+  useEffect(() => {
+    const el = videoRef.current;
+    if (!el || reduceMotion) return;
+    if (inView) el.play().catch(() => {});
+    else el.pause();
+  }, [inView, reduceMotion]);
+
+  return (
+    <div className="relative mx-auto max-w-3xl aspect-video rounded-2xl overflow-hidden border-2 border-cardboard/40 shadow-[8px_8px_0_0_#0D0D0D] bg-dark-bg">
+      <video
+        ref={videoRef}
+        src="/how-it-works/proceso.mp4"
+        poster="/how-it-works/proceso-azkomoly.webp"
+        muted
+        loop
+        playsInline
+        preload="none"
+        // Sin autoplay: lo dispara el IntersectionObserver de arriba, así no
+        // se reproducen 4-5 videos a la vez si hubiera más de uno en pantalla,
+        // y con `prefers-reduced-motion` directamente no se llama a `.play()`
+        // — el `poster` (el mismo infográfico numerado) queda como imagen fija.
+        className="w-full h-full object-contain"
+      />
+    </div>
+  );
+}
+
 function HowItWorks() {
   const t = useT();
   const reduceMotion = useReducedMotion();
@@ -895,40 +944,34 @@ function HowItWorks() {
             {t.how.heading}
           </h2>
         </div>
+
+        <div data-reveal>
+          <HowItWorksVideo />
+        </div>
+
         <motion.div
-          className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4"
+          className="mt-10 grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-3xl mx-auto"
           initial={reduceMotion ? false : "hidden"}
           whileInView={reduceMotion ? undefined : "show"}
           viewport={{ once: true, amount: 0.25 }}
           variants={{
             hidden: {},
-            show: { transition: { staggerChildren: 0.11 } },
+            show: { transition: { staggerChildren: 0.08 } },
           }}
         >
-          {t.how.steps.map((s, i) => (
+          {t.how.steps.map((s) => (
             <motion.div
               key={s.n}
-              className="relative bg-dark-bg border border-cardboard/30 p-7 overflow-hidden group hover:border-fire/70 hover:-translate-y-1 transition-all duration-300"
+              className="flex flex-col items-center text-center gap-1.5 rounded-2xl border border-cardboard/30 bg-dark-bg py-4 px-2"
               variants={{
-                hidden: { opacity: 0, y: 28, rotate: i % 2 === 0 ? -1.5 : 1.5 },
-                show: {
-                  opacity: 1,
-                  y: 0,
-                  rotate: 0,
-                  transition: { duration: 0.42, ease: [0.22, 1, 0.36, 1] },
-                },
+                hidden: { opacity: 0, y: 14 },
+                show: { opacity: 1, y: 0, transition: { duration: 0.35, ease: [0.22, 1, 0.36, 1] } },
               }}
             >
-              {/* Watermark number */}
-              <span className="absolute -bottom-4 -right-2 font-display leading-none text-fire/25 select-none pointer-events-none"
-                style={{ fontSize: "8.5rem" }}>
-                {s.n}
+              <span className="font-display text-sm text-fire">{s.n}</span>
+              <span className="font-display text-sm text-foreground uppercase tracking-wide">
+                {s.title}
               </span>
-              <span className="font-sans text-[10px] tracking-[0.4em] text-fire block mb-4">
-                {s.n}
-              </span>
-              <h3 className="font-display text-2xl text-foreground mb-2">{s.title}</h3>
-              <p className="font-sans text-sm text-foreground/60 leading-relaxed">{s.text}</p>
             </motion.div>
           ))}
         </motion.div>
