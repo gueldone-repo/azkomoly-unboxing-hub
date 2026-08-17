@@ -751,8 +751,8 @@ function HowItWorks() {
   const steps = t.how.steps;
   return (
     <section id="hogyan" className="bg-background">
-      <div className="mx-auto max-w-7xl px-6 py-24">
-        <div data-reveal className="text-center mb-14">
+      <div className="mx-auto max-w-7xl px-6 py-12 sm:py-16">
+        <div data-reveal className="text-center mb-8">
           <p className="font-sans text-xs tracking-[0.4em] text-fire mb-3">
             {t.how.kicker}
           </p>
@@ -761,7 +761,7 @@ function HowItWorks() {
           </h2>
         </div>
 
-        <div data-reveal className="mb-12">
+        <div data-reveal className="mb-8">
           <HowItWorksVideo />
         </div>
 
@@ -769,7 +769,7 @@ function HowItWorks() {
             pedido explícito de Diego ("los pasos deben ser verticales con
             una buena animación"). Desde `sm` vuelve a la grilla horizontal. */}
         <motion.div
-          className="flex flex-col gap-12 sm:grid sm:grid-cols-2 lg:grid-cols-4 sm:gap-6 max-w-5xl mx-auto"
+          className="flex flex-col gap-6 sm:grid sm:grid-cols-2 lg:grid-cols-4 sm:gap-4 max-w-5xl mx-auto"
           initial={reduceMotion ? false : "hidden"}
           whileInView={reduceMotion ? undefined : "show"}
           viewport={{ once: true, amount: 0.2 }}
@@ -781,7 +781,7 @@ function HowItWorks() {
           {steps.map((s, i) => (
             <motion.div
               key={s.n}
-              className="relative flex flex-col items-center text-center gap-3"
+              className="relative flex flex-col items-center text-center gap-2"
               variants={{
                 hidden: { opacity: 0, y: 28 },
                 show: { opacity: 1, y: 0, transition: { duration: 0.45, ease: [0.22, 1, 0.36, 1] } },
@@ -794,7 +794,7 @@ function HowItWorks() {
                    como un flujo y no como 4 tarjetas sueltas. */
                 <motion.span
                   aria-hidden="true"
-                  className="sm:hidden absolute left-1/2 top-full h-12 w-[3px] -translate-x-1/2 origin-top overflow-hidden rounded-full bg-gradient-to-b from-fire to-fire/20"
+                  className="sm:hidden absolute left-1/2 top-full h-8 w-[3px] -translate-x-1/2 origin-top overflow-hidden rounded-full bg-gradient-to-b from-fire to-fire/20"
                   initial={reduceMotion ? false : { scaleY: 0, opacity: 0 }}
                   whileInView={reduceMotion ? undefined : { scaleY: 1, opacity: 1 }}
                   viewport={{ once: true, amount: 0.6 }}
