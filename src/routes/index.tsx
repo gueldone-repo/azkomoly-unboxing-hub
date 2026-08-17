@@ -278,13 +278,15 @@ function ProductsSection() {
             justo debajo del CTA del hero, en el cuadrante que pidió Diego.
             z-10 = primera capa sobre el morado; se sale un poco por arriba
             (`-top`) para que pise el borde entre hero y esta sección, que es
-            lo que le da el efecto de pegatina superpuesta. */}
+            lo que le da el efecto de pegatina superpuesta. Visible también en
+            mobile (antes `hidden lg:block`) — ahí queda pegado al borde
+            derecho y se corta parcialmente a propósito, pedido de Diego. */}
         <img
-          src="/5.png"
+          src="/decor/products-sticker.webp"
           alt=""
           aria-hidden="true"
-          width={1376}
-          height={768}
+          width={1378}
+          height={1811}
           loading="lazy"
           draggable={false}
           /* Dentro de la sección morada, no a caballo entre las dos: la sección
@@ -292,7 +294,7 @@ function ProductsSection() {
              saliera por arriba quedaba tapada por el hero y se veía cortada,
              por mucho z-index que se le pusiera al sticker. Aquí abajo se ve
              entero y cubre el hueco que quedaba bajo el CTA. */
-          className="pointer-events-none absolute right-[10vw] top-[3vw] z-10 hidden w-[26vw] max-w-[360px] -rotate-6 drop-shadow-[0_18px_30px_rgba(13,13,13,0.28)] lg:block"
+          className="pointer-events-none absolute right-0 top-[2vw] sm:right-[6vw] lg:right-[10vw] z-10 w-[42vw] sm:w-[30vw] max-w-[360px] -rotate-6 drop-shadow-[0_18px_30px_rgba(13,13,13,0.28)]"
         />
       {/* El colchón sólo hace falta en escritorio, que es donde la caja del
           hero desborda sobre esta sección. Por debajo de lg el hero apila sin
@@ -586,8 +588,9 @@ function LifestyleStrip() {
 
 function FollowUsRow() {
   const t = useT();
+  const reduceMotion = useReducedMotion();
   return (
-    <div className="flex flex-wrap items-center justify-center gap-3 bg-fire px-4 py-6">
+    <div className="relative flex flex-wrap items-center justify-center gap-3 bg-fire px-4 py-6">
       <span className="mr-2 hidden font-sans text-xs font-bold uppercase tracking-[0.3em] text-white/78 sm:inline">
         {t.footer.follow}
       </span>
@@ -608,6 +611,23 @@ function FollowUsRow() {
           </span>
         </a>
       ))}
+
+      {/* Garra decorativa (pedido de Diego): vive justo en el corte entre
+          esta franja morada y "How it works" (blanca) — mitad y mitad, como
+          si estuviera bajando la caja de una sección a la otra. */}
+      <motion.img
+        src="/decor/claw-decor.webp"
+        alt=""
+        aria-hidden="true"
+        width={974}
+        height={1624}
+        loading="lazy"
+        draggable={false}
+        className="pointer-events-none absolute left-1/2 bottom-0 z-20 w-[86px] sm:w-[120px] -translate-x-1/2 translate-y-1/2 drop-shadow-[0_14px_24px_rgba(13,13,13,0.35)]"
+        animate={reduceMotion ? undefined : { rotate: [-3, 3, -3] }}
+        transition={reduceMotion ? undefined : { duration: 4, repeat: Infinity, ease: "easeInOut" }}
+        style={{ transformOrigin: "top center" }}
+      />
     </div>
   );
 }
