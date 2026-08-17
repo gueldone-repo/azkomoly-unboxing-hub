@@ -7,7 +7,6 @@ import { BLOG_POSTS } from "@/content/blog/posts";
 import { useT, useI18n, readLangCookie } from "@/lib/i18n";
 import { DICTIONARIES } from "@/lib/i18n/dictionary";
 import { seoLinks } from "@/lib/seo";
-import logoAsset from "@/assets/azkomoly-logo.png.asset.json";
 
 export const Route = createFileRoute("/blog/")({
   head: () => {
@@ -60,10 +59,9 @@ function BlogHero() {
     <section className="bg-background px-6 pt-14 pb-10 sm:pt-20 sm:pb-14 flex flex-col items-center text-center gap-6">
       <Link to={lang === "hu" ? "/" : "/en"} aria-label="AZKOMOLY">
         <img
-          src={logoAsset.url}
+          src="/azkomoly_new_logo.webp"
           alt="AZKOMOLY logó"
           className="h-24 sm:h-32 w-auto"
-          style={{ filter: "brightness(0)" }}
         />
       </Link>
       <span className="font-sans text-xs uppercase tracking-[0.3em] text-fire">
