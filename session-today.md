@@ -714,6 +714,74 @@ Fase 3 (estudio de keywords + blogs) y el video de "How it works" quedan para la
 
 ---
 
+## 2026-08-17 (Sesión 9, tercera parte) — Video de "How it works" + commit/push
+
+### Lo que se hizo
+- **Video "How it works" resuelto**: Diego generó el video con estilo mascota 3D morada
+  (bodega → van → puerta) directo en Google Flow/Gemini — mejor resultado que el enfoque
+  fotorrealista que yo había propuesto primero (el prompt original de la sesión anterior
+  no sirvió, Diego lo rehizo por su cuenta con mejor resultado). El clip original
+  (`Worker_delivering_box_with_van_202608171537.mp4`, 1280×720, 10s, con audio) se
+  recodificó a `public/how-it-works/proceso.mp4` (sin audio — se reproduce muteado de
+  todas formas, 2.5MB → 1.3MB) y se generó `public/how-it-works/proceso-azkomoly.webp`
+  (el infográfico numerado 1-5 que Diego también mandó, convertido de PNG 977KB a WebP
+  107KB) como `poster`/fallback.
+- `HowItWorks()` en `index.tsx`: el video reemplaza el número-watermark de las 4 tarjetas
+  grandes de texto — ahora es un único video centrado (`aspect-video`, borde+sombra dura)
+  que se reproduce sólo cuando entra en viewport (`IntersectionObserver`, mismo patrón que
+  ya usa `[data-reveal]` en esta página) y respeta `prefers-reduced-motion` (si está
+  activo nunca se llama a `.play()`, se ve el poster fijo). Debajo quedó una fila chica de
+  4 badges (número + título) en vez de las tarjetas grandes — el video ya cuenta la
+  historia, el texto ahora acompaña.
+
+### Investigación de Hero/Productos ("sigue siendo basura")
+Diego reportó que el Hero y la sección de productos siguen mal. Abrí el sitio real en
+Chrome (`localhost:8080`) para diagnosticar en vez de adivinar — con un hallazgo importante
+sobre mi propio proceso: en un primer pase creí ver la imagen del hero (la caja "?" morada)
+completamente ausente/vacía, pero era un **falso positivo mío** causado por comparar
+screenshots tomados en momentos/scrolls distintos sin darme cuenta (el juego de
+`resize_window` + capturas sucesivas no fue confiable en este entorno — ya estaba
+documentado como limitación desde sesión 8). Con una medición limpia (`scrollY:0` verificado
+por JS + zoom exacto a las coordenadas reales del `<img>`) confirmé que el Hero **renderiza
+correctamente**: imagen, texto curvo animado y caja de vidrio con el CTA están todos ahí.
+**No reporté esto como bug arreglado porque no era un bug real** — quede claro con Diego que
+esto no estaba roto técnicamente.
+Lo que sí es real y queda para revisar con Diego con más detalle (no se tocó, falta su
+dirección concreta): el texto curvo grande nunca se lee completo (se corta en ambos bordes
+mientras da la vuelta) y hay tramos con bastante espacio vacío entre el Hero y "Our boxes".
+Esto es una sesión aparte — el Hero ya tuvo muchas iteraciones previas (sesiones 7-8) y
+tocarlo sin un feedback más específico de Diego sobre qué cambiar puntualmente arriesga
+deshacer trabajo que sí le gustó (la caja de vidrio, por ejemplo, session 7 dice
+"le gustó, se queda").
+
+### Verificado y publicado
+- `npx tsc --noEmit` → 0.
+- `npm run build` (build de producción real, no sólo dev) → compila sin errores.
+- Confirmado en navegador: el video de "How it works" se reproduce de verdad al entrar en
+  viewport (comparé dos frames con 2s de diferencia, cambiaron).
+- **Commit y push a `origin/main`**: dos commits (`46053b7` con todo lo de mobile/
+  conversión/blog de esta sesión, `a6937f4` con el video de How it Works) ya están en el
+  remoto.
+
+### Pendiente
+- [ ] **Hero y "Our boxes"**: Diego dice que siguen mal — necesito de él algo más concreto
+  que "sigue siendo basura" para no iterar a ciegas otra vez (¿qué específicamente: el
+  texto cortado, el espacio vacío, la composición, algo de mobile?). Confirmar primero en
+  mobile real, no sólo desktop, porque el `resize_window` del navegador automatizado no
+  funciona en este entorno (limitación ya documentada, no es un bug del sitio).
+- [ ] `public/1.png`...`5.png`, `Worker_delivering_box_with_van_*.mp4` y
+  `proceso-azkomoly.png` (el PNG original, no el WebP usado) quedaron commiteados en la
+  raíz de `public/` tal cual los mandó Diego — son assets fuente sin optimizar y no los
+  referencia ningún componente (sólo se usan las versiones procesadas en
+  `public/how-it-works/`). Server los sigue publicando igual porque todo lo que hay en
+  `public/` se despliega. Mover a una carpeta fuera de `public/` (o borrar los que ya no
+  hagan falta) en una próxima sesión de limpieza.
+- (siguen pendientes de sesiones previas: apex `.com`, handles de producto,
+  `SHOPIFY_ADMIN_TOKEN`, envíos, pagos, ÁFA, estudio de keywords + blogs reales,
+  `shopify-theme/` sin trackear)
+
+---
+
 <!-- PLANTILLA PARA NUEVAS SESIONES:
 
 ## YYYY-MM-DD (Sesión N)
