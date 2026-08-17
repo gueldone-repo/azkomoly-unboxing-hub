@@ -39,7 +39,7 @@
   </url>
   <url>
     <loc>https://azkomoly.hu/shop/azkomoly-not-real-box-2-copy</loc>
-    <lastmod>2026-08-15</lastmod>
+    <lastmod>2026-08-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <xhtml:link rel="alternate" hreflang="hu" href="https://azkomoly.hu/shop/azkomoly-not-real-box-2-copy"/>
@@ -92,21 +92,30 @@
     <xhtml:link rel="alternate" hreflang="x-default" href="https://azkomoly.hu/shop/xxl-azkomoly-misztikus-borond"/>
   </url>
   <url>
-    <loc>https://azkomoly.hu/blog/mi-az-a-mystery-box</loc>
+    <loc>https://azkomoly.hu/blog/mystery-box-rendeles-magyarorszagon</loc>
     <lastmod>2026-08-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <xhtml:link rel="alternate" hreflang="hu" href="https://azkomoly.hu/blog/mi-az-a-mystery-box"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://azkomoly.hu/en/blog/mi-az-a-mystery-box"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://azkomoly.hu/blog/mi-az-a-mystery-box"/>
+    <xhtml:link rel="alternate" hreflang="hu" href="https://azkomoly.hu/blog/mystery-box-rendeles-magyarorszagon"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://azkomoly.hu/en/blog/mystery-box-rendeles-magyarorszagon"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://azkomoly.hu/blog/mystery-box-rendeles-magyarorszagon"/>
   </url>
   <url>
-    <loc>https://azkomoly.hu/blog/honnan-szarmaznak-a-termekeink</loc>
+    <loc>https://azkomoly.hu/blog/ruha-mystery-box-mi-van-a-dobozban</loc>
     <lastmod>2026-08-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-    <xhtml:link rel="alternate" hreflang="hu" href="https://azkomoly.hu/blog/honnan-szarmaznak-a-termekeink"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://azkomoly.hu/en/blog/honnan-szarmaznak-a-termekeink"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://azkomoly.hu/blog/honnan-szarmaznak-a-termekeink"/>
+    <xhtml:link rel="alternate" hreflang="hu" href="https://azkomoly.hu/blog/ruha-mystery-box-mi-van-a-dobozban"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://azkomoly.hu/en/blog/ruha-mystery-box-mi-van-a-dobozban"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://azkomoly.hu/blog/ruha-mystery-box-mi-van-a-dobozban"/>
+  </url>
+  <url>
+    <loc>https://azkomoly.hu/blog/honnan-szarmaznak-a-mystery-box-termekek</loc>
+    <lastmod>2026-08-17</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+    <xhtml:link rel="alternate" hreflang="hu" href="https://azkomoly.hu/blog/honnan-szarmaznak-a-mystery-box-termekek"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://azkomoly.hu/en/blog/honnan-szarmaznak-a-mystery-box-termekek"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://azkomoly.hu/blog/honnan-szarmaznak-a-mystery-box-termekek"/>
   </url>
 </urlset>

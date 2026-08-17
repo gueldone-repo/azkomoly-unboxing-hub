@@ -38,8 +38,9 @@ const STATIC_ROUTES = [
  * las rutas estáticas. RECORDAR: agregar acá cada post nuevo al publicarlo.
  */
 const BLOG_ROUTES = [
-  ["/blog/mi-az-a-mystery-box", "2026-08-17", "0.6", "monthly"],
-  ["/blog/honnan-szarmaznak-a-termekeink", "2026-08-17", "0.6", "monthly"],
+  ["/blog/mystery-box-rendeles-magyarorszagon", "2026-08-17", "0.6", "monthly"],
+  ["/blog/ruha-mystery-box-mi-van-a-dobozban", "2026-08-17", "0.6", "monthly"],
+  ["/blog/honnan-szarmaznak-a-mystery-box-termekek", "2026-08-17", "0.6", "monthly"],
 ];
 
 async function fetchProducts() {
