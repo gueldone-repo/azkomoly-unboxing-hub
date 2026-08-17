@@ -375,9 +375,9 @@ const hu: Dict = {
     heading: "Hogyan működik?",
     steps: [
       { n: "01", title: "VÁLASSZ DOBOZT", text: "" },
-      { n: "02", title: "FIZESS", text: "Bankkártya, Apple Pay, Google Pay. 2 perc az egész." },
-      { n: "03", title: "VÁRJ", text: "Dőlj hátra. A dobozod úton van hozzád." },
-      { n: "04", title: "NYISD KI", text: "Vedd fel kamerával. Posztold. Címkézz be minket." },
+      { n: "02", title: "FIZETSZ, MI KÉSZÍTJÜK", text: "Bankkártya, Apple Pay, Google Pay. 2 perc az egész." },
+      { n: "03", title: "KISZÁLLÍTJUK, TE VÁRSZ", text: "Dőlj hátra. A dobozod úton van hozzád." },
+      { n: "04", title: "KINYITOD, MEGJELÖLSZ", text: "Vedd fel kamerával. Posztold. Címkézz be minket." },
     ],
   },
   bigCta: {
@@ -651,10 +651,10 @@ const en: Dict = {
     kicker: "4 STEPS",
     heading: "How does it work?",
     steps: [
-      { n: "01", title: "PICK A BOX", text: "" },
-      { n: "02", title: "PAY", text: "Card, Apple Pay, Google Pay. Takes 2 minutes." },
-      { n: "03", title: "WAIT", text: "Sit back. Your box is on its way." },
-      { n: "04", title: "OPEN IT", text: "Film it. Post it. Tag us." },
+      { n: "01", title: "CHOOSE A BOX", text: "" },
+      { n: "02", title: "YOU PAY, WE PREPARE", text: "Card, Apple Pay, Google Pay. Takes 2 minutes." },
+      { n: "03", title: "WE SHIP, YOU WAIT", text: "Sit back. Your box is on its way." },
+      { n: "04", title: "YOU OPEN, TAG US", text: "Film it. Post it. Tag us." },
     ],
   },
   bigCta: {

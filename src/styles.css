@@ -4,8 +4,28 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/*
+ * Fallback con métricas ajustadas para Anton (el H1 del hero y casi todos los
+ * títulos usan `--font-display`). Sin esto, mientras Google Fonts todavía no
+ * bajó el .woff2, el navegador cae directo a `system-ui` — que en cada
+ * sistema operativo es una fuente completamente distinta (San Francisco en
+ * Mac, Segoe UI en Windows, Roboto en Android), con métricas de ancho muy
+ * distintas a las de Anton (condensada, mayúsculas anchas). Resultado: el
+ * layout brinca fuerte al cargar la fuente real, y en cada dispositivo se ve
+ * "distinto" durante ese primer segundo — justo el síntoma que reportó Diego.
+ * `size-adjust: 63%` iguala el ancho renderizado de Arial al de Anton para
+ * que el salto de layout sea mínimo. NO BORRAR.
+ */
+@font-face {
+  font-family: "AZK Anton Fallback";
+  src: local("Arial");
+  size-adjust: 63%;
+  ascent-override: 100%;
+  descent-override: 25%;
+}
+
 @theme inline {
-  --font-display: "Anton", "Poppins", system-ui, sans-serif;
+  --font-display: "Anton", "AZK Anton Fallback", "Poppins", system-ui, sans-serif;
   --font-sans: "Poppins", system-ui, sans-serif;
 
   --color-cardboard: var(--cardboard);

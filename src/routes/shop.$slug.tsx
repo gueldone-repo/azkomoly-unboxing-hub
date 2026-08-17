@@ -1,12 +1,12 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
-import { ShieldCheck, Truck, Sparkles, ChevronLeft } from "lucide-react";
+import { ShieldCheck, Truck, Sparkles } from "lucide-react";
 import { useT, useI18n, readLangCookie } from "@/lib/i18n";
 import { DICTIONARIES, type Lang } from "@/lib/i18n/dictionary";
 import { fetchProductByHandle, formatShopifyPrice, type ShopifyProduct } from "@/lib/shopify/client";
 import { useShopifyCart } from "@/lib/shopify/cart-store";
-import { CartButton } from "@/components/cart/CartSheet";
 import { SiteBreadcrumb } from "@/components/SiteBreadcrumb";
+import { SiteNav } from "@/components/nav/SiteNav";
 import { seoLinks, canonicalUrl, jsonLd, productSchema, breadcrumbSchema } from "@/lib/seo";
 
 export const Route = createFileRoute("/shop/$slug")({
@@ -181,13 +181,8 @@ export function ProductPage({
   }
 
   return (
-    <main className="bg-background text-foreground min-h-screen">
-      <div className="mx-auto max-w-7xl px-6 py-6 flex items-center justify-between gap-4">
-        <Link to="/" className="inline-flex items-center gap-1 font-sans text-sm text-foreground/70 hover:text-fire">
-          <ChevronLeft className="h-4 w-4" /> {t.product.back}
-        </Link>
-        <CartButton />
-      </div>
+    <main className="bg-background text-foreground min-h-screen pt-16">
+      <SiteNav />
       {/* Mismos 2 niveles que `breadcrumbSchema` (JSON-LD) más abajo — sin
           apuntar al ancla #termekek, que TanStack Link no resuelve como ruta. */}
       <SiteBreadcrumb

@@ -3,6 +3,8 @@ import { Instagram, Facebook, Youtube } from "lucide-react";
 import { DripDivider } from "@/components/DripDivider";
 import { SiteBreadcrumb } from "@/components/SiteBreadcrumb";
 import { SiteFooter } from "@/components/SiteFooter";
+import { SiteNav } from "@/components/nav/SiteNav";
+import { SocialProofMarquee } from "@/components/SocialProofMarquee";
 import { seoLinksHuOnly } from "@/lib/seo";
 import logoAsset from "@/assets/azkomoly-logo.png.asset.json";
 
@@ -57,11 +59,15 @@ const SOCIALS = [
 
 function AboutPage() {
   return (
-    <main className="bg-background">
+    <main className="bg-background pt-16">
+      <SiteNav />
       <SiteBreadcrumb trail={[{ name: "AZKOMOLY", path: "/" }, { name: "About Us" }]} />
       <AboutHero />
       <OurGoal />
       <WhoWeAre />
+      {/* "Real unboxings" — vivía en Home, Diego pidió moverla acá tal cual
+          estaba (mismo componente, sin cambios). */}
+      <SocialProofMarquee />
       <FollowUs />
       <SiteFooter productsHref="/#termekek" />
     </main>

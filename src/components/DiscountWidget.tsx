@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { X } from "lucide-react";
 import { useT } from "@/lib/i18n";
+import { useSignupDialogStore } from "@/lib/signup-dialog-store";
 
 const DISMISSED_KEY = "azkomoly-discount-widget-dismissed";
 
@@ -15,8 +16,9 @@ const DISMISSED_KEY = "azkomoly-discount-widget-dismissed";
  * no competir con el cookie banner ni interrumpir el hero. Una vez cerrado,
  * no vuelve a molestar (localStorage).
  */
-export function DiscountWidget({ onOpen }: { onOpen: () => void }) {
+export function DiscountWidget() {
   const t = useT();
+  const setSignupOpen = useSignupDialogStore((s) => s.setOpen);
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
@@ -114,7 +116,7 @@ export function DiscountWidget({ onOpen }: { onOpen: () => void }) {
         </div>
 
         <button
-          onClick={onOpen}
+          onClick={() => setSignupOpen(true)}
           className="btn-3d mt-3 w-full bg-fire px-4 py-2.5 font-sans text-sm font-semibold tracking-wide text-white"
         >
           {t.discountWidget.cta}

@@ -2,6 +2,7 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { SiteBreadcrumb } from "@/components/SiteBreadcrumb";
 import { BlogPostBody } from "@/components/blog/BlogPostBody";
 import { SiteFooter } from "@/components/SiteFooter";
+import { SiteNav } from "@/components/nav/SiteNav";
 import { getBlogPost, type BlogPost } from "@/content/blog/posts";
 import { useT, useI18n } from "@/lib/i18n";
 import { DICTIONARIES, type Lang } from "@/lib/i18n/dictionary";
@@ -110,7 +111,8 @@ export function BlogPostPage({ post }: { post: BlogPost }) {
   );
 
   return (
-    <main className="bg-background text-foreground min-h-screen">
+    <main className="bg-background text-foreground min-h-screen pt-16">
+      <SiteNav />
       <SiteBreadcrumb
         trail={[
           { name: "AZKOMOLY", path: lang === "hu" ? "/" : "/en" },

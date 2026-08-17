@@ -1,25 +1,20 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState, useEffect, useRef, type FormEvent } from "react";
-import { useServerFn } from "@tanstack/react-start";
+import { useState, useEffect, useRef } from "react";
 import { motion, useReducedMotion } from "motion/react";
-import { z } from "zod";
-import { supabase } from "@/integrations/supabase/client";
-import { appendLeadToSheet } from "@/lib/leads.functions";
 import { getUrgencyDeadline } from "@/lib/urgency.functions";
-import { ShieldCheck, Truck, Sparkles, Menu, X, MousePointer2, ChevronLeft, ChevronRight } from "lucide-react";
+import { ShieldCheck, Truck, Sparkles, MousePointer2, ChevronLeft, ChevronRight } from "lucide-react";
 import { CookieBanner } from "@/components/CookieBanner";
 import { IntroVideoModal } from "@/components/IntroVideoModal";
 import { SiteFooter } from "@/components/SiteFooter";
+import { SOCIAL_REVIEWS } from "@/components/SocialProofMarquee";
+import { SiteNav } from "@/components/nav/SiteNav";
+import { useSignupDialogStore } from "@/lib/signup-dialog-store";
 
 import { HeroV2 } from "@/components/HeroV2";
 import { DiscountWidget } from "@/components/DiscountWidget";
 import TextLoop from "@/components/TextLoop";
-import PillNav from "@/components/nav/PillNav";
-import StaggeredMenu from "@/components/nav/StaggeredMenu";
-import { SOCIAL_LINKS, SocialGlyph, SocialRow, SocialRail } from "@/components/social/SocialLogos";
+import { SOCIAL_LINKS, SocialGlyph, SocialRail } from "@/components/social/SocialLogos";
 import { ProductTiltCard } from "@/components/shop/ProductTiltCard";
-import { LanguageToggle } from "@/components/LanguageToggle";
-import { CartButton } from "@/components/cart/CartSheet";
 import { SlidingNumber } from "@/components/core/sliding-number";
 import { ScrollFloat } from "@/components/text/ScrollFloat";
 import { ScrollVelocity } from "@/components/text/ScrollVelocity";
@@ -28,20 +23,6 @@ import { fetchProducts, type ShopifyProduct } from "@/lib/shopify/client";
 import { useT, useI18n, readLangCookie } from "@/lib/i18n";
 import { DICTIONARIES } from "@/lib/i18n/dictionary";
 import { seoLinks } from "@/lib/seo";
-
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 
 export const Route = createFileRoute("/")({
   head: () => {
@@ -66,40 +47,7 @@ export const Route = createFileRoute("/")({
   component: Landing,
 });
 
-const COUNTRY_CODES: { code: string; label: string; flag: string }[] = [
-  { code: "+36", label: "Magyarország", flag: "🇭🇺" },
-  { code: "+52", label: "México", flag: "🇲🇽" },
-  { code: "+1", label: "USA / Canada", flag: "🇺🇸" },
-  { code: "+34", label: "España", flag: "🇪🇸" },
-  { code: "+44", label: "United Kingdom", flag: "🇬🇧" },
-  { code: "+49", label: "Deutschland", flag: "🇩🇪" },
-  { code: "+33", label: "France", flag: "🇫🇷" },
-  { code: "+39", label: "Italia", flag: "🇮🇹" },
-  { code: "+43", label: "Österreich", flag: "🇦🇹" },
-  { code: "+40", label: "România", flag: "🇷🇴" },
-  { code: "+421", label: "Slovensko", flag: "🇸🇰" },
-  { code: "+420", label: "Česko", flag: "🇨🇿" },
-  { code: "+48", label: "Polska", flag: "🇵🇱" },
-  { code: "+385", label: "Hrvatska", flag: "🇭🇷" },
-  { code: "+31", label: "Nederland", flag: "🇳🇱" },
-  { code: "+32", label: "België", flag: "🇧🇪" },
-  { code: "+41", label: "Schweiz", flag: "🇨🇭" },
-];
-
-const signupSchema = z.object({
-  name: z.string().trim().min(1).max(120),
-  email: z.string().trim().email().max(255),
-  phone: z
-    .string()
-    .trim()
-    .max(32)
-    .regex(/^[0-9 ()\-]*$/)
-    .optional()
-    .or(z.literal("")),
-});
-
 export function Landing() {
-  const [open, setOpen] = useState(false);
   // BoxSpinner popup disabled for now — will come back rebuilt on
   // https://headlessui.com/react/dialog. Keep closeBox/boxVisible plumbing
   // removed rather than dead-code so nothing half-fires in the meantime.
@@ -123,7 +71,7 @@ export function Landing() {
 
   return (
     <main className="relative min-h-screen bg-background text-foreground">
-      <TopNav onCta={() => setOpen(true)} />
+      <SiteNav isHome />
 
       <UrgencyClock />
       <HeroV2 />
@@ -134,16 +82,15 @@ export function Landing() {
       <VelocityBand />
       <LifestyleStrip />
       <FollowUsRow />
-      <SocialProofMarquee />
       <HowItWorks />
-      <BigCTA onCta={() => setOpen(true)} />
+      <BigCTA />
       <ClosingScrollFloat />
 
       <SiteFooter />
 
-      <SignupDialog open={open} onOpenChange={setOpen} />
-      {/* Reusa el mismo SignupDialog de arriba: el widget es sólo el anzuelo. */}
-      <DiscountWidget onOpen={() => setOpen(true)} />
+      {/* Reusa el mismo SignupDialog global (`__root.tsx`): el widget es
+          sólo el anzuelo, abre el mismo formulario que la navbar. */}
+      <DiscountWidget />
       <IntroVideoModal />
       <CookieBanner />
 
@@ -151,112 +98,6 @@ export function Landing() {
   );
 }
 
-
-function TopNav({ onCta }: { onCta: () => void }) {
-  const t = useT();
-  const { lang } = useI18n();
-  const [menuOpen, setMenuOpen] = useState(false);
-
-  useEffect(() => {
-    if (!menuOpen) return;
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = prev;
-    };
-  }, [menuOpen]);
-
-  // About y GYIK apuntan por fin a sus páginas reales (`/about`, `/faq`), que
-  // Lovable generó y hasta ahora no estaban enlazadas desde ningún sitio: se
-  // llegaba sólo escribiendo la URL a mano.
-  const navLinks = [
-    // Fuera "Contacto": no hay página ni sección de contacto real, sólo el
-    // ancla al footer, así que prometía algo que no existe. Las secciones que
-    // sí existen ahora están todas enlazadas.
-    { href: "#termekek", label: t.nav.shop },
-    { href: "#hogyan", label: t.nav.how },
-    { href: "#velemenyek", label: t.nav.reviews },
-    { href: "/about", label: t.nav.about },
-    { href: "/faq", label: t.nav.faq },
-    // A diferencia de About/FAQ (sólo húngaro por ahora), el blog sí tiene
-    // versión /en propia — enlazamos a la correcta según el idioma activo.
-    { href: lang === "hu" ? "/blog" : "/en/blog", label: t.nav.blog },
-  ];
-
-  return (
-    <>
-      {/* z-[70]: por encima del panel del menú (z-60), para que el botón de
-          cerrar y el carrito sigan alcanzables con el menú abierto. */}
-      {/* Barra blanca, como en la referencia. Antes era una franja morada
-          maciza que, con el hero también morado de título, cargaba el doble de
-          morado del necesario. En blanco el logo respira y el morado queda
-          reservado para lo que importa: los CTA.
-          z-[70]: por encima del panel del menú (z-60), para que el botón de
-          cerrar y el carrito sigan alcanzables con el menú abierto. */}
-      <nav className="fixed top-0 inset-x-0 z-[70] flex flex-col">
-        <div className="w-full bg-white/90 backdrop-blur-md border-b border-black/[0.07]">
-        <div className="mx-auto w-full max-w-7xl px-6 py-3 flex items-center justify-between gap-4">
-          <a href="#top" className="logo-link shrink-0">
-            <img
-              src="/azkomoly_new_logo.webp"
-              alt="AZKOMOLY"
-              className="logo-mark h-10 w-auto"
-            />
-          </a>
-          {/* Desktop: PillNav sin carril de fondo. En reposo los links son
-              texto negro sobre la barra; al pasar el cursor sube el círculo
-              morado y el texto pasa a blanco. */}
-          <div className="hidden md:block">
-            <PillNav
-              items={navLinks.map((l) => ({ label: l.label, href: l.href }))}
-              baseColor="#5B2EA8"
-              trackColor="transparent"
-              pillColor="transparent"
-              pillTextColor="#0D0D0D"
-              hoveredPillTextColor="#FFFFFF"
-            />
-          </div>
-          <div className="flex items-center gap-3 sm:gap-4">
-            <LanguageToggle className="hidden sm:inline-flex" />
-            <SocialRow className="hidden lg:flex !gap-3" iconClassName="h-[18px] w-[18px]" />
-            <CartButton />
-            <button
-              onClick={onCta}
-              className="btn-3d hidden bg-fire px-5 py-2.5 font-sans text-xs font-semibold tracking-wide text-white sm:inline-flex"
-            >
-              {t.nav.notify}
-            </button>
-            <button
-              onClick={() => setMenuOpen((v) => !v)}
-              aria-label={menuOpen ? "Bezárás" : "Menü"}
-              aria-expanded={menuOpen}
-              aria-controls="staggered-menu-panel"
-              className="md:hidden grid place-items-center h-9 w-9 text-foreground"
-            >
-              {menuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-            </button>
-          </div>
-        </div>
-        </div>
-      </nav>
-
-      {/* Menú móvil — StaggeredMenu: las capas de color entran escalonadas
-          (lavanda y morado de marca) y detrás llega el panel con los items.
-          Va controlado: el botón vive arriba, en el navbar. */}
-      <StaggeredMenu
-        open={menuOpen}
-        onClose={() => setMenuOpen(false)}
-        items={navLinks.map((l) => ({ label: l.label, link: l.href, ariaLabel: l.label }))}
-        socialItems={SOCIAL_LINKS.map((s) => ({ label: s.label, link: s.href }))}
-        socialsTitle={t.footer.follow}
-        position="right"
-        colors={["#8F78B5", "#5B2EA8"]}
-        accentColor="#5B2EA8"
-        displayItemNumbering={false}
-      />
-    </>
-  );
-}
 
 // Cuenta 5 minutos reales (por ahora — pendiente definir con Diego qué pasa
 // al llegar a 0 y el código de descuento de Shopify para quien compre a
@@ -326,13 +167,28 @@ function UrgencyClock() {
  * del viewBox, así que centrarlo la deja centrada en la franja.
  */
 function BrandWave() {
+  // El SVG interno tiene un viewBox fijo (1200×520) y escala con
+  // `preserveAspectRatio="meet"` según la dimensión más chica del
+  // contenedor — en mobile esa dimensión es el alto (`min-h`), que antes
+  // era el mismo valor fijo que en desktop. Resultado: en pantallas
+  // angostas el factor de escala se desplomaba y "azkomoly.hu" quedaba
+  // minúsculo. Ahora mobile tiene su propio alto mínimo Y su propio
+  // `fontSize`/`ribbonWidth` (en unidades del viewBox, no px), así el
+  // texto renderizado queda grande de verdad en celular, no sólo en desktop.
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 640px)");
+    setIsMobile(mq.matches);
+    const onChange = (e: MediaQueryListEvent) => setIsMobile(e.matches);
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
+  }, []);
+
   return (
-    // Sin `max-h`: ese tope fijo era justo lo que cortaba las crestas. El SVG
-    // escala con el ancho de la pantalla, así que en monitores grandes la cinta
-    // crecía más que su caja y se comía los bordes de arriba y abajo. Con la
-    // altura atada al ancho (y un mínimo para el móvil), la proporción se
-    // mantiene y nunca recorta.
-    <div aria-hidden="true" className="relative w-full overflow-hidden h-[14vw] min-h-[104px]">
+    <div
+      aria-hidden="true"
+      className="relative w-full overflow-hidden h-[14vw] min-h-[170px] sm:min-h-[104px]"
+    >
       <div className="absolute inset-x-0 top-1/2 -translate-y-1/2">
         {/* Pedido de Diego: mismo patrón/forma, pero quieta y con el dominio
             en vez del nombre suelto — `speed={0}` ya hace que TextLoop no
@@ -344,17 +200,15 @@ function BrandWave() {
           speed={0}
           direction="reverse"
           separator="✦"
-          /* Onda más baja y cinta más fina: juntas ocupan ~26% del alto del
-             SVG, así entra holgada en la franja en cualquier ancho. */
-          curviness={18}
-          fontSize={34}
+          curviness={isMobile ? 14 : 18}
+          fontSize={isMobile ? 80 : 34}
           fontWeight={800}
           letterSpacing={2}
           uppercase
           color="#5B2EA8"
           ribbon
           ribbonColor="#FFFFFF"
-          ribbonWidth={56}
+          ribbonWidth={isMobile ? 130 : 56}
           /* No se detiene al pasar el cursor: es una banda decorativa, no algo
              que haya que leer con calma, y frenarla al rozarla parece un fallo. */
           pauseOnHover={false}
@@ -426,11 +280,11 @@ function ProductsSection() {
             (`-top`) para que pise el borde entre hero y esta sección, que es
             lo que le da el efecto de pegatina superpuesta. */}
         <img
-          src="/sticker-azk.webp"
+          src="/5.png"
           alt=""
           aria-hidden="true"
-          width={721}
-          height={580}
+          width={1376}
+          height={768}
           loading="lazy"
           draggable={false}
           /* Dentro de la sección morada, no a caballo entre las dos: la sección
@@ -438,7 +292,7 @@ function ProductsSection() {
              saliera por arriba quedaba tapada por el hero y se veía cortada,
              por mucho z-index que se le pusiera al sticker. Aquí abajo se ve
              entero y cubre el hueco que quedaba bajo el CTA. */
-          className="pointer-events-none absolute right-[12vw] top-[3vw] z-10 hidden w-[22vw] max-w-[310px] -rotate-6 drop-shadow-[0_18px_30px_rgba(13,13,13,0.28)] lg:block"
+          className="pointer-events-none absolute right-[10vw] top-[3vw] z-10 hidden w-[26vw] max-w-[360px] -rotate-6 drop-shadow-[0_18px_30px_rgba(13,13,13,0.28)] lg:block"
         />
       {/* El colchón sólo hace falta en escritorio, que es donde la caja del
           hero desborda sobre esta sección. Por debajo de lg el hero apila sin
@@ -539,15 +393,6 @@ function ProductsSection() {
 }
 
 
-const SOCIAL_REVIEWS: { src: string; href: string; platform: "instagram" | "tiktok" }[] = [
-  { src: "/review1.webp", href: "https://www.instagram.com/reel/DbOVwukMheu/?utm_source=ig_web_button_share_sheet&igsh=MzRlODBiNWFlZA==", platform: "instagram" },
-  { src: "/review2.webp", href: "https://www.instagram.com/reel/DbAyYwQO_z9/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA==", platform: "instagram" },
-  { src: "/review3.webp", href: "https://www.instagram.com/reel/DanS3tFsao4/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA==", platform: "instagram" },
-  { src: "/review4.webp", href: "https://www.instagram.com/reel/DaLM-yzsLz_/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA==", platform: "instagram" },
-  { src: "/review5.webp", href: "https://www.instagram.com/reel/DaFsFjgKlCR/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA==", platform: "instagram" },
-  { src: "/review6.webp", href: "https://www.tiktok.com/@azkomoly.hu/video/7670098419981110550?is_from_webapp=1&sender_device=pc&web_id=7644208246575662593", platform: "tiktok" },
-];
-
 function VelocityBand() {
   const t = useT();
   // Antes eran dos líneas en sentidos opuestos; Diego pidió dejar sólo la
@@ -559,92 +404,6 @@ function VelocityBand() {
         baseVelocity={-3}
         className="font-display text-xl uppercase text-white sm:text-3xl"
       />
-    </section>
-  );
-}
-
-function ReviewCard({
-  review,
-  index,
-}: {
-  review: (typeof SOCIAL_REVIEWS)[number];
-  index: number;
-}) {
-  const t = useT();
-  const platform = SOCIAL_LINKS.find((s) => s.key === review.platform);
-
-  return (
-    <a
-      href={review.href}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="group relative block w-36 overflow-hidden rounded-md border-2 border-black bg-white shadow-[8px_8px_0_#0D0D0D] transition-transform duration-200 hover:-translate-y-1 sm:w-44"
-      aria-label={`${t.socialProof.openOn} ${platform?.label ?? review.platform}`}
-    >
-      <img
-        src={review.src}
-        alt={`${platform?.label ?? review.platform} ${t.socialProof.screenshotAlt} ${index + 1}`}
-        className="aspect-[3/4] h-auto w-full object-cover"
-        loading="lazy"
-        decoding="async"
-      />
-      <span className="absolute left-2 top-2 grid h-8 w-8 place-items-center rounded-full bg-black text-white">
-        {platform && <SocialGlyph path={platform.path} className="h-4 w-4" />}
-      </span>
-    </a>
-  );
-}
-
-function SocialProofMarquee() {
-  const t = useT();
-  const columns = [
-    SOCIAL_REVIEWS.filter((_, i) => i % 3 === 0),
-    SOCIAL_REVIEWS.filter((_, i) => i % 3 === 1),
-    SOCIAL_REVIEWS.filter((_, i) => i % 3 === 2),
-  ];
-
-  return (
-    <section id="velemenyek" className="overflow-hidden bg-white py-18 sm:py-24">
-      <div className="mx-auto grid max-w-7xl gap-10 px-6 lg:grid-cols-[0.85fr_1.15fr] lg:items-center">
-        <div>
-          <p className="mb-3 font-sans text-xs font-bold uppercase tracking-[0.35em] text-fire">
-            {t.socialProof.kicker}
-          </p>
-          <h2 className="font-display text-4xl leading-none text-black sm:text-6xl">
-            {t.socialProof.heading}
-          </h2>
-          {/* TODO: Replace this with real transcribed creator/customer copy when provided. */}
-          <p className="mt-5 max-w-[34rem] font-sans text-base leading-relaxed text-black/68">
-            {t.socialProof.sub}
-          </p>
-        </div>
-        {/* Altura fija: en mobile `520px` casi llenaba la pantalla entera —
-            achicada ahí, vuelve al tamaño original desde `sm`. */}
-        <div className="relative h-[360px] sm:h-[520px] overflow-hidden [perspective:900px]">
-          <div className="absolute inset-x-0 top-0 z-10 h-24 bg-gradient-to-b from-white to-transparent" />
-          <div className="absolute inset-x-0 bottom-0 z-10 h-24 bg-gradient-to-t from-white to-transparent" />
-          <div className="grid h-full grid-cols-3 gap-3 [transform:rotateX(10deg)_rotateZ(-4deg)_scale(1.03)] sm:gap-5">
-            {columns.map((items, index) => (
-              <Marquee
-                key={index}
-                vertical
-                reverse={index % 2 === 1}
-                pauseOnHover
-                repeat={5}
-                className="[--duration:26s] [--gap:1rem]"
-              >
-                {items.map((review, itemIndex) => (
-                  <ReviewCard
-                    key={`${review.src}-${itemIndex}`}
-                    review={review}
-                    index={SOCIAL_REVIEWS.indexOf(review)}
-                  />
-                ))}
-              </Marquee>
-            ))}
-          </div>
-        </div>
-      </div>
     </section>
   );
 }
@@ -882,10 +641,25 @@ function ValueProps() {
 }
 
 /**
- * El video/poster muestran el recorrido completo (bodega → van → puerta →
- * unboxing) en una sola pieza — no hace falta un clip por paso. Las 4
- * tarjetas de antes quedan como una fila de referencia chica debajo, no como
- * protagonistas: el video ya cuenta la historia.
+ * Un mascota 3D por paso, en vez del video: el video quedaba encajonado en un
+ * marco con borde/sombra dura que competía con el fondo blanco del sitio
+ * ("no pertenece a la página" — feedback de Diego). Estas 4 imágenes son PNG
+ * con transparencia real (verificado: alpha 0 en las esquinas), así que se
+ * paran directo sobre `bg-dark-bg` sin ningún marco — se leen como parte del
+ * diseño, no como un recorte de video pegado encima.
+ */
+const HOW_STEP_IMAGES = [
+  "/how-it-works/step-1.webp", // bodega
+  "/how-it-works/step-2.webp", // carga en la van
+  "/how-it-works/step-3.webp", // en camino
+  "/how-it-works/step-5.webp", // abre la caja
+];
+
+/**
+ * Vuelve el video, pero esta vez sin el marco de borde+sombra dura que hacía
+ * que se sintiera "pegado encima" del resto de la página — acá va sin borde,
+ * mismo `bg-background` que el resto de la sección, así se lee como parte del
+ * diseño y no como un recorte de video ajeno.
  */
 function HowItWorksVideo() {
   const reduceMotion = useReducedMotion();
@@ -911,7 +685,7 @@ function HowItWorksVideo() {
   }, [inView, reduceMotion]);
 
   return (
-    <div className="relative mx-auto max-w-3xl aspect-video rounded-2xl overflow-hidden border-2 border-cardboard/40 shadow-[8px_8px_0_0_#0D0D0D] bg-dark-bg">
+    <div className="relative mx-auto max-w-2xl aspect-video rounded-2xl overflow-hidden bg-background">
       <video
         ref={videoRef}
         src="/how-it-works/proceso.mp4"
@@ -920,10 +694,6 @@ function HowItWorksVideo() {
         loop
         playsInline
         preload="none"
-        // Sin autoplay: lo dispara el IntersectionObserver de arriba, así no
-        // se reproducen 4-5 videos a la vez si hubiera más de uno en pantalla,
-        // y con `prefers-reduced-motion` directamente no se llama a `.play()`
-        // — el `poster` (el mismo infográfico numerado) queda como imagen fija.
         className="w-full h-full object-contain"
       />
     </div>
@@ -933,6 +703,7 @@ function HowItWorksVideo() {
 function HowItWorks() {
   const t = useT();
   const reduceMotion = useReducedMotion();
+  const steps = t.how.steps;
   return (
     <section id="hogyan" className="bg-background">
       <div className="mx-auto max-w-7xl px-6 py-24">
@@ -945,31 +716,59 @@ function HowItWorks() {
           </h2>
         </div>
 
-        <div data-reveal>
+        <div data-reveal className="mb-12">
           <HowItWorksVideo />
         </div>
 
+        {/* Mobile: columna vertical con línea que conecta los pasos —
+            pedido explícito de Diego ("los pasos deben ser verticales con
+            una buena animación"). Desde `sm` vuelve a la grilla horizontal. */}
         <motion.div
-          className="mt-10 grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-3xl mx-auto"
+          className="flex flex-col gap-12 sm:grid sm:grid-cols-2 lg:grid-cols-4 sm:gap-6 max-w-5xl mx-auto"
           initial={reduceMotion ? false : "hidden"}
           whileInView={reduceMotion ? undefined : "show"}
-          viewport={{ once: true, amount: 0.25 }}
+          viewport={{ once: true, amount: 0.2 }}
           variants={{
             hidden: {},
-            show: { transition: { staggerChildren: 0.08 } },
+            show: { transition: { staggerChildren: 0.15 } },
           }}
         >
-          {t.how.steps.map((s) => (
+          {steps.map((s, i) => (
             <motion.div
               key={s.n}
-              className="flex flex-col items-center text-center gap-1.5 rounded-2xl border border-cardboard/30 bg-dark-bg py-4 px-2"
+              className="relative flex flex-col items-center text-center gap-3"
               variants={{
-                hidden: { opacity: 0, y: 14 },
-                show: { opacity: 1, y: 0, transition: { duration: 0.35, ease: [0.22, 1, 0.36, 1] } },
+                hidden: { opacity: 0, y: 28 },
+                show: { opacity: 1, y: 0, transition: { duration: 0.45, ease: [0.22, 1, 0.36, 1] } },
               }}
             >
+              {i < steps.length - 1 && (
+                <span
+                  aria-hidden="true"
+                  className="sm:hidden absolute left-1/2 top-full h-12 w-0.5 -translate-x-1/2 bg-gradient-to-b from-fire/40 to-fire/5"
+                />
+              )}
+              <motion.div
+                className="aspect-square w-full max-w-[280px] sm:max-w-[200px] grid place-items-center"
+                variants={{
+                  hidden: { opacity: 0, scale: 0.7 },
+                  show: {
+                    opacity: 1,
+                    scale: 1,
+                    transition: { type: "spring", stiffness: 160, damping: 14, delay: 0.1 },
+                  },
+                }}
+              >
+                <img
+                  src={HOW_STEP_IMAGES[i]}
+                  alt=""
+                  aria-hidden="true"
+                  loading="lazy"
+                  className="max-h-full max-w-full object-contain"
+                />
+              </motion.div>
               <span className="font-display text-sm text-fire">{s.n}</span>
-              <span className="font-display text-sm text-foreground uppercase tracking-wide">
+              <span className="font-display text-lg sm:text-base text-foreground uppercase tracking-wide max-w-[16ch]">
                 {s.title}
               </span>
             </motion.div>
@@ -980,8 +779,9 @@ function HowItWorks() {
   );
 }
 
-function BigCTA({ onCta }: { onCta: () => void }) {
+function BigCTA() {
   const t = useT();
+  const setSignupOpen = useSignupDialogStore((s) => s.setOpen);
   const lines = t.bigCta.heading.split("\n");
   const sectionRef = useRef<HTMLElement | null>(null);
   const [spot, setSpot] = useState({ x: 50, y: 50, active: false });
@@ -1117,7 +917,7 @@ function BigCTA({ onCta }: { onCta: () => void }) {
             {t.bigCta.showBoxes}
           </a>
           <button
-            onClick={onCta}
+            onClick={() => setSignupOpen(true)}
             className="btn-3d bg-fire px-10 py-5 font-display text-xl text-primary-foreground sm:text-2xl"
           >
             {t.bigCta.notify}
@@ -1179,180 +979,3 @@ function LegacyFooter() {
   );
 }
 
-function SignupDialog({
-  open,
-  onOpenChange,
-}: {
-  open: boolean;
-  onOpenChange: (v: boolean) => void;
-}) {
-  const t = useT();
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [countryCode, setCountryCode] = useState("+36");
-  const [phone, setPhone] = useState("");
-  const [consent, setConsent] = useState(false);
-  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
-  const [message, setMessage] = useState("");
-  const appendToSheet = useServerFn(appendLeadToSheet);
-
-  async function onSubmit(e: FormEvent) {
-    e.preventDefault();
-    if (!consent) {
-      setStatus("error");
-      setMessage(t.signup.errorConsent);
-      return;
-    }
-    const parsed = signupSchema.safeParse({ name, email, phone });
-    if (!parsed.success) {
-      setStatus("error");
-      setMessage(t.signup.errorGeneric);
-      return;
-    }
-    setStatus("loading");
-    setMessage("");
-
-    const phoneTrim = parsed.data.phone?.trim();
-    const emailLower = parsed.data.email.toLowerCase();
-    const { error } = await supabase.from("azkomoly_leads").insert({
-      name: parsed.data.name,
-      email: emailLower,
-      phone: phoneTrim ? phoneTrim : null,
-      phone_country_code: phoneTrim ? countryCode : null,
-      source: "landing",
-    });
-
-    if (error && error.code !== "23505") {
-      setStatus("error");
-      setMessage(t.signup.errorGeneric);
-      return;
-    }
-
-    appendToSheet({
-      data: {
-        name: parsed.data.name,
-        email: emailLower,
-        countryCode: phoneTrim ? countryCode : null,
-        phone: phoneTrim || null,
-      },
-    }).catch((err) => console.error("Sheet append error", err));
-
-    if (error?.code === "23505") {
-      setStatus("success");
-      setMessage(t.signup.successExisting);
-      return;
-    }
-    setStatus("success");
-    setMessage(t.signup.successNew);
-    setName("");
-    setEmail("");
-    setPhone("");
-  }
-
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="bg-dark-bg border-fire/60 graffiti-border w-[94vw] max-w-md p-5 sm:p-6">
-        <DialogHeader className="pb-1">
-          <DialogTitle className="font-display text-2xl sm:text-3xl text-fire text-fire-glow text-center">
-            {t.signup.title}
-          </DialogTitle>
-        </DialogHeader>
-
-        <form onSubmit={onSubmit} className="flex flex-col gap-3 sm:gap-4 mt-1">
-          <div>
-            <label htmlFor="name" className="block font-sans text-sm text-foreground mb-1">{t.signup.name}</label>
-            <input
-              id="name"
-              required
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              maxLength={120}
-              placeholder={t.signup.namePlaceholder}
-              className="w-full rounded-2xl bg-background border-2 border-cardboard/40 focus:border-fire text-foreground px-4 py-3 text-base font-sans focus:outline-none focus:ring-2 focus:ring-fire/25 transition-colors"
-            />
-          </div>
-
-          <div>
-            <label htmlFor="email" className="block font-sans text-sm text-foreground mb-1">{t.signup.email}</label>
-            <input
-              id="email"
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              maxLength={255}
-              placeholder="te@email.hu"
-              className="w-full rounded-2xl bg-background border-2 border-cardboard/40 focus:border-fire text-foreground px-4 py-3 text-base font-sans focus:outline-none focus:ring-2 focus:ring-fire/25 transition-colors"
-            />
-          </div>
-
-          <div>
-            <label htmlFor="phone" className="block font-sans text-sm text-foreground mb-1">
-              {t.signup.phone} <span className="text-muted-foreground">{t.signup.optional}</span>
-            </label>
-            {/* Antes era una fila apretada de dos cajas rectas pegadas — ahora
-                separadas (`gap-2.5`) y redondeadas como el resto del form. */}
-            <div className="flex gap-2.5">
-              <Select value={countryCode} onValueChange={setCountryCode}>
-                <SelectTrigger className="w-[110px] sm:w-[130px] shrink-0 rounded-2xl bg-background border-2 border-cardboard/40 text-foreground font-sans py-3 px-3 text-base min-h-[52px] focus:ring-2 focus:ring-fire/25">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className="bg-dark-bg border-cardboard/60 text-foreground max-h-72 min-w-[180px] rounded-2xl">
-                  {COUNTRY_CODES.map((c) => (
-                    <SelectItem key={c.code} value={c.code} className="font-sans text-base">
-                      <span className="mr-2">{c.flag}</span>
-                      {c.code}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <input
-                id="phone"
-                type="tel"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                maxLength={32}
-                placeholder={t.signup.phonePlaceholder}
-                className="flex-1 min-w-0 rounded-2xl bg-background border-2 border-cardboard/40 focus:border-fire text-foreground px-4 py-3 text-base font-sans focus:outline-none focus:ring-2 focus:ring-fire/25 transition-colors min-h-[52px]"
-              />
-            </div>
-          </div>
-
-          <label className="flex items-start gap-2 text-xs sm:text-sm text-foreground/80 font-sans">
-            <input
-              type="checkbox"
-              checked={consent}
-              onChange={(e) => setConsent(e.target.checked)}
-              className="mt-0.5 accent-fire"
-              required
-            />
-            <span>
-              {t.signup.consentPre}
-              <Link to="/terms" className="text-fire underline" target="_blank">{t.signup.consentTerms}</Link>
-              {t.signup.consentMid}
-              <Link to="/privacy" className="text-fire underline" target="_blank">{t.signup.consentPrivacy}</Link>
-              {t.signup.consentPost}
-            </span>
-          </label>
-
-          <button
-            type="submit"
-            disabled={status === "loading"}
-            className="btn-3d mt-1 bg-fire px-6 py-4 font-display text-lg text-primary-foreground sm:mt-2 sm:text-xl"
-          >
-            {status === "loading" ? t.signup.sending : t.signup.submit}
-          </button>
-
-          {message && (
-            <p
-              role="status"
-              className={`font-sans text-sm text-center ${status === "success" ? "text-fire" : "text-destructive"}`}
-            >
-              {message}
-            </p>
-          )}
-        </form>
-      </DialogContent>
-    </Dialog>
-  );
-}

@@ -3,6 +3,7 @@ import { useState, type FormEvent } from "react";
 import { DripDivider } from "@/components/DripDivider";
 import { SiteBreadcrumb } from "@/components/SiteBreadcrumb";
 import { SiteFooter } from "@/components/SiteFooter";
+import { SiteNav } from "@/components/nav/SiteNav";
 import { useT } from "@/lib/i18n";
 import { DICTIONARIES } from "@/lib/i18n/dictionary";
 import { seoLinksHuOnly, jsonLd, faqSchema } from "@/lib/seo";
@@ -49,7 +50,8 @@ const CONTACT_EMAIL = "azkomoly.hu@gmail.com";
 
 function FaqPage() {
   return (
-    <main className="bg-background">
+    <main className="bg-background pt-16">
+      <SiteNav />
       <SiteBreadcrumb trail={[{ name: "AZKOMOLY", path: "/" }, { name: "FAQ" }]} />
       <FaqHero />
       <FaqAccordion />
