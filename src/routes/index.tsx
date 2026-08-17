@@ -1,17 +1,14 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, lazy, Suspense } from "react";
 import { motion, useReducedMotion } from "motion/react";
 import { getUrgencyDeadline } from "@/lib/urgency.functions";
 import { ShieldCheck, Truck, Sparkles, MousePointer2, ChevronLeft, ChevronRight } from "lucide-react";
-import { CookieBanner } from "@/components/CookieBanner";
-import { IntroVideoModal } from "@/components/IntroVideoModal";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SOCIAL_REVIEWS } from "@/components/SocialProofMarquee";
 import { SiteNav } from "@/components/nav/SiteNav";
 import { useSignupDialogStore } from "@/lib/signup-dialog-store";
 
 import { HeroV2 } from "@/components/HeroV2";
-import { DiscountWidget } from "@/components/DiscountWidget";
 import TextLoop from "@/components/TextLoop";
 import { SOCIAL_LINKS, SocialGlyph, SocialRail } from "@/components/social/SocialLogos";
 import { ProductTiltCard } from "@/components/shop/ProductTiltCard";
@@ -23,6 +20,21 @@ import { fetchProducts, type ShopifyProduct } from "@/lib/shopify/client";
 import { useT, useI18n, readLangCookie } from "@/lib/i18n";
 import { DICTIONARIES } from "@/lib/i18n/dictionary";
 import { seoLinks } from "@/lib/seo";
+
+/**
+ * Overlays y widgets que no forman parte del primer render: se cargan en un
+ * chunk aparte para que el JS inicial (hero + productos) sea más chico y la
+ * página pinte antes. Antes venían todos en el bundle de la landing.
+ */
+const DiscountWidget = lazy(() =>
+  import("@/components/DiscountWidget").then((m) => ({ default: m.DiscountWidget })),
+);
+const IntroVideoModal = lazy(() =>
+  import("@/components/IntroVideoModal").then((m) => ({ default: m.IntroVideoModal })),
+);
+const CookieBanner = lazy(() =>
+  import("@/components/CookieBanner").then((m) => ({ default: m.CookieBanner })),
+);
 
 export const Route = createFileRoute("/")({
   head: () => {
@@ -40,6 +52,9 @@ export const Route = createFileRoute("/")({
         // Las fuentes se cargan una sola vez en __root.tsx (ver comentario ahí).
         // `/` es la versión húngara para crawlers y el x-default.
         ...seoLinks("/", lang),
+        // Preload del héroe: es el LCP de la landing, sin esto el navegador
+        // recién lo descubre después de hidratar y la página se siente lenta.
+        { rel: "preload", as: "image", href: "/azkomoly_new_HERO_2.webp", type: "image/webp" },
       ],
       // El FAQ (y su schema FAQPage) se mudó a /faq — ver faq.tsx.
     };
@@ -95,9 +110,11 @@ export function Landing() {
 
       {/* Reusa el mismo SignupDialog global (`__root.tsx`): el widget es
           sólo el anzuelo, abre el mismo formulario que la navbar. */}
-      <DiscountWidget />
-      <IntroVideoModal />
-      <CookieBanner />
+      <Suspense fallback={null}>
+        <DiscountWidget />
+        <IntroVideoModal />
+        <CookieBanner />
+      </Suspense>
 
     </main>
   );
@@ -771,13 +788,32 @@ function HowItWorks() {
               }}
             >
               {i < steps.length - 1 && (
-                <span
+                /* Línea morada que une los pasos en mobile: se "dibuja"
+                   sola al entrar en pantalla (scaleY desde arriba) y lleva
+                   un punto que baja en loop, para que el recorrido se lea
+                   como un flujo y no como 4 tarjetas sueltas. */
+                <motion.span
                   aria-hidden="true"
-                  className="sm:hidden absolute left-1/2 top-full h-12 w-0.5 -translate-x-1/2 bg-gradient-to-b from-fire/40 to-fire/5"
-                />
+                  className="sm:hidden absolute left-1/2 top-full h-12 w-[3px] -translate-x-1/2 origin-top overflow-hidden rounded-full bg-gradient-to-b from-fire to-fire/20"
+                  initial={reduceMotion ? false : { scaleY: 0, opacity: 0 }}
+                  whileInView={reduceMotion ? undefined : { scaleY: 1, opacity: 1 }}
+                  viewport={{ once: true, amount: 0.6 }}
+                  transition={{ duration: 0.5, ease: "easeOut" }}
+                >
+                  <motion.span
+                    className="absolute left-1/2 h-2 w-2 -translate-x-1/2 rounded-full bg-fire"
+                    animate={reduceMotion ? undefined : { top: ["-8px", "48px"], opacity: [0, 1, 0] }}
+                    transition={
+                      reduceMotion
+                        ? undefined
+                        : { duration: 1.6, repeat: Infinity, ease: "easeInOut", delay: i * 0.25 }
+                    }
+                  />
+                </motion.span>
               )}
               <motion.div
-                className="aspect-square w-full max-w-[340px] sm:max-w-[260px] grid place-items-center"
+                className="aspect-square w-full max-w-[420px] sm:max-w-[320px] grid place-items-center"
+
                 variants={{
                   hidden: { opacity: 0, scale: 0.7 },
                   show: {
@@ -893,6 +929,8 @@ function BigCTA() {
         src="/boxes inside.webp"
         alt=""
         aria-hidden="true"
+        loading="lazy"
+        decoding="async"
         className="absolute inset-0 w-full h-full object-cover"
         draggable={false}
       />
@@ -902,6 +940,8 @@ function BigCTA() {
         src="/boxes.webp"
         alt=""
         aria-hidden="true"
+        loading="lazy"
+        decoding="async"
         className="absolute inset-0 w-full h-full object-cover"
         draggable={false}
         style={{
@@ -917,6 +957,8 @@ function BigCTA() {
         <img
           src="/azkomoly_new_logo_negativo.webp"
           alt="AZKOMOLY"
+          loading="lazy"
+          decoding="async"
           className="h-12 sm:h-14 w-auto mx-auto mb-6 drop-shadow-[0_2px_6px_rgba(0,0,0,0.6)]"
         />
         <p className="font-display text-primary-foreground text-base sm:text-lg tracking-[0.4em] mb-4 [text-shadow:0_2px_6px_rgba(0,0,0,0.6)]">
