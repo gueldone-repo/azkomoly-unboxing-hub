@@ -771,13 +771,32 @@ function HowItWorks() {
               }}
             >
               {i < steps.length - 1 && (
-                <span
+                /* Línea morada que une los pasos en mobile: se "dibuja"
+                   sola al entrar en pantalla (scaleY desde arriba) y lleva
+                   un punto que baja en loop, para que el recorrido se lea
+                   como un flujo y no como 4 tarjetas sueltas. */
+                <motion.span
                   aria-hidden="true"
-                  className="sm:hidden absolute left-1/2 top-full h-12 w-0.5 -translate-x-1/2 bg-gradient-to-b from-fire/40 to-fire/5"
-                />
+                  className="sm:hidden absolute left-1/2 top-full h-12 w-[3px] -translate-x-1/2 origin-top overflow-hidden rounded-full bg-gradient-to-b from-fire to-fire/20"
+                  initial={reduceMotion ? false : { scaleY: 0, opacity: 0 }}
+                  whileInView={reduceMotion ? undefined : { scaleY: 1, opacity: 1 }}
+                  viewport={{ once: true, amount: 0.6 }}
+                  transition={{ duration: 0.5, ease: "easeOut" }}
+                >
+                  <motion.span
+                    className="absolute left-1/2 h-2 w-2 -translate-x-1/2 rounded-full bg-fire"
+                    animate={reduceMotion ? undefined : { top: ["-8px", "48px"], opacity: [0, 1, 0] }}
+                    transition={
+                      reduceMotion
+                        ? undefined
+                        : { duration: 1.6, repeat: Infinity, ease: "easeInOut", delay: i * 0.25 }
+                    }
+                  />
+                </motion.span>
               )}
               <motion.div
-                className="aspect-square w-full max-w-[340px] sm:max-w-[260px] grid place-items-center"
+                className="aspect-square w-full max-w-[420px] sm:max-w-[320px] grid place-items-center"
+
                 variants={{
                   hidden: { opacity: 0, scale: 0.7 },
                   show: {
