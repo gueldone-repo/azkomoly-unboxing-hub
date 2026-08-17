@@ -1,4 +1,5 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
+import { SiteNav } from "@/components/nav/SiteNav";
 import { seoLinksHuOnly } from "@/lib/seo";
 
 export const Route = createFileRoute("/privacy")({
@@ -19,11 +20,9 @@ export const Route = createFileRoute("/privacy")({
 
 export function PrivacyPage() {
   return (
-    <main className="min-h-screen bg-background text-foreground px-6 py-12">
+    <main className="min-h-screen bg-background text-foreground px-6 pt-28 pb-12">
+      <SiteNav />
       <article className="mx-auto max-w-3xl flex flex-col gap-6">
-        <Link to="/" className="text-fire underline font-sans text-sm">
-          ← Vissza
-        </Link>
         <h1 className="font-display text-fire text-4xl sm:text-5xl">ADATVÉDELMI TÁJÉKOZTATÓ</h1>
         <p className="font-sans text-sm text-muted-foreground">
           Hatályba lépés dátuma: 2026. július 10.
