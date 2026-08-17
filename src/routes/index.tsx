@@ -6,7 +6,7 @@ import { MousePointer2, ChevronLeft, ChevronRight } from "lucide-react";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SOCIAL_REVIEWS } from "@/components/SocialProofMarquee";
 import { SiteNav } from "@/components/nav/SiteNav";
-import { useSignupDialogStore } from "@/lib/signup-dialog-store";
+import { useSignupDialogStore } from "@/lib/state/signup-dialog-store";
 
 import { HeroV2 } from "@/components/HeroV2";
 import TextLoop from "@/components/TextLoop";

@@ -18,7 +18,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { appendLeadToSheet } from "@/lib/leads.functions";
 import { useT } from "@/lib/i18n";
-import { useSignupDialogStore } from "@/lib/signup-dialog-store";
+import { useSignupDialogStore } from "@/lib/state/signup-dialog-store";
 
 const COUNTRY_CODES: { code: string; label: string; flag: string }[] = [
   { code: "+36", label: "Magyarország", flag: "🇭🇺" },

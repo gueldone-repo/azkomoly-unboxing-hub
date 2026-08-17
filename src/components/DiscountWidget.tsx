@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { X } from "lucide-react";
 import { useT } from "@/lib/i18n";
-import { useSignupDialogStore } from "@/lib/signup-dialog-store";
+import { useSignupDialogStore } from "@/lib/state/signup-dialog-store";
 
 const DISMISSED_KEY = "azkomoly-discount-widget-dismissed";
 

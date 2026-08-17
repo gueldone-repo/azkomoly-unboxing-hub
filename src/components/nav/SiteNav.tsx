@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Menu, X } from "lucide-react";
 import { useT, useI18n } from "@/lib/i18n";
-import { useSignupDialogStore } from "@/lib/signup-dialog-store";
+import { useSignupDialogStore } from "@/lib/state/signup-dialog-store";
 import PillNav from "@/components/nav/PillNav";
 import StaggeredMenu from "@/components/nav/StaggeredMenu";
 import { SOCIAL_LINKS, SocialGlyph, SocialRow } from "@/components/social/SocialLogos";
