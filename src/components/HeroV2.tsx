@@ -49,10 +49,14 @@ export function HeroV2() {
     // añadirle sombra la despegaba del fondo como una calcomanía.
     <motion.div
       className="relative"
-      initial={reduceMotion ? false : { opacity: 0, scale: 0.86, rotate: -8, y: 46 }}
+      // Pedido de Diego: que la caja "caiga" desde arriba al cargar la
+      // página, no que aparezca con un pop chico. Arranca bien afuera del
+      // viewport (y: -600) y el spring con poco damping le da el rebote de
+      // aterrizaje — cae, pica un poco, se asienta.
+      initial={reduceMotion ? false : { opacity: 0, scale: 0.92, rotate: -8, y: -600 }}
       animate={reduceMotion ? undefined : { opacity: 1, scale: 1, rotate: -1.5, y: 0 }}
       whileHover={reduceMotion ? undefined : { scale: 1.035, rotate: 1.25, y: -8 }}
-      transition={{ type: "spring", stiffness: 120, damping: 13, mass: 0.9, delay: 0.18 }}
+      transition={{ type: "spring", stiffness: 90, damping: 11, mass: 1.1 }}
     >
       <img
         src="/azkomoly_new_HERO_2.webp"

@@ -190,14 +190,12 @@ function BrandWave() {
       className="relative w-full overflow-hidden h-[14vw] min-h-[170px] sm:min-h-[104px]"
     >
       <div className="absolute inset-x-0 top-1/2 -translate-y-1/2">
-        {/* Pedido de Diego: mismo patrón/forma, pero quieta y con el dominio
-            en vez del nombre suelto — `speed={0}` ya hace que TextLoop no
-            arme el tween de GSAP (ver TextLoop.tsx), no hace falta tocar el
-            componente. */}
+        {/* Vuelve el movimiento (Diego lo pidió de nuevo) — mismo patrón/forma
+            de antes, con "azkomoly.hu" en vez del nombre suelto. */}
         <TextLoop
           text="azkomoly.hu"
           shape="wave"
-          speed={0}
+          speed={isMobile ? 55 : 90}
           direction="reverse"
           separator="✦"
           curviness={isMobile ? 14 : 18}
@@ -590,44 +588,47 @@ function FollowUsRow() {
   const t = useT();
   const reduceMotion = useReducedMotion();
   return (
-    <div className="relative flex flex-wrap items-center justify-center gap-3 bg-fire px-4 py-6">
-      <span className="mr-2 hidden font-sans text-xs font-bold uppercase tracking-[0.3em] text-white/78 sm:inline">
-        {t.footer.follow}
-      </span>
-      {SOCIAL_LINKS.map((s) => (
-        <a
-          key={s.key}
-          href={s.href}
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label={s.label}
-          className="group grid h-11 w-11 place-items-center overflow-hidden rounded-full border-2 border-white/45 bg-white/10 text-white transition-all hover:w-32 hover:-translate-y-0.5 hover:border-white hover:bg-white hover:text-fire focus-visible:w-32 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white/40"
-        >
-          <span className="flex items-center gap-2 whitespace-nowrap px-3">
-            <SocialGlyph path={s.path} className="h-5 w-5 shrink-0" />
-            <span className="max-w-0 overflow-hidden font-sans text-xs font-bold uppercase opacity-0 transition-all group-hover:max-w-24 group-hover:opacity-100 group-focus-visible:max-w-24 group-focus-visible:opacity-100">
-              {s.label}
-            </span>
-          </span>
-        </a>
-      ))}
-
-      {/* Garra decorativa (pedido de Diego): vive justo en el corte entre
-          esta franja morada y "How it works" (blanca) — mitad y mitad, como
-          si estuviera bajando la caja de una sección a la otra. */}
+    // Envoltorio sin fondo propio: la garra vive DETRÁS de la franja morada
+    // (`z-0`, arranca en `top-0`) y la franja (`z-10`, sí con `bg-fire`) le
+    // tapa la vara — sólo asoma la mano+caja por abajo, sobre "How it works".
+    // Eso da la sensación de capas/3D que pidió Diego: la garra "viene
+    // saliendo" de detrás de la sección morada, no está pegada encima.
+    <div className="relative">
       <motion.img
         src="/decor/claw-decor.webp"
         alt=""
         aria-hidden="true"
-        width={974}
-        height={1624}
+        width={1434}
+        height={1672}
         loading="lazy"
         draggable={false}
-        className="pointer-events-none absolute left-1/2 bottom-0 z-20 w-[86px] sm:w-[120px] -translate-x-1/2 translate-y-1/2 drop-shadow-[0_14px_24px_rgba(13,13,13,0.35)]"
+        className="pointer-events-none absolute right-[4%] sm:right-[10%] top-0 z-0 w-[150px] sm:w-[220px] drop-shadow-[0_20px_28px_rgba(13,13,13,0.35)]"
         animate={reduceMotion ? undefined : { rotate: [-3, 3, -3] }}
         transition={reduceMotion ? undefined : { duration: 4, repeat: Infinity, ease: "easeInOut" }}
         style={{ transformOrigin: "top center" }}
       />
+      <div className="relative z-10 flex flex-wrap items-center justify-center gap-3 bg-fire px-4 py-6">
+        <span className="mr-2 hidden font-sans text-xs font-bold uppercase tracking-[0.3em] text-white/78 sm:inline">
+          {t.footer.follow}
+        </span>
+        {SOCIAL_LINKS.map((s) => (
+          <a
+            key={s.key}
+            href={s.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={s.label}
+            className="group grid h-11 w-11 place-items-center overflow-hidden rounded-full border-2 border-white/45 bg-white/10 text-white transition-all hover:w-32 hover:-translate-y-0.5 hover:border-white hover:bg-white hover:text-fire focus-visible:w-32 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white/40"
+          >
+            <span className="flex items-center gap-2 whitespace-nowrap px-3">
+              <SocialGlyph path={s.path} className="h-5 w-5 shrink-0" />
+              <span className="max-w-0 overflow-hidden font-sans text-xs font-bold uppercase opacity-0 transition-all group-hover:max-w-24 group-hover:opacity-100 group-focus-visible:max-w-24 group-focus-visible:opacity-100">
+                {s.label}
+              </span>
+            </span>
+          </a>
+        ))}
+      </div>
     </div>
   );
 }
@@ -705,7 +706,7 @@ function HowItWorksVideo() {
   }, [inView, reduceMotion]);
 
   return (
-    <div className="relative mx-auto max-w-2xl aspect-video rounded-2xl overflow-hidden bg-background">
+    <div className="relative mx-auto max-w-4xl w-full aspect-video rounded-2xl overflow-hidden bg-background">
       <video
         ref={videoRef}
         src="/how-it-works/proceso.mp4"
