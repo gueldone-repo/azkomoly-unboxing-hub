@@ -1,17 +1,14 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, lazy, Suspense } from "react";
 import { motion, useReducedMotion } from "motion/react";
 import { getUrgencyDeadline } from "@/lib/urgency.functions";
 import { ShieldCheck, Truck, Sparkles, MousePointer2, ChevronLeft, ChevronRight } from "lucide-react";
-import { CookieBanner } from "@/components/CookieBanner";
-import { IntroVideoModal } from "@/components/IntroVideoModal";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SOCIAL_REVIEWS } from "@/components/SocialProofMarquee";
 import { SiteNav } from "@/components/nav/SiteNav";
 import { useSignupDialogStore } from "@/lib/signup-dialog-store";
 
 import { HeroV2 } from "@/components/HeroV2";
-import { DiscountWidget } from "@/components/DiscountWidget";
 import TextLoop from "@/components/TextLoop";
 import { SOCIAL_LINKS, SocialGlyph, SocialRail } from "@/components/social/SocialLogos";
 import { ProductTiltCard } from "@/components/shop/ProductTiltCard";
@@ -23,6 +20,21 @@ import { fetchProducts, type ShopifyProduct } from "@/lib/shopify/client";
 import { useT, useI18n, readLangCookie } from "@/lib/i18n";
 import { DICTIONARIES } from "@/lib/i18n/dictionary";
 import { seoLinks } from "@/lib/seo";
+
+/**
+ * Overlays y widgets que no forman parte del primer render: se cargan en un
+ * chunk aparte para que el JS inicial (hero + productos) sea más chico y la
+ * página pinte antes. Antes venían todos en el bundle de la landing.
+ */
+const DiscountWidget = lazy(() =>
+  import("@/components/DiscountWidget").then((m) => ({ default: m.DiscountWidget })),
+);
+const IntroVideoModal = lazy(() =>
+  import("@/components/IntroVideoModal").then((m) => ({ default: m.IntroVideoModal })),
+);
+const CookieBanner = lazy(() =>
+  import("@/components/CookieBanner").then((m) => ({ default: m.CookieBanner })),
+);
 
 export const Route = createFileRoute("/")({
   head: () => {
@@ -95,9 +107,11 @@ export function Landing() {
 
       {/* Reusa el mismo SignupDialog global (`__root.tsx`): el widget es
           sólo el anzuelo, abre el mismo formulario que la navbar. */}
-      <DiscountWidget />
-      <IntroVideoModal />
-      <CookieBanner />
+      <Suspense fallback={null}>
+        <DiscountWidget />
+        <IntroVideoModal />
+        <CookieBanner />
+      </Suspense>
 
     </main>
   );
@@ -912,6 +926,8 @@ function BigCTA() {
         src="/boxes inside.webp"
         alt=""
         aria-hidden="true"
+        loading="lazy"
+        decoding="async"
         className="absolute inset-0 w-full h-full object-cover"
         draggable={false}
       />
@@ -921,6 +937,8 @@ function BigCTA() {
         src="/boxes.webp"
         alt=""
         aria-hidden="true"
+        loading="lazy"
+        decoding="async"
         className="absolute inset-0 w-full h-full object-cover"
         draggable={false}
         style={{
@@ -936,6 +954,8 @@ function BigCTA() {
         <img
           src="/azkomoly_new_logo_negativo.webp"
           alt="AZKOMOLY"
+          loading="lazy"
+          decoding="async"
           className="h-12 sm:h-14 w-auto mx-auto mb-6 drop-shadow-[0_2px_6px_rgba(0,0,0,0.6)]"
         />
         <p className="font-display text-primary-foreground text-base sm:text-lg tracking-[0.4em] mb-4 [text-shadow:0_2px_6px_rgba(0,0,0,0.6)]">
