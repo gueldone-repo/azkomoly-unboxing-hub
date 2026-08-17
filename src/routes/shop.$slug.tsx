@@ -180,8 +180,10 @@ export function ProductPage({
     if (url) window.location.href = url;
   }
 
+  // Sin min-h-screen: en páginas de producto cortas (poco texto/sin
+  // variantes) dejaba un tramo de fondo blanco después del footer.
   return (
-    <main className="bg-background text-foreground min-h-screen pt-16">
+    <main className="bg-background text-foreground pt-16">
       <SiteNav />
       {/* Mismos 2 niveles que `breadcrumbSchema` (JSON-LD) más abajo — sin
           apuntar al ancla #termekek, que TanStack Link no resuelve como ruta. */}

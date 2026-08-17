@@ -4,7 +4,7 @@ import { useT, useI18n } from "@/lib/i18n";
 import { useSignupDialogStore } from "@/lib/signup-dialog-store";
 import PillNav from "@/components/nav/PillNav";
 import StaggeredMenu from "@/components/nav/StaggeredMenu";
-import { SOCIAL_LINKS, SocialRow } from "@/components/social/SocialLogos";
+import { SOCIAL_LINKS, SocialGlyph, SocialRow } from "@/components/social/SocialLogos";
 import { LanguageToggle } from "@/components/LanguageToggle";
 import { CartButton } from "@/components/cart/CartSheet";
 
@@ -58,7 +58,10 @@ export function SiteNav({ isHome = false }: { isHome?: boolean }) {
                 className="logo-mark h-10 w-auto"
               />
             </a>
-            <div className="hidden md:block">
+            {/* Sólo desktop de verdad (lg+) muestra los links de texto —
+                antes arrancaba en `md` y la tablet ya recibía el menú
+                hamburguesa "de escritorio", que no entra bien en ese ancho. */}
+            <div className="hidden lg:block">
               <PillNav
                 items={navLinks.map((l) => ({ label: l.label, href: l.href }))}
                 baseColor="#5B2EA8"
@@ -70,7 +73,10 @@ export function SiteNav({ isHome = false }: { isHome?: boolean }) {
             </div>
             <div className="flex items-center gap-3 sm:gap-4">
               <LanguageToggle className="hidden sm:inline-flex" />
-              <SocialRow className="hidden lg:flex !gap-3" iconClassName="h-[18px] w-[18px]" />
+              {/* Desde tablet (md) hay lugar para los íconos en la barra —
+                  antes arrancaba recién en desktop (lg). En mobile viven
+                  adentro del menú hamburguesa en vez de acá. */}
+              <SocialRow className="hidden md:flex !gap-3" iconClassName="h-[18px] w-[18px]" />
               <CartButton />
               <button
                 onClick={() => setSignupOpen(true)}
@@ -83,7 +89,7 @@ export function SiteNav({ isHome = false }: { isHome?: boolean }) {
                 aria-label={menuOpen ? "Bezárás" : "Menü"}
                 aria-expanded={menuOpen}
                 aria-controls="staggered-menu-panel"
-                className="md:hidden grid place-items-center h-9 w-9 text-foreground"
+                className="lg:hidden grid place-items-center h-9 w-9 text-foreground"
               >
                 {menuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
               </button>
@@ -96,7 +102,13 @@ export function SiteNav({ isHome = false }: { isHome?: boolean }) {
         open={menuOpen}
         onClose={() => setMenuOpen(false)}
         items={navLinks.map((l) => ({ label: l.label, link: l.href, ariaLabel: l.label }))}
-        socialItems={SOCIAL_LINKS.map((s) => ({ label: s.label, link: s.href }))}
+        // Íconos oficiales de marca (mismos que `SocialRow`), no el nombre en
+        // texto de cada red — pedido de Diego.
+        socialItems={SOCIAL_LINKS.map((s) => ({
+          label: s.label,
+          link: s.href,
+          icon: <SocialGlyph path={s.path} className="h-5 w-5" style={{ color: s.brand }} />,
+        }))}
         socialsTitle={t.footer.follow}
         position="right"
         colors={["#8F78B5", "#5B2EA8"]}

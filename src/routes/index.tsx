@@ -69,8 +69,13 @@ export function Landing() {
     return () => io.disconnect();
   }, []);
 
+  // Sin `min-h-screen`: forzaba el `<main>` a medir al menos una pantalla
+  // completa, y si el contenido real era más corto (pasa seguido en
+  // celular), el fondo blanco del `<main>` se estiraba de más y quedaba
+  // un tramo vacío después del footer morado. El contenido real ya define
+  // la altura, no hace falta forzarla.
   return (
-    <main className="relative min-h-screen bg-background text-foreground">
+    <main className="relative bg-background text-foreground">
       <SiteNav isHome />
 
       <UrgencyClock />
@@ -589,10 +594,12 @@ function FollowUsRow() {
   const reduceMotion = useReducedMotion();
   return (
     // Envoltorio sin fondo propio: la garra vive DETRÁS de la franja morada
-    // (`z-0`, arranca en `top-0`) y la franja (`z-10`, sí con `bg-fire`) le
+    // (`z-0`, arranca en `top-8`) y la franja (`z-10`, sí con `bg-fire`) le
     // tapa la vara — sólo asoma la mano+caja por abajo, sobre "How it works".
     // Eso da la sensación de capas/3D que pidió Diego: la garra "viene
     // saliendo" de detrás de la sección morada, no está pegada encima.
+    // `top-8` (en vez de `top-0`) baja toda la imagen un poco más, así la
+    // caja cuelga más adentro de la sección blanca.
     <div className="relative">
       <motion.img
         src="/decor/claw-decor.webp"
@@ -602,7 +609,7 @@ function FollowUsRow() {
         height={1672}
         loading="lazy"
         draggable={false}
-        className="pointer-events-none absolute right-[4%] sm:right-[10%] top-0 z-0 w-[150px] sm:w-[220px] drop-shadow-[0_20px_28px_rgba(13,13,13,0.35)]"
+        className="pointer-events-none absolute right-[4%] sm:right-[10%] top-8 sm:top-10 z-0 w-[150px] sm:w-[220px] drop-shadow-[0_20px_28px_rgba(13,13,13,0.35)]"
         animate={reduceMotion ? undefined : { rotate: [-3, 3, -3] }}
         transition={reduceMotion ? undefined : { duration: 4, repeat: Infinity, ease: "easeInOut" }}
         style={{ transformOrigin: "top center" }}
@@ -770,7 +777,7 @@ function HowItWorks() {
                 />
               )}
               <motion.div
-                className="aspect-square w-full max-w-[280px] sm:max-w-[200px] grid place-items-center"
+                className="aspect-square w-full max-w-[340px] sm:max-w-[260px] grid place-items-center"
                 variants={{
                   hidden: { opacity: 0, scale: 0.7 },
                   show: {
@@ -780,12 +787,21 @@ function HowItWorks() {
                   },
                 }}
               >
-                <img
+                {/* Flotación suave e infinita, aparte de la entrada — pedido
+                    de Diego ("con alguna animación"). Desfasada por índice
+                    para que no floten los 4 exactamente igual. */}
+                <motion.img
                   src={HOW_STEP_IMAGES[i]}
                   alt=""
                   aria-hidden="true"
                   loading="lazy"
                   className="max-h-full max-w-full object-contain"
+                  animate={reduceMotion ? undefined : { y: [0, -10, 0] }}
+                  transition={
+                    reduceMotion
+                      ? undefined
+                      : { duration: 3.4, repeat: Infinity, ease: "easeInOut", delay: i * 0.3 }
+                  }
                 />
               </motion.div>
               <span className="font-display text-sm text-fire">{s.n}</span>

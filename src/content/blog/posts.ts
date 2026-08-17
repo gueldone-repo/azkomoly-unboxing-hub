@@ -38,7 +38,7 @@ export const BLOG_POSTS: BlogPost[] = [
     slug: "mi-az-a-mystery-box",
     publishedAt: "2026-08-17",
     category: "guias",
-    coverImage: "/HERO_1_FRAME.jpeg",
+    coverImage: "/boxes.webp",
     hu: {
       title: "Mi az a mystery box, és miért nem tudod előre mi van benne?",
       excerpt:
@@ -102,7 +102,7 @@ export const BLOG_POSTS: BlogPost[] = [
     slug: "honnan-szarmaznak-a-termekeink",
     publishedAt: "2026-08-17",
     category: "detras-de-la-caja",
-    coverImage: "/HERO_1_FRAME.jpeg",
+    coverImage: "/boxes.webp",
     hu: {
       title: "Honnan származnak az AZKOMOLY dobozokban lévő termékek?",
       excerpt:

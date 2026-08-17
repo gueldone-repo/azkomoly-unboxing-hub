@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
 import { ChevronRight } from "lucide-react";
 import { motion, useReducedMotion } from "motion/react";
 import { siInstagram, siTiktok, siYoutube, siFacebook } from "simple-icons";
@@ -56,9 +56,17 @@ export const SOCIAL_LINKS: {
   },
 ];
 
-export function SocialGlyph({ path, className = "" }: { path: string; className?: string }) {
+export function SocialGlyph({
+  path,
+  className = "",
+  style,
+}: {
+  path: string;
+  className?: string;
+  style?: CSSProperties;
+}) {
   return (
-    <svg viewBox="0 0 24 24" className={className} fill="currentColor" aria-hidden="true">
+    <svg viewBox="0 0 24 24" className={className} style={style} fill="currentColor" aria-hidden="true">
       <path d={path} />
     </svg>
   );

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useLayoutEffect, useRef } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, type ReactNode } from "react";
 import { gsap } from "gsap";
 import "./StaggeredMenu.css";
 
@@ -25,6 +25,9 @@ export type StaggeredMenuItem = {
 export type StaggeredMenuSocialItem = {
   label: string;
   link: string;
+  /** Ícono real de la red (ej. `SocialGlyph`) — si viene, se muestra en vez
+   *  del texto del `label` (que sigue usándose para accesibilidad). */
+  icon?: ReactNode;
 };
 
 export type StaggeredMenuProps = {
@@ -272,9 +275,10 @@ export const StaggeredMenu = ({
                       target="_blank"
                       rel="noopener noreferrer"
                       className="sm-socials-link"
+                      aria-label={s.label}
                       tabIndex={open ? 0 : -1}
                     >
-                      {s.label}
+                      {s.icon ?? s.label}
                     </a>
                   </li>
                 ))}
