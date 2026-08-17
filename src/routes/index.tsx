@@ -52,6 +52,9 @@ export const Route = createFileRoute("/")({
         // Las fuentes se cargan una sola vez en __root.tsx (ver comentario ahí).
         // `/` es la versión húngara para crawlers y el x-default.
         ...seoLinks("/", lang),
+        // Preload del héroe: es el LCP de la landing, sin esto el navegador
+        // recién lo descubre después de hidratar y la página se siente lenta.
+        { rel: "preload", as: "image", href: "/azkomoly_new_HERO_2.webp", type: "image/webp" },
       ],
       // El FAQ (y su schema FAQPage) se mudó a /faq — ver faq.tsx.
     };
