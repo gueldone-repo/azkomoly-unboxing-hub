@@ -157,6 +157,7 @@ export type Dict = {
     name: string;
     namePlaceholder: string;
     email: string;
+    emailPlaceholder: string;
     phone: string;
     optional: string;
     phonePlaceholder: string;
