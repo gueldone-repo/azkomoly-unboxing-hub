@@ -630,6 +630,7 @@ const en: Dict = {
   urgency: {
     prefix: "Flash offer ends in:",
     suffix: "",
+    ended: "Flash offer ended",
   },
   introVideo: {
     title: "Click if you want to skip",
