@@ -19,6 +19,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as EnIndexRouteImport } from './routes/en.index'
 import { Route as BlogIndexRouteImport } from './routes/blog.index'
 import { Route as ShopSlugRouteImport } from './routes/shop.$slug'
+import { Route as EnAboutRouteImport } from './routes/en.about'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
 import { Route as EnBlogIndexRouteImport } from './routes/en.blog.index'
 import { Route as EnShopSlugRouteImport } from './routes/en.shop.$slug'
@@ -74,6 +75,11 @@ const ShopSlugRoute = ShopSlugRouteImport.update({
   path: '/shop/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EnAboutRoute = EnAboutRouteImport.update({
+  id: '/about',
+  path: '/about',
+  getParentRoute: () => EnRoute,
+} as any)
 const BlogSlugRoute = BlogSlugRouteImport.update({
   id: '/blog/$slug',
   path: '/blog/$slug',
@@ -104,6 +110,7 @@ export interface FileRoutesByFullPath {
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
   '/blog/$slug': typeof BlogSlugRoute
+  '/en/about': typeof EnAboutRoute
   '/shop/$slug': typeof ShopSlugRoute
   '/blog/': typeof BlogIndexRoute
   '/en/': typeof EnIndexRoute
@@ -119,6 +126,7 @@ export interface FileRoutesByTo {
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
   '/blog/$slug': typeof BlogSlugRoute
+  '/en/about': typeof EnAboutRoute
   '/shop/$slug': typeof ShopSlugRoute
   '/blog': typeof BlogIndexRoute
   '/en': typeof EnIndexRoute
@@ -136,6 +144,7 @@ export interface FileRoutesById {
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
   '/blog/$slug': typeof BlogSlugRoute
+  '/en/about': typeof EnAboutRoute
   '/shop/$slug': typeof ShopSlugRoute
   '/blog/': typeof BlogIndexRoute
   '/en/': typeof EnIndexRoute
@@ -154,6 +163,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/terms'
     | '/blog/$slug'
+    | '/en/about'
     | '/shop/$slug'
     | '/blog/'
     | '/en/'
@@ -169,6 +179,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/terms'
     | '/blog/$slug'
+    | '/en/about'
     | '/shop/$slug'
     | '/blog'
     | '/en'
@@ -185,6 +196,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/terms'
     | '/blog/$slug'
+    | '/en/about'
     | '/shop/$slug'
     | '/blog/'
     | '/en/'
@@ -278,6 +290,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ShopSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/en/about': {
+      id: '/en/about'
+      path: '/about'
+      fullPath: '/en/about'
+      preLoaderRoute: typeof EnAboutRouteImport
+      parentRoute: typeof EnRoute
+    }
     '/blog/$slug': {
       id: '/blog/$slug'
       path: '/blog/$slug'
@@ -310,6 +329,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface EnRouteChildren {
+  EnAboutRoute: typeof EnAboutRoute
   EnIndexRoute: typeof EnIndexRoute
   EnBlogSlugRoute: typeof EnBlogSlugRoute
   EnShopSlugRoute: typeof EnShopSlugRoute
@@ -317,6 +337,7 @@ interface EnRouteChildren {
 }
 
 const EnRouteChildren: EnRouteChildren = {
+  EnAboutRoute: EnAboutRoute,
   EnIndexRoute: EnIndexRoute,
   EnBlogSlugRoute: EnBlogSlugRoute,
   EnShopSlugRoute: EnShopSlugRoute,

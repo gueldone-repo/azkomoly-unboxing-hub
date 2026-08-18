@@ -66,6 +66,8 @@ export type Dict = {
   urgency: {
     prefix: string;
     suffix: string;
+    /** Texto que reemplaza al 00:00 cuando el contador llega a cero. */
+    ended: string;
   };
   introVideo: {
     title: string;
@@ -127,6 +129,35 @@ export type Dict = {
     kicker: string;
     heading: string;
     items: { q: string; a: string }[];
+  };
+  /** Página /faq (y /en/faq): cabecera y bloque de contacto. */
+  faqPage: {
+    title: string;
+    intro: string;
+    helpTitle: string;
+    helpSub: string;
+    fieldName: string;
+    fieldEmail: string;
+    fieldMessage: string;
+    send: string;
+    mailFallback: string;
+    breadcrumb: string;
+  };
+  /** Página /about (y /en/about). */
+  about: {
+    title: string;
+    intro: string;
+    goalTitle: string;
+    goalP1: string;
+    goalP2: string;
+    whoTitle: string;
+    whoLead: string;
+    whoBody: string;
+    badgeHungarian: string;
+    badgeOriginal: string;
+    seeBoxes: string;
+    followTitle: string;
+    followSub: string;
   };
   blog: {
     kicker: string;
@@ -288,6 +319,7 @@ const hu: Dict = {
   urgency: {
     prefix: "Villámajánlat lejár:",
     suffix: "",
+    ended: "A villámajánlat lejárt",
   },
   introVideo: {
     title: "Kattints, ha ugranál",
@@ -380,7 +412,7 @@ const hu: Dict = {
       { n: "01", title: "VÁLASSZ DOBOZT", text: "" },
       { n: "02", title: "FIZETSZ, MI KÉSZÍTJÜK", text: "Bankkártya, Apple Pay, Google Pay. 2 perc az egész." },
       { n: "03", title: "KISZÁLLÍTJUK, TE VÁRSZ", text: "Dőlj hátra. A dobozod úton van hozzád." },
-      { n: "04", title: "KINYITOD, MEGJELÖLSZ", text: "Vedd fel kamerával. Posztold. Címkézz be minket." },
+      { n: "04", title: "KINYITOD, MEGJELÖLSZ", text: "Vedd videóra, posztold és jelölj be minket — 20% kedvezményt kapsz a következő rendelésedre." },
     ],
   },
   bigCta: {
@@ -405,6 +437,38 @@ const hu: Dict = {
       { q: "Mi van, ha nem tetszik a termék?", a: "Biztosak vagyunk benne, hogy imádni fogod — de ha mégsem, lépj kapcsolatba ügyfélszolgálatunkkal és megtaláljuk a legjobb megoldást." },
       { q: "Melyik futárszolgálat szállítja a csomagot?", a: "Ez attól függ, hogy házhoz kéred vagy csomagpontra. Mindig a legjobb elérhető megoldást választjuk, és ha csomagpontra megy, mindig a hozzád legközelebbi pontot jelöljük ki." },
     ],
+  },
+  faqPage: {
+    title: "GYIK",
+    intro:
+      "Minden, amit a mystery boxokról tudni érdemes — szállítás, méret, tartalom és minden, ami eddig kérdés volt.",
+    helpTitle: "Még kérdésed van?",
+    helpSub: "Nem találtad meg a válaszod? Írj nekünk, és 24 órán belül válaszolunk.",
+    fieldName: "Név",
+    fieldEmail: "Email",
+    fieldMessage: "Üzenet",
+    send: "Írj nekünk!",
+    mailFallback: "Megnyitottuk a leveleződ. Ha nem indult el automatikusan, írj ide közvetlenül:",
+    breadcrumb: "GYIK",
+  },
+  about: {
+    title: "Rólunk",
+    intro: "100% magyar mystery box csapat. Eredeti termékek, valódi meglepetés — semmi extra.",
+    goalTitle: "A célunk",
+    goalP1:
+      "Az AZKOMOLY azért létezik, mert hiszünk abban, hogy a vásárlás lehet izgalmas is, nem csak praktikus. Minden doboz egy kis kockázat és egy nagy meglepetés — te választod a tétet, mi garantáljuk az értéket.",
+    goalP2:
+      "Nem akarunk még egy webshopot, ahol pontosan tudod, mi érkezik. Azt akarjuk, hogy amikor kibontod a dobozod, tényleg érezd azt a pillanatot — mintha ajándékot kapnál magadtól.",
+    whoTitle: "Kik vagyunk",
+    whoLead: "100% magyar vállalkozás vagyunk, és minden, amit árulunk, eredeti termék.",
+    whoBody:
+      "Az AZKOMOLY egy maroknyi magyar csapat ötletéből indult, akiket idegesített, hogy a legtöbb webshopban semmi meglepetés nincs a vásárlásban. Elkezdtünk liquidation és túlkészletezett tételekből válogatni, és mystery boxokba rendezni őket — így minden doboz garantáltan minőségi, eredeti terméket tartalmaz, de sosem tudod pontosan, mit kapsz.",
+    badgeHungarian: "100% magyar",
+    badgeOriginal: "Eredeti termékek",
+    seeBoxes: "Nézd meg a dobozainkat",
+    followTitle: "Kövess minket",
+    followSub:
+      "Kövesd az AZKOMOLY-t a közösségi médiában — minden unboxingot ott osztunk meg elsőként.",
   },
   blog: {
     kicker: "AZKOMOLY BLOG",
@@ -566,6 +630,7 @@ const en: Dict = {
   urgency: {
     prefix: "Flash offer ends in:",
     suffix: "",
+    ended: "Flash offer ended",
   },
   introVideo: {
     title: "Click if you want to skip",
@@ -658,7 +723,7 @@ const en: Dict = {
       { n: "01", title: "CHOOSE A BOX", text: "" },
       { n: "02", title: "YOU PAY, WE PREPARE", text: "Card, Apple Pay, Google Pay. Takes 2 minutes." },
       { n: "03", title: "WE SHIP, YOU WAIT", text: "Sit back. Your box is on its way." },
-      { n: "04", title: "YOU OPEN, TAG US", text: "Film it. Post it. Tag us." },
+      { n: "04", title: "YOU OPEN, TAG US", text: "Film it, post it and tag us — you get 20% off your next order." },
     ],
   },
   bigCta: {
@@ -683,6 +748,37 @@ const en: Dict = {
       { q: "What if I don't like my product?", a: "We're confident you'll love what's inside — but if you don't, reach out to our customer support team and we'll find the best solution for you." },
       { q: "Which delivery company will bring my order?", a: "It depends on whether you choose home delivery or a pickup point. Either way, we always select the best available option — and if it's a pickup point, we assign the one closest to your address." },
     ],
+  },
+  faqPage: {
+    title: "FAQ",
+    intro:
+      "Everything worth knowing about the mystery boxes — shipping, sizing, contents and anything else you've been wondering about.",
+    helpTitle: "Still need help?",
+    helpSub: "Didn't find your answer? Write to us and we'll reply within 24 hours.",
+    fieldName: "Name",
+    fieldEmail: "Email",
+    fieldMessage: "Message",
+    send: "Email us!",
+    mailFallback: "We opened your mail app. If it didn't start automatically, write to us directly:",
+    breadcrumb: "FAQ",
+  },
+  about: {
+    title: "About Us",
+    intro: "100% Hungarian mystery box crew. Original products, real surprises — nothing else.",
+    goalTitle: "Our Goal",
+    goalP1:
+      "AZKOMOLY exists because we believe shopping can be exciting, not just practical. Every box is a small risk and a big surprise — you set the stake, we guarantee the value.",
+    goalP2:
+      "We don't want to be one more webshop where you know exactly what shows up. We want that moment when you open your box to feel real — like a gift from yourself.",
+    whoTitle: "Who We Are",
+    whoLead: "We're a 100% Hungarian business, and everything we sell is an original product.",
+    whoBody:
+      "AZKOMOLY started with a handful of Hungarians who were tired of shopping with zero surprise in it. We began sourcing liquidation and overstock lots and turning them into mystery boxes — so every box holds genuine, quality products, but you never know exactly what you'll get.",
+    badgeHungarian: "100% Hungarian",
+    badgeOriginal: "Original products",
+    seeBoxes: "See our boxes",
+    followTitle: "Follow Us",
+    followSub: "Follow AZKOMOLY on social — every unboxing lands there first.",
   },
   blog: {
     kicker: "AZKOMOLY BLOG",
