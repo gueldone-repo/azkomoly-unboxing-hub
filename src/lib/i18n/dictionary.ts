@@ -130,6 +130,35 @@ export type Dict = {
     heading: string;
     items: { q: string; a: string }[];
   };
+  /** Página /faq (y /en/faq): cabecera y bloque de contacto. */
+  faqPage: {
+    title: string;
+    intro: string;
+    helpTitle: string;
+    helpSub: string;
+    fieldName: string;
+    fieldEmail: string;
+    fieldMessage: string;
+    send: string;
+    mailFallback: string;
+    breadcrumb: string;
+  };
+  /** Página /about (y /en/about). */
+  about: {
+    title: string;
+    intro: string;
+    goalTitle: string;
+    goalP1: string;
+    goalP2: string;
+    whoTitle: string;
+    whoLead: string;
+    whoBody: string;
+    badgeHungarian: string;
+    badgeOriginal: string;
+    seeBoxes: string;
+    followTitle: string;
+    followSub: string;
+  };
   blog: {
     kicker: string;
     heading: string;
