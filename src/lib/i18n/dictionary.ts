@@ -715,6 +715,37 @@ const en: Dict = {
       { q: "Which delivery company will bring my order?", a: "It depends on whether you choose home delivery or a pickup point. Either way, we always select the best available option — and if it's a pickup point, we assign the one closest to your address." },
     ],
   },
+  faqPage: {
+    title: "FAQ",
+    intro:
+      "Everything worth knowing about the mystery boxes — shipping, sizing, contents and anything else you've been wondering about.",
+    helpTitle: "Still need help?",
+    helpSub: "Didn't find your answer? Write to us and we'll reply within 24 hours.",
+    fieldName: "Name",
+    fieldEmail: "Email",
+    fieldMessage: "Message",
+    send: "Email us!",
+    mailFallback: "We opened your mail app. If it didn't start automatically, write to us directly:",
+    breadcrumb: "FAQ",
+  },
+  about: {
+    title: "About Us",
+    intro: "100% Hungarian mystery box crew. Original products, real surprises — nothing else.",
+    goalTitle: "Our Goal",
+    goalP1:
+      "AZKOMOLY exists because we believe shopping can be exciting, not just practical. Every box is a small risk and a big surprise — you set the stake, we guarantee the value.",
+    goalP2:
+      "We don't want to be one more webshop where you know exactly what shows up. We want that moment when you open your box to feel real — like a gift from yourself.",
+    whoTitle: "Who We Are",
+    whoLead: "We're a 100% Hungarian business, and everything we sell is an original product.",
+    whoBody:
+      "AZKOMOLY started with a handful of Hungarians who were tired of shopping with zero surprise in it. We began sourcing liquidation and overstock lots and turning them into mystery boxes — so every box holds genuine, quality products, but you never know exactly what you'll get.",
+    badgeHungarian: "100% Hungarian",
+    badgeOriginal: "Original products",
+    seeBoxes: "See our boxes",
+    followTitle: "Follow Us",
+    followSub: "Follow AZKOMOLY on social — every unboxing lands there first.",
+  },
   blog: {
     kicker: "AZKOMOLY BLOG",
     heading: "Articles & stories",
