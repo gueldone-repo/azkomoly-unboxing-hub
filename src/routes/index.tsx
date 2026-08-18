@@ -547,7 +547,9 @@ function LifestyleStrip() {
   };
 
   return (
-    <section className="relative py-6 overflow-hidden border-y border-cardboard/20 bg-dark-bg/60">
+    // `#velemenyek`: el link "Vélemények / Reviews" del navbar apunta acá —
+    // los unboxings reales viven en la home, no en About.
+    <section id="velemenyek" className="relative scroll-mt-28 py-6 overflow-hidden border-y border-cardboard/20 bg-dark-bg/60">
       <button
         type="button"
         onClick={() => scrollByCard(-1)}
