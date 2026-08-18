@@ -437,6 +437,38 @@ const hu: Dict = {
       { q: "Melyik futárszolgálat szállítja a csomagot?", a: "Ez attól függ, hogy házhoz kéred vagy csomagpontra. Mindig a legjobb elérhető megoldást választjuk, és ha csomagpontra megy, mindig a hozzád legközelebbi pontot jelöljük ki." },
     ],
   },
+  faqPage: {
+    title: "GYIK",
+    intro:
+      "Minden, amit a mystery boxokról tudni érdemes — szállítás, méret, tartalom és minden, ami eddig kérdés volt.",
+    helpTitle: "Még kérdésed van?",
+    helpSub: "Nem találtad meg a válaszod? Írj nekünk, és 24 órán belül válaszolunk.",
+    fieldName: "Név",
+    fieldEmail: "Email",
+    fieldMessage: "Üzenet",
+    send: "Írj nekünk!",
+    mailFallback: "Megnyitottuk a leveleződ. Ha nem indult el automatikusan, írj ide közvetlenül:",
+    breadcrumb: "GYIK",
+  },
+  about: {
+    title: "Rólunk",
+    intro: "100% magyar mystery box csapat. Eredeti termékek, valódi meglepetés — semmi extra.",
+    goalTitle: "A célunk",
+    goalP1:
+      "Az AZKOMOLY azért létezik, mert hiszünk abban, hogy a vásárlás lehet izgalmas is, nem csak praktikus. Minden doboz egy kis kockázat és egy nagy meglepetés — te választod a tétet, mi garantáljuk az értéket.",
+    goalP2:
+      "Nem akarunk még egy webshopot, ahol pontosan tudod, mi érkezik. Azt akarjuk, hogy amikor kibontod a dobozod, tényleg érezd azt a pillanatot — mintha ajándékot kapnál magadtól.",
+    whoTitle: "Kik vagyunk",
+    whoLead: "100% magyar vállalkozás vagyunk, és minden, amit árulunk, eredeti termék.",
+    whoBody:
+      "Az AZKOMOLY egy maroknyi magyar csapat ötletéből indult, akiket idegesített, hogy a legtöbb webshopban semmi meglepetés nincs a vásárlásban. Elkezdtünk liquidation és túlkészletezett tételekből válogatni, és mystery boxokba rendezni őket — így minden doboz garantáltan minőségi, eredeti terméket tartalmaz, de sosem tudod pontosan, mit kapsz.",
+    badgeHungarian: "100% magyar",
+    badgeOriginal: "Eredeti termékek",
+    seeBoxes: "Nézd meg a dobozainkat",
+    followTitle: "Kövess minket",
+    followSub:
+      "Kövesd az AZKOMOLY-t a közösségi médiában — minden unboxingot ott osztunk meg elsőként.",
+  },
   blog: {
     kicker: "AZKOMOLY BLOG",
     heading: "Cikkek & sztorik",
