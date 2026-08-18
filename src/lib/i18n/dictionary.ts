@@ -412,7 +412,7 @@ const hu: Dict = {
       { n: "01", title: "VÁLASSZ DOBOZT", text: "" },
       { n: "02", title: "FIZETSZ, MI KÉSZÍTJÜK", text: "Bankkártya, Apple Pay, Google Pay. 2 perc az egész." },
       { n: "03", title: "KISZÁLLÍTJUK, TE VÁRSZ", text: "Dőlj hátra. A dobozod úton van hozzád." },
-      { n: "04", title: "KINYITOD, MEGJELÖLSZ", text: "Vedd fel kamerával. Posztold. Címkézz be minket." },
+      { n: "04", title: "KINYITOD, MEGJELÖLSZ", text: "Vedd videóra, posztold és jelölj be minket — 20% kedvezményt kapsz a következő rendelésedre." },
     ],
   },
   bigCta: {
@@ -723,7 +723,7 @@ const en: Dict = {
       { n: "01", title: "CHOOSE A BOX", text: "" },
       { n: "02", title: "YOU PAY, WE PREPARE", text: "Card, Apple Pay, Google Pay. Takes 2 minutes." },
       { n: "03", title: "WE SHIP, YOU WAIT", text: "Sit back. Your box is on its way." },
-      { n: "04", title: "YOU OPEN, TAG US", text: "Film it. Post it. Tag us." },
+      { n: "04", title: "YOU OPEN, TAG US", text: "Film it, post it and tag us — you get 20% off your next order." },
     ],
   },
   bigCta: {
