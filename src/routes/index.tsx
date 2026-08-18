@@ -323,7 +323,10 @@ function ProductsSection() {
              saliera por arriba quedaba tapada por el hero y se veía cortada,
              por mucho z-index que se le pusiera al sticker. Aquí abajo se ve
              entero y cubre el hueco que quedaba bajo el CTA. */
-          className="pointer-events-none absolute right-0 top-[2vw] sm:right-[6vw] lg:right-[10vw] z-10 w-[42vw] sm:w-[30vw] max-w-[360px] -rotate-6 drop-shadow-[0_18px_30px_rgba(13,13,13,0.28)]"
+          /* Móvil y tablet: más chico y pegado arriba a la derecha, fuera del
+             carril de tarjetas — antes tapaba el precio de la primera caja.
+             Desde `lg` queda exactamente como estaba. */
+          className="pointer-events-none absolute right-0 top-1 z-10 w-[26vw] max-w-[150px] -rotate-6 opacity-90 drop-shadow-[0_18px_30px_rgba(13,13,13,0.28)] sm:right-[3vw] sm:w-[22vw] sm:max-w-[190px] lg:right-[10vw] lg:top-[2vw] lg:w-[30vw] lg:max-w-[360px] lg:opacity-100"
         />
       {/* El colchón sólo hace falta en escritorio, que es donde la caja del
           hero desborda sobre esta sección. Por debajo de lg el hero apila sin
