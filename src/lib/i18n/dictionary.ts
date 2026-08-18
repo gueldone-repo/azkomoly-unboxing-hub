@@ -66,6 +66,8 @@ export type Dict = {
   urgency: {
     prefix: string;
     suffix: string;
+    /** Texto que reemplaza al 00:00 cuando el contador llega a cero. */
+    ended: string;
   };
   introVideo: {
     title: string;
