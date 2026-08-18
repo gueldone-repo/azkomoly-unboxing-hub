@@ -158,19 +158,28 @@ function UrgencyClock() {
 
   const minutes = Math.floor(remaining / 60);
   const seconds = remaining % 60;
+  // Al llegar a cero no tiene sentido mostrar 00:00 parpadeando: se cambia
+  // por el aviso de que la oferta terminó (traducido).
+  const ended = deadline != null && remaining <= 0;
 
   return (
     // z-[55], por DEBAJO del panel del menú (z-60). Estaba en z-[65] y se
     // montaba encima, tapando las opciones del menú hamburguesa.
     <section className="sticky top-[65px] z-[55] bg-black text-white shadow-[0_8px_24px_rgba(13,13,13,0.16)]">
       <div className="mx-auto flex min-h-11 max-w-7xl items-center justify-center gap-2 px-4 py-2 text-center font-sans text-[11px] font-semibold uppercase tracking-wide sm:text-xs">
-        <span className="text-white/78">{t.urgency.prefix}</span>
-        <span className="inline-flex items-center gap-1 rounded-sm bg-white px-2 py-1 text-fire">
-          <SlidingNumber value={minutes} />
-          <span>:</span>
-          <SlidingNumber value={seconds} />
-        </span>
-        <span className="text-white/78">{t.urgency.suffix}</span>
+        {ended ? (
+          <span className="text-white">{t.urgency.ended}</span>
+        ) : (
+          <>
+            <span className="text-white/78">{t.urgency.prefix}</span>
+            <span className="inline-flex items-center gap-1 rounded-sm bg-white px-2 py-1 text-fire">
+              <SlidingNumber value={minutes} />
+              <span>:</span>
+              <SlidingNumber value={seconds} />
+            </span>
+            <span className="text-white/78">{t.urgency.suffix}</span>
+          </>
+        )}
       </div>
     </section>
   );
