@@ -782,6 +782,93 @@ deshacer trabajo que sí le gustó (la caja de vidrio, por ejemplo, session 7 di
 
 ---
 
+## 2026-08-18 (Sesión 10) ✅ CERRADA — Blog real de Codex + limpieza hexagonal
+
+### Ronda 1 — Blog real y merge con Lovable
+- **Codex terminó los 3 posts reales** que reemplazan los 2 placeholders en
+  `src/content/blog/posts.ts` (`mystery-box-rendeles-magyarorszagon`,
+  `ruha-mystery-box-mi-van-a-dobozban`, `honnan-szarmaznak-a-mystery-box-termekek`).
+  Verificadas las imágenes de portada (`/boxes.webp`, `/boxes inside.webp`,
+  `/asset_azkomoly.webp`, todas existentes en `public/`) y actualizado
+  `scripts/generate-sitemap.mjs` (`BLOG_ROUTES`) + `sitemap.xml` regenerado. Commit `70c5f19`.
+- **Push bloqueado** porque `origin/main` traía **20 commits de Lovable** (Diego editó en el
+  editor visual entre sesiones). `git fetch` + `git merge origin/main --no-edit` — merge
+  limpio, sin marcas de conflicto.
+- **Regresión de TypeScript post-merge**: `tsc --noEmit` rompía en las 4 rutas con
+  `Route.useLoaderData()` (`shop.$slug`, `en.shop.$slug`, `blog.$slug`, `en.blog.$slug`) con
+  `Property 'product'/'post' does not exist on type 'undefined'`. Causa real (no el falso
+  positivo ya documentado en sesión 9): **el propio build de Lovable dejó commiteado el
+  bloque `declare module '@tanstack/react-start' { interface Register ... }` dentro de
+  `routeTree.gen.ts` en `origin/main`** — el gotcha de siempre (CLAUDE.md) ya no es solo cosa
+  del dev server local, Lovable también lo reinyecta. Se quitó el bloque, `tsc --noEmit` a 0,
+  commit `71d4217` pusheado.
+  **Nota para la próxima sesión**: vigilar este bloque también después de cualquier pull de
+  Lovable, no solo después de `npm run build` local.
+
+### Ronda 2 — Limpieza guiada por la skill `hexagonal-architecture`
+Diego pidió aplicar la skill para sacar código muerto y organizar `utils`/`helpers`, con una
+restricción explícita: **no reescribir lógica, solo estructurar**. Se hizo con plan mode
+(plan en `C:\Users\Mariana\.claude\plans\iterative-pondering-sparkle.md`), 3 fases, verificado
+`tsc --noEmit` + `npm run build` limpios después de cada fase:
+
+- **Fase A — código muerto eliminado** (cero referencias confirmadas por grep):
+  `src/lib/cart.tsx`, `src/lib/mock-products.ts` (carrito mock viejo), `src/lib/api/example.functions.ts`
+  + `src/lib/config.server.ts` (scaffold `getGreeting` de TanStack, nunca invocado),
+  `src/components/shop/ProductCard.tsx` (reemplazado por `ProductTiltCard.tsx`),
+  `src/components/shop/PromoBanner.tsx` y `src/components/shop/SocialProof.tsx` (duplicados
+  huérfanos), `src/components/core/dock.tsx` (sin referencias). También las funciones
+  `ValueProps()` y `LegacyFooter()` dentro de `src/routes/index.tsx` (definidas, nunca
+  renderizadas). Commits `3a8da48` + `22d8485`.
+  **No tocado a propósito**: `BoxSpinner.tsx` y `discounts.functions.ts` — parecen huérfanos
+  pero es feature en pausa (comentario explícito en `index.tsx`), no basura.
+- **Fase B — clasificación `utils` vs `helpers`** (criterio §3.1 de la skill: ¿la función
+  sabe algo del negocio?): inventario de `src/lib/*.ts` — solo `utils.ts` (el `cn()` de
+  shadcn) es un util puro; todo lo demás (`seo.ts`, `leads.functions.ts`, `urgency.functions.ts`)
+  ya es helper/servicio de negocio, y el resto del código ya vive agrupado por dominio
+  (`shopify/`, `i18n/`, `analytics/`). Conclusión: **no se crearon carpetas `utils/`/`helpers/`**
+  — con un solo archivo util puro, separar en dos carpetas sería sobre-ingeniería (la skill
+  lo advierte explícitamente para proyectos chicos).
+- **Fase C — reestructuración liviana** (mover, no reescribir):
+  1. `src/lib/signup-dialog-store.ts` → `src/lib/state/signup-dialog-store.ts` (único store
+     de Zustand que no es específico de Shopify; `cart-store.ts` se queda en `lib/shopify/`
+     porque sí lo es). 4 imports actualizados (`DiscountWidget.tsx`, `SiteNav.tsx`,
+     `SignupDialog.tsx`, `routes/index.tsx`). Commits `5dd9a82` + `63a0809`.
+  2. Comentarios de cabecera de una línea (capa/rol, §7 de la skill) agregados a
+     `lib/shopify/client.ts`, `lib/shopify/cart-store.ts`, `lib/shopify/discounts.functions.ts`,
+     `lib/i18n/dictionary.ts`, `lib/i18n/index.tsx` — cero cambio de comportamiento, solo
+     documenta lo que ya era cierto en la práctica. Commit `14a8148`.
+  3. **No se crearon** carpetas `entity/model/repository/controller` — la skill misma
+     advierte contra forzar esa ceremonia en un frontend de un solo desarrollador; las rutas
+     de TanStack Start ya cumplen el rol de "controller" y `lib/shopify/client.ts` ya cumple
+     el de "repository".
+
+**Gotcha nuevo de Git descubierto esta sesión** (para tener en cuenta siempre): si en un
+mismo `git add <paths...>` se lista la ruta VIEJA de un archivo ya movido/borrado (`git mv`/
+`git rm`) junto con otras rutas reales, `git add` tira `fatal: pathspec ... did not match any
+files` y **trunca en silencio el resto del comando** — los demás archivos listados después NO
+quedan agregados, pero el `git commit` igual sale bien y con un diff que parece completo. Pasó
+dos veces esta sesión (detectado ambas veces por chequear `git status --short` después de cada
+commit, no antes). Lección: **nunca reusar la ruta vieja de un archivo ya movido/borrado en un
+`git add` posterior junto a otros archivos** — y siempre confirmar `git status --short` limpio
+inmediatamente después de cada commit.
+
+Todo pusheado a `origin/main` (`71d4217` + los 5 commits de la limpieza, hasta `14a8148`).
+No se hizo el recorrido visual en navegador de esta última tanda (Diego pidió pushear y cerrar
+directo) — **revisar Home/About/producto/blog al abrir la próxima sesión** antes de seguir,
+solo como chequeo rápido de que nada se rompió silenciosamente.
+
+### Pendiente para la próxima sesión
+- [ ] **Recorrido visual rápido** (Home/About/producto/blog) para confirmar que la limpieza
+  de esta sesión no rompió nada silenciosamente — no se hizo todavía.
+- [ ] Vigilar el bloque `Register` de `react-start` en `routeTree.gen.ts` también después de
+  pulls de Lovable, no solo después de builds locales (nuevo hallazgo de esta sesión).
+- (siguen pendientes de sesiones previas: apex `.com`, handles de producto,
+  `SHOPIFY_ADMIN_TOKEN`, envíos, pagos, ÁFA, estudio de keywords + blogs reales — ahora con
+  3 posts reales, revisar si hace falta más —, `shopify-theme/` sin trackear, assets fuente
+  sin optimizar en `public/` raíz)
+
+---
+
 <!-- PLANTILLA PARA NUEVAS SESIONES:
 
 ## YYYY-MM-DD (Sesión N)
