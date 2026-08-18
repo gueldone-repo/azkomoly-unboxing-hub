@@ -319,6 +319,7 @@ const hu: Dict = {
   urgency: {
     prefix: "Villámajánlat lejár:",
     suffix: "",
+    ended: "A villámajánlat lejárt",
   },
   introVideo: {
     title: "Kattints, ha ugranál",
