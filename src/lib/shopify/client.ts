@@ -122,11 +122,40 @@ export const PRODUCT_BY_HANDLE_QUERY = /* GraphQL */ `
   }
 `;
 
+/**
+ * "AZKOMOLY" es marca, no una palabra a traducir. La traducción automática de
+ * Shopify la convierte en "Serious"/"Komoly" según el idioma; acá se restaura
+ * el nombre de marca en el título que ve el usuario. Cuando se arregle en
+ * Shopify Admin esto simplemente deja de tener efecto.
+ */
+export function normalizeProductTitle(title: string): string {
+  return title.replace(/\b(serious|komoly)\b/gi, "AZKOMOLY");
+}
+
+/** ¿Es una maleta? Van siempre al final del listado (pedido de Diego). */
+function isSuitcase(node: ShopifyProduct["node"]): boolean {
+  const hay = `${node.title} ${node.handle}`.toLowerCase();
+  return /suitcase|luggage|bőrönd|borond|koffer/.test(hay);
+}
+
+/** Orden fijo del escaparate: cajas primero, maletas al final. */
+export function sortStorefrontProducts(edges: ShopifyProduct[]): ShopifyProduct[] {
+  return [...edges].sort(
+    (a, b) => Number(isSuitcase(a.node)) - Number(isSuitcase(b.node)),
+  );
+}
+
 export async function fetchProducts(first = 20, query?: string, lang = "hu") {
   const res = await storefrontApiRequest<{
     products: { edges: ShopifyProduct[] };
   }>(PRODUCTS_QUERY, { first, query, language: toShopifyLanguage(lang) });
-  return res?.data?.products.edges ?? [];
+  const edges = res?.data?.products.edges ?? [];
+  return sortStorefrontProducts(
+    edges.map((e) => ({
+      ...e,
+      node: { ...e.node, title: normalizeProductTitle(e.node.title) },
+    })),
+  );
 }
 
 export async function fetchProductByHandle(handle: string, lang = "hu") {
@@ -134,7 +163,8 @@ export async function fetchProductByHandle(handle: string, lang = "hu") {
     PRODUCT_BY_HANDLE_QUERY,
     { handle, language: toShopifyLanguage(lang) },
   );
-  return res?.data?.product ?? null;
+  const product = res?.data?.product ?? null;
+  return product ? { ...product, title: normalizeProductTitle(product.title) } : null;
 }
 
 // ---------- Cart mutations ----------
