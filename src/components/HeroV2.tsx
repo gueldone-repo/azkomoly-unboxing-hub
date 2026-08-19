@@ -31,17 +31,31 @@ export function HeroV2() {
     </h1>
   );
 
-  // El titular visible: el mismo texto, curvo, en morado translúcido.
-  const curvedTitle = (
-    <CurvedLoop
-      text={`${t.hero.heading.replace("\n", " ")} ✦ `}
-      speed={reduceMotion ? 0 : 38}
-      reverse
-      // Morado a plena fuerza: al 35% se leía apagado y el titular perdía peso.
-      // El texto sale de `t.hero.heading`, así que sigue traducido (hu/en).
-      className="font-display text-fire [&_text]:![font-family:'Bungee',var(--font-display)]"
-    />
+  // El titular visible: el mismo texto, en LÍNEA RECTA, desplazándose en
+  // bucle. Antes iba curvo sobre un <textPath>; Diego pidió que se moviera
+  // recto. Se duplica el contenido y la animación recorre -50% para que el
+  // bucle sea continuo sin saltos.
+  const marqueeText = `${t.hero.heading.replace("\n", " ")} ✦ `;
+  const straightTitle = (
+    <div
+      aria-hidden="true"
+      className="w-full overflow-hidden select-none"
+      style={{ WebkitMaskImage: "linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent)", maskImage: "linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent)" }}
+    >
+      <div
+        className={`flex w-max ${reduceMotion ? "" : "animate-marquee"} font-display uppercase leading-none text-fire`}
+        style={{
+          ["--duration" as string]: "26s",
+          fontFamily: "'Bungee', var(--font-display)",
+          fontSize: "clamp(2.2rem, 7.5vw, 7rem)",
+        }}
+      >
+        <span className="pr-8 whitespace-nowrap">{marqueeText.repeat(3)}</span>
+        <span className="pr-8 whitespace-nowrap">{marqueeText.repeat(3)}</span>
+      </div>
+    </div>
   );
+
 
   const box = (
     // Sin sombra: ni el drop-shadow del <img> ni la elipse difusa del
