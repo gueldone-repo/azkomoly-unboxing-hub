@@ -127,7 +127,7 @@ export function BlogPostPage({ post }: { post: BlogPost }) {
             {post.category}
           </span>
           <h1
-            className="text-fire text-3d-fire text-[clamp(2rem,8vw,3.5rem)] uppercase leading-[0.95]"
+            className="text-fire text-[clamp(2rem,8vw,3.5rem)] uppercase leading-[0.95]"
             style={TITLE_STYLE}
           >
             {content.title}

@@ -232,7 +232,7 @@ export function ProductPage({
 
         {/* Info */}
         <div>
-          <h1 className="font-display text-fire text-3d-fire text-5xl sm:text-6xl mt-2 leading-none">{product.title}</h1>
+          <h1 className="font-display text-fire text-5xl sm:text-6xl mt-2 leading-none">{product.title}</h1>
           <div className="flex items-baseline gap-3 mt-5">
             <span className="font-display text-4xl text-fire">
               {selectedVariant

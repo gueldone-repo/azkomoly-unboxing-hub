@@ -38,11 +38,11 @@ export function SiteNav({ isHome = false }: { isHome?: boolean }) {
   const navLinks = [
     { href: anchor("termekek"), label: t.nav.shop },
     { href: anchor("hogyan"), label: t.nav.how },
-    // "Real unboxings" se mudó a About — el link de reviews apunta ahí en
-    // vez de a un ancla de la landing.
-    { href: "/about#velemenyek", label: t.nav.reviews },
-    { href: "/about", label: t.nav.about },
-    { href: "/faq", label: t.nav.faq },
+    // Los unboxings reales viven en la home; el link de reviews va a esa
+    // sección, no a About (donde ya se quitó el bloque de videos).
+    { href: anchor("velemenyek"), label: t.nav.reviews },
+    { href: lang === "hu" ? "/about" : "/en/about", label: t.nav.about },
+    { href: lang === "hu" ? "/faq" : "/en/faq", label: t.nav.faq },
     { href: lang === "hu" ? "/blog" : "/en/blog", label: t.nav.blog },
   ];
 
