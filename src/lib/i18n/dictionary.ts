@@ -66,6 +66,8 @@ export type Dict = {
   urgency: {
     prefix: string;
     suffix: string;
+    /** Sufijo corto junto al número de días (ej. "d" / "nap"). */
+    days: string;
     /** Texto que reemplaza al 00:00 cuando el contador llega a cero. */
     ended: string;
   };
@@ -323,6 +325,7 @@ const hu: Dict = {
   urgency: {
     prefix: "Villámajánlat lejár:",
     suffix: "",
+    days: "nap",
     ended: "A villámajánlat lejárt",
   },
   introVideo: {
@@ -638,6 +641,7 @@ const en: Dict = {
   urgency: {
     prefix: "Flash offer ends in:",
     suffix: "",
+    days: "d",
     ended: "Flash offer ended",
   },
   introVideo: {

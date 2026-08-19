@@ -1,7 +1,6 @@
 import { useState, type FormEvent } from "react";
 
 import { DripDivider } from "@/components/DripDivider";
-import { SiteBreadcrumb } from "@/components/SiteBreadcrumb";
 import { SiteFooter } from "@/components/SiteFooter";
 import { useT, useI18n } from "@/lib/i18n";
 
@@ -134,7 +133,8 @@ export function FaqPageBody() {
 
   return (
     <main className="bg-background pt-16">
-      <SiteBreadcrumb trail={[{ name: "AZKOMOLY" }, { name: t.faqPage.breadcrumb }]} />
+      {/* Sin breadcrumb: se leía como una barra de "volver" redundante —
+          el navbar ya cubre esa navegación (pedido de Diego). */}
 
       <section id="faq-intro" className="bg-background px-6 pt-14 pb-10 sm:pt-20 sm:pb-14 flex flex-col items-center text-center gap-6">
         <a href={homeHref} aria-label="AZKOMOLY">

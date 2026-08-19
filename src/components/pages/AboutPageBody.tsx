@@ -2,7 +2,6 @@ import { Link } from "@tanstack/react-router";
 import { Instagram, Facebook, Youtube } from "lucide-react";
 
 import { DripDivider } from "@/components/DripDivider";
-import { SiteBreadcrumb } from "@/components/SiteBreadcrumb";
 import { SiteFooter } from "@/components/SiteFooter";
 import { useT, useI18n } from "@/lib/i18n";
 
@@ -44,8 +43,8 @@ export function AboutPageBody() {
 
   return (
     <main className="bg-background pt-16">
-      <SiteBreadcrumb trail={[{ name: "AZKOMOLY" }, { name: t.about.title }]} />
-
+      {/* Sin breadcrumb: se leía como una barra de "volver" redundante —
+          el navbar ya cubre esa navegación (pedido de Diego). */}
       <section id="about-intro" className="bg-background px-6 pt-14 pb-12 sm:pt-20 sm:pb-16 flex flex-col items-center text-center gap-6">
         <a href={homeHref} aria-label="AZKOMOLY">
           <img src="/azkomoly_new_logo.webp" alt="AZKOMOLY" className="h-24 sm:h-32 w-auto" />

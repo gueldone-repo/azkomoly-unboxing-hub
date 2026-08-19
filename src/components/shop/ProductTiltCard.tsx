@@ -3,7 +3,7 @@ import { ShoppingBag } from "lucide-react";
 import TiltedCard from "./TiltedCard";
 import { useShopifyCart } from "@/lib/shopify/cart-store";
 import { formatShopifyPrice, type ShopifyProduct } from "@/lib/shopify/client";
-import { useT } from "@/lib/i18n";
+import { useT, useI18n } from "@/lib/i18n";
 
 /**
  * Producto presentado con TiltedCard.
@@ -19,6 +19,12 @@ import { useT } from "@/lib/i18n";
  */
 export function ProductTiltCard({ p }: { p: ShopifyProduct }) {
   const t = useT();
+  const { lang } = useI18n();
+  // Antes siempre enlazaba a "/shop/$slug" (húngaro) sin importar el idioma
+  // activo. En inglés sin cookie de idioma persistida (sólo forceLang de la
+  // ruta /en) esto hacía que la ficha de producto "perdiera" el inglés al
+  // entrar, porque /shop/$slug no está bajo el layout que fuerza inglés.
+  const productRoute = lang === "hu" ? "/shop/$slug" : "/en/shop/$slug";
   const addItem = useShopifyCart((s) => s.addItem);
   const isLoading = useShopifyCart((s) => s.isLoading);
 
@@ -43,7 +49,7 @@ export function ProductTiltCard({ p }: { p: ShopifyProduct }) {
   return (
     <article className="flex flex-col items-center gap-4">
       <Link
-        to="/shop/$slug"
+        to={productRoute}
         params={{ slug: product.handle }}
         aria-label={product.title}
         className="block w-full"
@@ -90,7 +96,7 @@ export function ProductTiltCard({ p }: { p: ShopifyProduct }) {
 
         <div className="flex w-full items-center justify-center gap-2">
           <Link
-            to="/shop/$slug"
+            to={productRoute}
             params={{ slug: product.handle }}
             className="btn-3d flex-1 bg-white px-5 py-3 text-center font-sans text-sm font-bold uppercase tracking-wide text-fire"
           >

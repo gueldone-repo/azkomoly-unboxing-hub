@@ -1,12 +1,11 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { ShieldCheck, Truck, Sparkles, ZoomIn, X, ChevronLeft, ChevronRight, Check } from "lucide-react";
+import { ShieldCheck, Truck, Sparkles, ZoomIn, ChevronLeft, ChevronRight, Check } from "lucide-react";
 import { useT, useI18n, readLangCookie } from "@/lib/i18n";
 import { DICTIONARIES, type Lang } from "@/lib/i18n/dictionary";
 import { fetchProductByHandle, formatShopifyPrice, type ShopifyProduct } from "@/lib/shopify/client";
 import { useShopifyCart } from "@/lib/shopify/cart-store";
-import { SiteBreadcrumb } from "@/components/SiteBreadcrumb";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { seoLinks, canonicalUrl, jsonLd, productSchema, breadcrumbSchema } from "@/lib/seo";
 
@@ -215,14 +214,11 @@ export function ProductPage({
       {/* SiteNav vive ahora en __root.tsx */}
       {/* Mismos 2 niveles que `breadcrumbSchema` (JSON-LD) más abajo — sin
           apuntar al ancla #termekek, que TanStack Link no resuelve como ruta. */}
-      <SiteBreadcrumb
-        trail={[
-          { name: "AZKOMOLY", path: lang === "hu" ? "/" : "/en" },
-          { name: product.title },
-        ]}
-      />
-
-      <div className="mx-auto max-w-7xl px-6 pb-20 grid lg:grid-cols-2 gap-10">
+      {/* Sin breadcrumb: se leía como una barra de "volver" redundante —
+          el navbar ya cubre esa navegación (pedido de Diego). El JSON-LD
+          `breadcrumbSchema` de arriba (head()) no depende de esto, se queda
+          intacto para SEO. */}
+      <div className="mx-auto max-w-7xl px-6 pt-8 pb-20 grid lg:grid-cols-2 gap-10">
         {/* Visual */}
         <div>
           <button

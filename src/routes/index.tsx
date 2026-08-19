@@ -1,7 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, useEffect, useRef, lazy, Suspense } from "react";
 import { motion, useReducedMotion } from "motion/react";
-import { getUrgencyDeadline } from "@/lib/urgency.functions";
 import { MousePointer2, ChevronLeft, ChevronRight } from "lucide-react";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SOCIAL_REVIEWS } from "@/lib/social-reviews";
@@ -122,46 +121,47 @@ export function Landing() {
 }
 
 
-// Cuenta 5 minutos reales (por ahora — pendiente definir con Diego qué pasa
-// al llegar a 0 y el código de descuento de Shopify para quien compre a
-// tiempo). Guardado en sessionStorage para que sea honesto: si el usuario
-// refresca, sigue contando desde donde iba, no se reinicia.
-const URGENCY_DURATION_SECONDS = 5 * 60;
+// Cuenta hacia un descuento REAL de Shopify — "Flash launch" (automatic
+// discount, 5% off, sin código, se aplica solo en el checkout), creado en
+// Shopify Admin el 2026-08-19 con fin el 26 de septiembre. Este countdown
+// ya no es decorativo: si alguien compra antes de que llegue a 0, el 5% se
+// le aplica de verdad, sin que el sitio tenga que hacer nada más (el
+// descuento es automático, no depende de un código que el sitio inyecte).
+//
+// Para cambiar la fecha en el futuro (otra campaña, otro % en Shopify
+// Admin): actualizar SOLO esta constante, con la misma fecha/hora de fin
+// que se puso en Shopify Admin → Discounts → "Flash launch".
+const FLASH_DEAL_END = new Date("2026-09-26T23:59:00+02:00").getTime();
 
-function getSecondsRemaining(deadline: number) {
-  return Math.max(0, Math.round((deadline - Date.now()) / 1000));
+function getMsRemaining(deadline: number) {
+  return Math.max(0, deadline - Date.now());
 }
 
 function UrgencyClock() {
   const t = useT();
-  // El deadline lo decide el servidor por IP (ver urgency.functions.ts), no
-  // el navegador: así cada IP nueva arranca su propio 5:00 y refrescar o
-  // abrir otra pestaña desde la misma IP no lo reinicia gratis.
-  const [deadline, setDeadline] = useState<number | null>(null);
-  const [remaining, setRemaining] = useState(URGENCY_DURATION_SECONDS);
+  const [remainingMs, setRemainingMs] = useState(() => getMsRemaining(FLASH_DEAL_END));
 
   useEffect(() => {
-    let cancelled = false;
-    getUrgencyDeadline().then((res) => {
-      if (!cancelled) setDeadline(res.deadline);
-    });
-    return () => {
-      cancelled = true;
-    };
+    const timer = window.setInterval(() => setRemainingMs(getMsRemaining(FLASH_DEAL_END)), 1000);
+    return () => window.clearInterval(timer);
   }, []);
 
-  useEffect(() => {
-    if (deadline == null) return;
-    setRemaining(getSecondsRemaining(deadline));
-    const timer = window.setInterval(() => setRemaining(getSecondsRemaining(deadline)), 1000);
-    return () => window.clearInterval(timer);
-  }, [deadline]);
+  const totalSeconds = Math.round(remainingMs / 1000);
+  const days = Math.floor(totalSeconds / 86400);
+  const hours = Math.floor((totalSeconds % 86400) / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+  const ended = remainingMs <= 0;
 
-  const minutes = Math.floor(remaining / 60);
-  const seconds = remaining % 60;
-  // Al llegar a cero no tiene sentido mostrar 00:00 parpadeando: se cambia
-  // por el aviso de que la oferta terminó (traducido).
-  const ended = deadline != null && remaining <= 0;
+  // Cuenta regresiva de semanas: mostrar segundos todo el tiempo se vería
+  // roto (parpadeando desde un número gigante). Progresivamente más
+  // detallada a medida que se acerca el final: días → horas:minutos →
+  // minutos:segundos en la última hora, que es donde sí tiene sentido el
+  // conteo segundo a segundo.
+  let parts: number[];
+  if (days >= 1) parts = [days, hours];
+  else if (hours >= 1) parts = [hours, minutes];
+  else parts = [minutes, seconds];
 
   return (
     // z-[55], por DEBAJO del panel del menú (z-60). Estaba en z-[65] y se
@@ -174,9 +174,10 @@ function UrgencyClock() {
           <>
             <span className="text-white/78">{t.urgency.prefix}</span>
             <span className="inline-flex items-center gap-1 rounded-sm bg-white px-2 py-1 text-fire">
-              <SlidingNumber value={minutes} />
+              <SlidingNumber value={parts[0]} />
+              {days >= 1 && <span className="text-[10px]">{t.urgency.days}</span>}
               <span>:</span>
-              <SlidingNumber value={seconds} />
+              <SlidingNumber value={parts[1]} />
             </span>
             <span className="text-white/78">{t.urgency.suffix}</span>
           </>
