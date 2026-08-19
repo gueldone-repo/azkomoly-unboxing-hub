@@ -345,10 +345,9 @@ function ProductsSection() {
         </div>
       </div>
 
-      {/* La cinta va FUERA del contenedor centrado: dentro de `max-w-7xl` se
-          quedaba en 1280px y por eso se veía cortada, sin llegar a los bordes
-          de la pantalla. */}
-      <BrandWave />
+      {/* Cinta de marca retirada a pedido de Diego: la línea en movimiento
+          dentro de "Our boxes" distraía de las tarjetas. `BrandWave` se
+          conserva por si vuelve a usarse en otra sección. */}
 
       <div className="mx-auto max-w-7xl px-6 pt-10 pb-20">
         {loading ? (

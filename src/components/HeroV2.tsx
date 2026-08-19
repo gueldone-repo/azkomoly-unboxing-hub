@@ -3,7 +3,6 @@ import { motion, useReducedMotion } from "motion/react";
 
 import { useT } from "@/lib/i18n";
 import { WaveBackdrop } from "@/components/WaveBackdrop";
-import { CurvedLoop } from "@/components/text/CurvedLoop";
 import { RotatingText } from "@/components/text/RotatingText";
 import { SplitText } from "@/components/text/SplitText";
 
@@ -31,17 +30,31 @@ export function HeroV2() {
     </h1>
   );
 
-  // El titular visible: el mismo texto, curvo, en morado translúcido.
-  const curvedTitle = (
-    <CurvedLoop
-      text={`${t.hero.heading.replace("\n", " ")} ✦ `}
-      speed={reduceMotion ? 0 : 38}
-      reverse
-      // Morado a plena fuerza: al 35% se leía apagado y el titular perdía peso.
-      // El texto sale de `t.hero.heading`, así que sigue traducido (hu/en).
-      className="font-display text-fire [&_text]:![font-family:'Bungee',var(--font-display)]"
-    />
+  // El titular visible: el mismo texto, en LÍNEA RECTA, desplazándose en
+  // bucle. Antes iba curvo sobre un <textPath>; Diego pidió que se moviera
+  // recto. Se duplica el contenido y la animación recorre -50% para que el
+  // bucle sea continuo sin saltos.
+  const marqueeText = `${t.hero.heading.replace("\n", " ")} ✦ `;
+  const straightTitle = (
+    <div
+      aria-hidden="true"
+      className="w-full overflow-hidden select-none"
+      style={{ WebkitMaskImage: "linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent)", maskImage: "linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent)" }}
+    >
+      <div
+        className={`flex w-max ${reduceMotion ? "" : "animate-marquee"} font-display uppercase leading-none text-fire`}
+        style={{
+          ["--duration" as string]: "26s",
+          fontFamily: "'Bungee', var(--font-display)",
+          fontSize: "clamp(2.2rem, 7.5vw, 7rem)",
+        }}
+      >
+        <span className="pr-8 whitespace-nowrap">{marqueeText.repeat(3)}</span>
+        <span className="pr-8 whitespace-nowrap">{marqueeText.repeat(3)}</span>
+      </div>
+    </div>
   );
+
 
   const box = (
     // Sin sombra: ni el drop-shadow del <img> ni la elipse difusa del
@@ -145,7 +158,7 @@ export function HeroV2() {
       {seoTitle}
 
       <div className="relative flex flex-col items-center gap-5 px-6 pb-8 pt-20 lg:hidden">
-        <div className="relative z-10 w-full">{curvedTitle}</div>
+        <div className="relative z-10 w-full">{straightTitle}</div>
         <div className="relative z-20 -mt-2 w-full max-w-[560px]">{box}</div>
         <div className="relative z-30 w-full pb-4">{renderCta(false)}</div>
         {scrollCue}
@@ -153,8 +166,8 @@ export function HeroV2() {
 
       <div className="hidden lg:block relative min-h-[100dvh]">
         {/* El titular, ahora en movimiento: mismo texto que el <h1> oculto,
-            curvo y translúcido. Arriba del todo, por encima de la caja. */}
-        <div className="pointer-events-none absolute inset-x-0 top-[9%] z-[1]">{curvedTitle}</div>
+            en línea recta. Arriba del todo, por encima de la caja. */}
+        <div className="pointer-events-none absolute inset-x-0 top-[9%] z-[1]">{straightTitle}</div>
 
 
         <div className="absolute bottom-[-3.5vw] left-[-1vw] z-20 w-[74vw] max-w-[1220px]">

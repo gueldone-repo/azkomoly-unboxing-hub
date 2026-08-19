@@ -67,7 +67,7 @@ function BlogHero() {
       <span className="font-sans text-xs uppercase tracking-[0.3em] text-fire">
         {t.blog.kicker}
       </span>
-      <h1 className="text-fire text-3d-fire text-[clamp(2.5rem,12vw,6rem)] uppercase" style={TITLE_STYLE}>
+      <h1 className="text-fire text-[clamp(2.5rem,12vw,6rem)] uppercase" style={TITLE_STYLE}>
         {t.blog.heading}
       </h1>
       <p className="font-sans text-sm sm:text-base text-foreground/70 max-w-md">{t.blog.sub}</p>
