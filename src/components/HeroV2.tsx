@@ -3,7 +3,6 @@ import { motion, useReducedMotion } from "motion/react";
 
 import { useT } from "@/lib/i18n";
 import { WaveBackdrop } from "@/components/WaveBackdrop";
-import { CurvedLoop } from "@/components/text/CurvedLoop";
 import { RotatingText } from "@/components/text/RotatingText";
 import { SplitText } from "@/components/text/SplitText";
 
@@ -159,7 +158,7 @@ export function HeroV2() {
       {seoTitle}
 
       <div className="relative flex flex-col items-center gap-5 px-6 pb-8 pt-20 lg:hidden">
-        <div className="relative z-10 w-full">{curvedTitle}</div>
+        <div className="relative z-10 w-full">{straightTitle}</div>
         <div className="relative z-20 -mt-2 w-full max-w-[560px]">{box}</div>
         <div className="relative z-30 w-full pb-4">{renderCta(false)}</div>
         {scrollCue}
@@ -167,8 +166,8 @@ export function HeroV2() {
 
       <div className="hidden lg:block relative min-h-[100dvh]">
         {/* El titular, ahora en movimiento: mismo texto que el <h1> oculto,
-            curvo y translúcido. Arriba del todo, por encima de la caja. */}
-        <div className="pointer-events-none absolute inset-x-0 top-[9%] z-[1]">{curvedTitle}</div>
+            en línea recta. Arriba del todo, por encima de la caja. */}
+        <div className="pointer-events-none absolute inset-x-0 top-[9%] z-[1]">{straightTitle}</div>
 
 
         <div className="absolute bottom-[-3.5vw] left-[-1vw] z-20 w-[74vw] max-w-[1220px]">
