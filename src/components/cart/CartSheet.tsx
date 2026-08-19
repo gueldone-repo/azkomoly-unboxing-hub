@@ -45,7 +45,7 @@ function LineItem({ item }: { item: CartItem }) {
         {image ? (
           <img src={image} alt={item.product.node.title} className="w-full h-full object-cover" />
         ) : (
-          <span className="font-display text-fire text-2xl text-fire-glow text-stroke-black select-none">?</span>
+          <span className="font-display text-fire text-2xl text-fire-glow select-none">?</span>
         )}
       </div>
 

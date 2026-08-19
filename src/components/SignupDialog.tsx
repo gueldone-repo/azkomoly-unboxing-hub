@@ -125,7 +125,7 @@ export function SignupDialog() {
 
   return (
     <Dialog open={isOpen} onOpenChange={setOpen}>
-      <DialogContent className="bg-dark-bg border-fire/60 sm:graffiti-border w-[92vw] max-w-md p-5 sm:p-6">
+      <DialogContent className="bg-dark-bg border-fire/60 sm:graffiti-border w-[92vw] max-w-md max-h-[85vh] overflow-y-auto p-5 sm:p-6">
         <DialogHeader className="pb-1">
           <DialogTitle className="font-display text-2xl sm:text-3xl text-fire text-fire-glow text-center">
             {t.signup.title}

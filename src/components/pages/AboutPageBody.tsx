@@ -4,7 +4,6 @@ import { Instagram, Facebook, Youtube } from "lucide-react";
 import { DripDivider } from "@/components/DripDivider";
 import { SiteBreadcrumb } from "@/components/SiteBreadcrumb";
 import { SiteFooter } from "@/components/SiteFooter";
-import { SiteNav } from "@/components/nav/SiteNav";
 import { useT, useI18n } from "@/lib/i18n";
 
 /**
@@ -45,10 +44,9 @@ export function AboutPageBody() {
 
   return (
     <main className="bg-background pt-16">
-      <SiteNav />
-      <SiteBreadcrumb trail={[{ name: "AZKOMOLY", path: "/" }, { name: t.about.title }]} />
+      <SiteBreadcrumb trail={[{ name: "AZKOMOLY" }, { name: t.about.title }]} />
 
-      <section className="bg-background px-6 pt-14 pb-12 sm:pt-20 sm:pb-16 flex flex-col items-center text-center gap-6">
+      <section id="about-intro" className="bg-background px-6 pt-14 pb-12 sm:pt-20 sm:pb-16 flex flex-col items-center text-center gap-6">
         <a href={homeHref} aria-label="AZKOMOLY">
           <img src="/azkomoly_new_logo.webp" alt="AZKOMOLY" className="h-24 sm:h-32 w-auto" />
         </a>
@@ -63,7 +61,7 @@ export function AboutPageBody() {
 
       {/* bgColor = color de la sección de abajo, si no queda una línea recta. */}
       <DripDivider variant="organic" mainColor="#FFFFFF" bgColor="#5B2EA8" shadowColor="#0D0D0D" depth={4} height={34} />
-      <section className="bg-fire px-6 py-14 sm:py-20">
+      <section id="about-goal" className="bg-fire px-6 py-14 sm:py-20">
         <div className="mx-auto max-w-2xl flex flex-col gap-5 text-center sm:text-left">
           <h2 className="text-white text-[clamp(2rem,9vw,4rem)] uppercase" style={TITLE_STYLE}>
             {t.about.goalTitle}
@@ -78,7 +76,7 @@ export function AboutPageBody() {
       </section>
 
       <DripDivider variant="organic" mainColor="#5B2EA8" bgColor="#FFFFFF" shadowColor="#0D0D0D" depth={4} height={34} />
-      <section className="bg-background px-6 py-14 sm:py-20">
+      <section id="about-who" className="bg-background px-6 py-14 sm:py-20">
         <div className="mx-auto max-w-2xl flex flex-col gap-5 text-center sm:text-left">
           <h2 className="text-fire text-[clamp(2rem,9vw,4rem)] uppercase" style={TITLE_STYLE}>
             {t.about.whoTitle}
@@ -109,7 +107,7 @@ export function AboutPageBody() {
       </section>
 
       <DripDivider variant="organic" mainColor="#FFFFFF" bgColor="#5B2EA8" shadowColor="#0D0D0D" depth={4} height={34} />
-      <section className="bg-fire px-6 py-14 sm:py-20 flex flex-col items-center text-center gap-6">
+      <section id="about-follow" className="bg-fire px-6 py-14 sm:py-20 flex flex-col items-center text-center gap-6">
         <img src="/azkomoly_new_logo_negativo.webp" alt="" aria-hidden className="h-16 w-auto" />
         <h2 className="text-white text-[clamp(2rem,9vw,4rem)] uppercase" style={TITLE_STYLE}>
           {t.about.followTitle}

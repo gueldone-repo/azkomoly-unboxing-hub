@@ -6,6 +6,13 @@ import { getRequestIP } from "@tanstack/react-start/server";
 // refrescar en otra pestaña o limpiar el storage lo reiniciaba gratis).
 // Vive en memoria del proceso: se resetea si el servidor reinicia/redeploya,
 // aceptable por ahora dado el volumen del sitio.
+//
+// PENDIENTE: el reloj es solo decorativo — cuenta 5 minutos pero no aplica
+// ningún descuento real. Decisión de Diego (2026-08-19): así sale el lunes,
+// se conecta en otra sesión cuando exista un código de descuento real en
+// Shopify (Admin → Discounts). Ese día, lo que falta es: leer ese código acá
+// (igual que ya se lee para BoxSpinner) y pegarlo al link de compra mientras
+// el reloj no haya llegado a 0.
 const DURATION_SECONDS = 5 * 60;
 const deadlinesByIp = new Map<string, number>();
 

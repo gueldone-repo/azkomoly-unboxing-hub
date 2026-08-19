@@ -216,6 +216,10 @@ export type Dict = {
     back: string;
     size: string;
     addToCart: string;
+    added: string;
+    zoom: string;
+    previous: string;
+    next: string;
     buyNow: string;
     contents: string;
     guaranteedValue: string;
@@ -441,7 +445,7 @@ const hu: Dict = {
   faqPage: {
     title: "GYIK",
     intro:
-      "Minden, amit a mystery boxokról tudni érdemes — szállítás, méret, tartalom és minden, ami eddig kérdés volt.",
+      "Minden, amit a mystery boxokról tudni érdemes — szállítás, méret, tartalom, és amit eddig még nem mertél megkérdezni.",
     helpTitle: "Még kérdésed van?",
     helpSub: "Nem találtad meg a válaszod? Írj nekünk, és 24 órán belül válaszolunk.",
     fieldName: "Név",
@@ -453,18 +457,18 @@ const hu: Dict = {
   },
   about: {
     title: "Rólunk",
-    intro: "100% magyar mystery box csapat. Eredeti termékek, valódi meglepetés — semmi extra.",
+    intro: "100% magyar csapat, egy küldetéssel: hogy minden doboz meglepjen.",
     goalTitle: "A célunk",
     goalP1:
-      "Az AZKOMOLY azért létezik, mert hiszünk abban, hogy a vásárlás lehet izgalmas is, nem csak praktikus. Minden doboz egy kis kockázat és egy nagy meglepetés — te választod a tétet, mi garantáljuk az értéket.",
+      "Az AZKOMOLY azért létezik, mert hiszünk abban, hogy a vásárlás lehet izgalmas is, nem csak praktikus. Minden doboz egy kis kockázat és egy nagy meglepetés — te választod a tétet, mi garantáljuk az élményt.",
     goalP2:
       "Nem akarunk még egy webshopot, ahol pontosan tudod, mi érkezik. Azt akarjuk, hogy amikor kibontod a dobozod, tényleg érezd azt a pillanatot — mintha ajándékot kapnál magadtól.",
     whoTitle: "Kik vagyunk",
-    whoLead: "100% magyar vállalkozás vagyunk, és minden, amit árulunk, eredeti termék.",
+    whoLead: "100% magyar csapat vagyunk, és a meglepetés a szakmánk.",
     whoBody:
-      "Az AZKOMOLY egy maroknyi magyar csapat ötletéből indult, akiket idegesített, hogy a legtöbb webshopban semmi meglepetés nincs a vásárlásban. Elkezdtünk liquidation és túlkészletezett tételekből válogatni, és mystery boxokba rendezni őket — így minden doboz garantáltan minőségi, eredeti terméket tartalmaz, de sosem tudod pontosan, mit kapsz.",
+      "Az AZKOMOLY egy maroknyi magyar csapat ötletéből indult, akiket idegesített, hogy a legtöbb webshopban semmi meglepetés nincs a vásárlásban. Gondosan válogatott tételekből állítjuk össze a dobozainkat, hogy minden bontás tényleg meglepetés legyen — sosem tudod pontosan, mit kapsz, csak azt, hogy megéri kinyitni.",
     badgeHungarian: "100% magyar",
-    badgeOriginal: "Eredeti termékek",
+    badgeOriginal: "Garantált meglepetés",
     seeBoxes: "Nézd meg a dobozainkat",
     followTitle: "Kövess minket",
     followSub:
@@ -491,7 +495,7 @@ const hu: Dict = {
     privacy: "Adatvédelem",
     terms: "Felhasználási feltételek",
     cookies: "Süti szabályzat",
-    tagline: "Mystery box élmény eredeti termékekkel, gyors szállítással és valódi unboxing pillanatokkal.",
+    tagline: "Mystery box élmény garantált meglepetésekkel, gyors szállítással és valódi unboxing pillanatokkal.",
     taxNumber: "Adószám",
     companyNumber: "Cégjegyzékszám",
     rights: "Minden jog fenntartva",
@@ -527,6 +531,10 @@ const hu: Dict = {
     back: "Vissza a bolthoz",
     size: "MÉRET",
     addToCart: "KOSÁRBA",
+    added: "KOSÁRBAN!",
+    zoom: "Kép nagyítása",
+    previous: "Előző kép",
+    next: "Következő kép",
     buyNow: "AZONNALI VÁSÁRLÁS",
     contents: "Tartalom",
     guaranteedValue: "Garantált érték",
@@ -752,7 +760,7 @@ const en: Dict = {
   faqPage: {
     title: "FAQ",
     intro:
-      "Everything worth knowing about the mystery boxes — shipping, sizing, contents and anything else you've been wondering about.",
+      "Everything worth knowing about the mystery boxes — shipping, sizing, contents, and the stuff you didn't dare ask yet.",
     helpTitle: "Still need help?",
     helpSub: "Didn't find your answer? Write to us and we'll reply within 24 hours.",
     fieldName: "Name",
@@ -764,18 +772,18 @@ const en: Dict = {
   },
   about: {
     title: "About Us",
-    intro: "100% Hungarian mystery box crew. Original products, real surprises — nothing else.",
+    intro: "A 100% Hungarian crew on a mission: make every box a surprise.",
     goalTitle: "Our Goal",
     goalP1:
-      "AZKOMOLY exists because we believe shopping can be exciting, not just practical. Every box is a small risk and a big surprise — you set the stake, we guarantee the value.",
+      "AZKOMOLY exists because we believe shopping can be exciting, not just practical. Every box is a small risk and a big surprise — you set the stake, we guarantee the experience.",
     goalP2:
       "We don't want to be one more webshop where you know exactly what shows up. We want that moment when you open your box to feel real — like a gift from yourself.",
     whoTitle: "Who We Are",
-    whoLead: "We're a 100% Hungarian business, and everything we sell is an original product.",
+    whoLead: "We're a 100% Hungarian team, and surprise is our whole job.",
     whoBody:
-      "AZKOMOLY started with a handful of Hungarians who were tired of shopping with zero surprise in it. We began sourcing liquidation and overstock lots and turning them into mystery boxes — so every box holds genuine, quality products, but you never know exactly what you'll get.",
+      "AZKOMOLY started with a handful of Hungarians who were tired of shopping with zero surprise in it. We carefully curate every box so every unboxing is a real surprise — you never know exactly what you'll get, only that it's worth opening.",
     badgeHungarian: "100% Hungarian",
-    badgeOriginal: "Original products",
+    badgeOriginal: "Guaranteed surprise",
     seeBoxes: "See our boxes",
     followTitle: "Follow Us",
     followSub: "Follow AZKOMOLY on social — every unboxing lands there first.",
@@ -801,7 +809,7 @@ const en: Dict = {
     privacy: "Privacy",
     terms: "Terms of use",
     cookies: "Cookie policy",
-    tagline: "Mystery box energy with original products, fast shipping, and real unboxing moments.",
+    tagline: "Mystery box energy with guaranteed surprises, fast shipping, and real unboxing moments.",
     taxNumber: "Tax number",
     companyNumber: "Company registration number",
     rights: "All rights reserved",
@@ -837,6 +845,10 @@ const en: Dict = {
     back: "Back to shop",
     size: "SIZE",
     addToCart: "ADD TO CART",
+    added: "ADDED!",
+    zoom: "Zoom image",
+    previous: "Previous image",
+    next: "Next image",
     buyNow: "BUY NOW",
     contents: "Contents",
     guaranteedValue: "Guaranteed value",

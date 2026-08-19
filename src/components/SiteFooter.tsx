@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { SOCIAL_LINKS, SocialGlyph } from "@/components/social/SocialLogos";
-import { useT } from "@/lib/i18n";
+import { useT, useI18n } from "@/lib/i18n";
 
 function TapeCorner({ className }: { className: string }) {
   return (
@@ -24,10 +24,16 @@ function TapeCorner({ className }: { className: string }) {
  */
 export function SiteFooter({ productsHref = "#termekek" }: { productsHref?: string }) {
   const t = useT();
+  const { lang } = useI18n();
+  // Igual que SiteNav: en inglés estos links deben ir a las rutas /en/...,
+  // si no, un visitante en /en/faq caía en la versión húngara al hacer clic
+  // acá (bug real reportado por el equipo de Diego). Rutas legales se quedan
+  // en húngaro siempre (no hay /en/privacy todavía, ver CLAUDE.md).
+  const isHu = lang === "hu";
   const links = [
-    { to: "/about", label: t.footer.about },
-    { to: "/faq", label: t.footer.faq },
-    { to: "/blog", label: t.footer.blog },
+    { to: isHu ? "/about" : "/en/about", label: t.footer.about },
+    { to: isHu ? "/faq" : "/en/faq", label: t.footer.faq },
+    { to: isHu ? "/blog" : "/en/blog", label: t.footer.blog },
     { to: "/privacy", label: t.footer.privacy },
     { to: "/terms", label: t.footer.terms },
     { to: "/cookies", label: t.footer.cookies },

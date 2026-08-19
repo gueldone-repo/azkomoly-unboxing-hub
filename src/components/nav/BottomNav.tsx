@@ -8,6 +8,14 @@ import { useShopifyCart } from "@/lib/shopify/cart-store";
 import { cn } from "@/lib/utils";
 
 const LANDING_SECTIONS = ["termekek", "hogyan", "gyik", "kapcsolat"] as const;
+// About y FAQ tienen sus propias secciones reales (ver ids agregados en
+// AboutPageBody.tsx/FaqPageBody.tsx) — antes la flecha en esas páginas sólo
+// hacía un scroll genérico de "una pantalla", sin saber qué había abajo.
+// "kapcsolat" es el id del footer compartido (`SiteFooter.tsx`), así que
+// sirve de última parada en cualquier ruta.
+const ABOUT_SECTIONS = ["about-intro", "about-goal", "about-who", "about-follow", "kapcsolat"] as const;
+const FAQ_SECTIONS = ["faq-intro", "faq-list", "faq-help", "kapcsolat"] as const;
+
 // "Después del hero": el hero mide ~1 pantalla, así que aparece pasado ese
 // primer tramo. BOTTOM_MARGIN_PX: cuánto antes del final de la página se
 // considera "cerca del final" para que la flecha ya apunte hacia arriba.
@@ -18,12 +26,19 @@ function isHomePath(pathname: string): boolean {
   return pathname === "/" || pathname === "/en";
 }
 
-function getCurrentSectionIndex(): number {
+function sectionsForPath(pathname: string): readonly string[] | null {
+  if (isHomePath(pathname)) return LANDING_SECTIONS;
+  if (pathname === "/about" || pathname === "/en/about") return ABOUT_SECTIONS;
+  if (pathname === "/faq" || pathname === "/en/faq") return FAQ_SECTIONS;
+  return null;
+}
+
+function getCurrentSectionIndex(sections: readonly string[]): number {
   const centerY = window.innerHeight / 2;
   let bestIndex = 0;
   let bestDistance = Number.POSITIVE_INFINITY;
 
-  LANDING_SECTIONS.forEach((id, index) => {
+  sections.forEach((id, index) => {
     const el = document.getElementById(id);
     if (!el) return;
     const rect = el.getBoundingClientRect();
@@ -56,7 +71,7 @@ function scrollToElement(id: string): void {
 export function BottomNav() {
   const t = useT();
   const location = useRouterState({ select: (s) => s.location });
-  const onHome = isHomePath(location.pathname);
+  const sections = sectionsForPath(location.pathname);
   const prefersReducedMotion = useReducedMotion();
   const cartOpen = useShopifyCart((s) => s.isOpen);
 
@@ -94,13 +109,13 @@ export function BottomNav() {
       window.scrollTo({ top: 0, behavior: "smooth" });
       return;
     }
-    if (onHome) {
-      const next = Math.min(LANDING_SECTIONS.length - 1, getCurrentSectionIndex() + 1);
-      scrollToElement(LANDING_SECTIONS[next]);
+    if (sections) {
+      const next = Math.min(sections.length - 1, getCurrentSectionIndex(sections) + 1);
+      scrollToElement(sections[next]);
     } else {
       window.scrollBy({ top: window.innerHeight * 0.85, behavior: "smooth" });
     }
-  }, [onHome, pointDown]);
+  }, [sections, pointDown]);
 
   // Con el carrito abierto la flecha estorba: competía por encima del panel.
   if (cartOpen) return null;

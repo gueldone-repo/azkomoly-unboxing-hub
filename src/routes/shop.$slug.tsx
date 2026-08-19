@@ -1,12 +1,13 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
-import { ShieldCheck, Truck, Sparkles } from "lucide-react";
+import { AnimatePresence, motion } from "motion/react";
+import { ShieldCheck, Truck, Sparkles, ZoomIn, X, ChevronLeft, ChevronRight, Check } from "lucide-react";
 import { useT, useI18n, readLangCookie } from "@/lib/i18n";
 import { DICTIONARIES, type Lang } from "@/lib/i18n/dictionary";
 import { fetchProductByHandle, formatShopifyPrice, type ShopifyProduct } from "@/lib/shopify/client";
 import { useShopifyCart } from "@/lib/shopify/cart-store";
 import { SiteBreadcrumb } from "@/components/SiteBreadcrumb";
-import { SiteNav } from "@/components/nav/SiteNav";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { seoLinks, canonicalUrl, jsonLd, productSchema, breadcrumbSchema } from "@/lib/seo";
 
 export const Route = createFileRoute("/shop/$slug")({
@@ -162,6 +163,31 @@ export function ProductPage({
   const available = selectedVariant?.availableForSale ?? false;
   const hasVariants = variants.length > 1 || (variants[0]?.title !== "Default Title");
 
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  // Confirmación breve en el botón de compra: pasa a un check + "Kosárban!"
+  // por 1.4s y vuelve solo — feedback inmediato sin modal ni toast aparte.
+  const [added, setAdded] = useState(false);
+
+  function showNext() {
+    if (images.length < 2) return;
+    setActiveImageIdx((i) => (i + 1) % images.length);
+  }
+  function showPrev() {
+    if (images.length < 2) return;
+    setActiveImageIdx((i) => (i - 1 + images.length) % images.length);
+  }
+
+  useEffect(() => {
+    if (!lightboxOpen) return;
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "ArrowRight") showNext();
+      if (e.key === "ArrowLeft") showPrev();
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lightboxOpen, images.length]);
+
   async function handleAddToCart() {
     if (!selectedVariant) return;
     await addItem({
@@ -172,6 +198,8 @@ export function ProductPage({
       quantity: qty,
       selectedOptions: selectedVariant.selectedOptions,
     });
+    setAdded(true);
+    window.setTimeout(() => setAdded(false), 1400);
   }
 
   async function handleBuyNow() {
@@ -184,7 +212,7 @@ export function ProductPage({
   // variantes) dejaba un tramo de fondo blanco después del footer.
   return (
     <main className="bg-background text-foreground pt-16">
-      <SiteNav />
+      {/* SiteNav vive ahora en __root.tsx */}
       {/* Mismos 2 niveles que `breadcrumbSchema` (JSON-LD) más abajo — sin
           apuntar al ancla #termekek, que TanStack Link no resuelve como ruta. */}
       <SiteBreadcrumb
@@ -197,48 +225,138 @@ export function ProductPage({
       <div className="mx-auto max-w-7xl px-6 pb-20 grid lg:grid-cols-2 gap-10">
         {/* Visual */}
         <div>
-          <div className="relative aspect-square rounded-2xl bg-dark-bg overflow-hidden border-2 border-cardboard/40 shadow-[8px_8px_0_0_#0D0D0D]">
-            {image ? (
-              <img
-                src={image.url}
-                alt={image.altText ?? product.title}
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <div className="w-full h-full grid place-items-center">
-                <span className="font-display text-fire text-8xl text-fire-glow text-stroke-black select-none">?</span>
-              </div>
+          <button
+            type="button"
+            onClick={() => image && setLightboxOpen(true)}
+            disabled={!image}
+            aria-label={t.product.zoom}
+            className="group relative aspect-square w-full rounded-2xl bg-dark-bg overflow-hidden border-2 border-cardboard/40 shadow-[8px_8px_0_0_#0D0D0D] cursor-zoom-in disabled:cursor-default"
+          >
+            <AnimatePresence mode="wait" initial={false}>
+              {image ? (
+                <motion.img
+                  key={image.url}
+                  src={image.url}
+                  alt={image.altText ?? product.title}
+                  className="absolute inset-0 w-full h-full object-cover"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.25, ease: "easeOut" }}
+                />
+              ) : (
+                <div className="absolute inset-0 grid place-items-center">
+                  <span className="font-display text-fire text-8xl text-fire-glow select-none">?</span>
+                </div>
+              )}
+            </AnimatePresence>
+            {image && (
+              <span className="pointer-events-none absolute bottom-3 right-3 grid h-10 w-10 place-items-center rounded-full bg-black/55 text-white opacity-0 backdrop-blur-sm transition-opacity group-hover:opacity-100">
+                <ZoomIn className="h-5 w-5" />
+              </span>
             )}
-          </div>
+            {images.length > 1 && (
+              <>
+                <span
+                  role="button"
+                  tabIndex={-1}
+                  onClick={(e) => { e.stopPropagation(); showPrev(); }}
+                  className="absolute left-2 top-1/2 -translate-y-1/2 grid h-9 w-9 place-items-center rounded-full bg-black/40 text-white opacity-0 transition-opacity group-hover:opacity-100 hover:bg-black/60"
+                >
+                  <ChevronLeft className="h-5 w-5" />
+                </span>
+                <span
+                  role="button"
+                  tabIndex={-1}
+                  onClick={(e) => { e.stopPropagation(); showNext(); }}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 grid h-9 w-9 place-items-center rounded-full bg-black/40 text-white opacity-0 transition-opacity group-hover:opacity-100 hover:bg-black/60"
+                >
+                  <ChevronRight className="h-5 w-5" />
+                </span>
+              </>
+            )}
+          </button>
           {/* Galería: antes sólo se mostraba la primera foto (`images.edges[0]`)
               aunque Shopify trajera más. */}
           {images.length > 1 && (
             <div className="mt-3 flex gap-2 overflow-x-auto scrollbar-none">
               {images.map((img: { url: string; altText: string | null }, i: number) => (
-                <button
+                <motion.button
                   key={img.url}
                   onClick={() => setActiveImageIdx(i)}
                   aria-label={`${product.title} — ${i + 1}`}
+                  whileHover={{ scale: 1.06 }}
+                  whileTap={{ scale: 0.96 }}
                   className={`shrink-0 h-16 w-16 rounded-xl overflow-hidden border-2 transition-colors ${
                     i === activeImageIdx ? "border-fire" : "border-cardboard/40 hover:border-cardboard/70"
                   }`}
                 >
                   <img src={img.url} alt="" className="w-full h-full object-cover" />
-                </button>
+                </motion.button>
               ))}
             </div>
           )}
         </div>
 
+        <Dialog open={lightboxOpen} onOpenChange={setLightboxOpen}>
+          <DialogContent className="max-w-[92vw] sm:max-w-3xl border-none bg-black/95 p-0 text-white [&>button]:text-white [&>button]:opacity-80 [&>button:hover]:opacity-100">
+            <div className="relative aspect-square w-full">
+              <AnimatePresence mode="wait" initial={false}>
+                {image && (
+                  <motion.img
+                    key={image.url}
+                    src={image.url}
+                    alt={image.altText ?? product.title}
+                    className="absolute inset-0 h-full w-full object-contain"
+                    initial={{ opacity: 0, scale: 0.98 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.98 }}
+                    transition={{ duration: 0.2, ease: "easeOut" }}
+                  />
+                )}
+              </AnimatePresence>
+              {images.length > 1 && (
+                <>
+                  <button
+                    type="button"
+                    onClick={showPrev}
+                    aria-label={t.product.previous}
+                    className="absolute left-3 top-1/2 -translate-y-1/2 grid h-11 w-11 place-items-center rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+                  >
+                    <ChevronLeft className="h-6 w-6" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={showNext}
+                    aria-label={t.product.next}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 grid h-11 w-11 place-items-center rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+                  >
+                    <ChevronRight className="h-6 w-6" />
+                  </button>
+                </>
+              )}
+            </div>
+          </DialogContent>
+        </Dialog>
+
         {/* Info */}
         <div>
           <h1 className="font-display text-fire text-5xl sm:text-6xl mt-2 leading-none">{product.title}</h1>
-          <div className="flex items-baseline gap-3 mt-5">
-            <span className="font-display text-4xl text-fire">
-              {selectedVariant
-                ? formatShopifyPrice(selectedVariant.price)
-                : formatShopifyPrice(product.priceRange.minVariantPrice)}
-            </span>
+          <div className="flex items-baseline gap-3 mt-5 overflow-hidden">
+            <AnimatePresence mode="wait" initial={false}>
+              <motion.span
+                key={selectedVariant?.id ?? "base"}
+                className="font-display text-4xl text-fire inline-block"
+                initial={{ y: 10, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: -10, opacity: 0 }}
+                transition={{ duration: 0.2, ease: "easeOut" }}
+              >
+                {selectedVariant
+                  ? formatShopifyPrice(selectedVariant.price)
+                  : formatShopifyPrice(product.priceRange.minVariantPrice)}
+              </motion.span>
+            </AnimatePresence>
           </div>
           {product.description && (
             <p className="font-sans text-base text-foreground/80 mt-6 leading-relaxed">
@@ -251,20 +369,33 @@ export function ProductPage({
             <div className="mt-8">
               <p className="font-sans text-xs tracking-[0.3em] text-foreground/70 mb-3">{t.product.size}</p>
               <div className="flex flex-wrap gap-2">
-                {variants.map((v: ProductVariant) => (
-                  <button
-                    key={v.id}
-                    onClick={() => setSelectedVariant(v)}
-                    disabled={!v.availableForSale}
-                    className={`h-12 min-w-12 px-3 rounded-xl font-display text-lg border-2 transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${
-                      selectedVariant?.id === v.id
-                        ? "bg-fire text-primary-foreground border-fire"
-                        : "border-cardboard/60 text-foreground hover:border-fire"
-                    }`}
-                  >
-                    {v.title}
-                  </button>
-                ))}
+                {variants.map((v: ProductVariant) => {
+                  const isSelected = selectedVariant?.id === v.id;
+                  return (
+                    <button
+                      key={v.id}
+                      onClick={() => setSelectedVariant(v)}
+                      disabled={!v.availableForSale}
+                      className={`relative h-12 min-w-12 px-3 rounded-xl font-display text-lg border-2 transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${
+                        isSelected
+                          ? "border-fire text-primary-foreground"
+                          : "border-cardboard/60 text-foreground hover:border-fire"
+                      }`}
+                    >
+                      {/* `layoutId` compartido: en vez de que el fondo aparezca/
+                          desaparezca de golpe en cada botón, la misma mancha
+                          morada se desliza de un botón al siguiente. */}
+                      {isSelected && (
+                        <motion.span
+                          layoutId="variant-highlight"
+                          className="absolute inset-0 z-0 rounded-[10px] bg-fire"
+                          transition={{ type: "spring", stiffness: 500, damping: 35 }}
+                        />
+                      )}
+                      <span className="relative z-10">{v.title}</span>
+                    </button>
+                  );
+                })}
               </div>
             </div>
           )}
@@ -278,12 +409,38 @@ export function ProductPage({
             </div>
             <button
               onClick={handleAddToCart}
-              disabled={!available || isLoading}
-              className="flex-1 bg-fire text-primary-foreground font-display text-xl btn-drip hover:translate-y-[-2px] transition-transform disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={!available || isLoading || added}
+              className="relative flex-1 overflow-hidden bg-fire text-primary-foreground font-display text-xl btn-drip hover:translate-y-[-2px] transition-transform disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {t.product.addToCart} · {selectedVariant
-                ? formatShopifyPrice({ amount: String(parseFloat(selectedVariant.price.amount) * qty), currencyCode: selectedVariant.price.currencyCode })
-                : ""}
+              {/* Confirmación: al agregar, el label se reemplaza un momento
+                  por un check + "Kosárban!" en vez de abrir un toast aparte
+                  — el feedback vive en el botón que se apretó. */}
+              <AnimatePresence mode="wait" initial={false}>
+                {added ? (
+                  <motion.span
+                    key="added"
+                    className="flex items-center justify-center gap-2"
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -8 }}
+                    transition={{ duration: 0.18, ease: "easeOut" }}
+                  >
+                    <Check className="h-5 w-5" /> {t.product.added}
+                  </motion.span>
+                ) : (
+                  <motion.span
+                    key="idle"
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -8 }}
+                    transition={{ duration: 0.18, ease: "easeOut" }}
+                  >
+                    {t.product.addToCart} · {selectedVariant
+                      ? formatShopifyPrice({ amount: String(parseFloat(selectedVariant.price.amount) * qty), currencyCode: selectedVariant.price.currencyCode })
+                      : ""}
+                  </motion.span>
+                )}
+              </AnimatePresence>
             </button>
           </div>
 

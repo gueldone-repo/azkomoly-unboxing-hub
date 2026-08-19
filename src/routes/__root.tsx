@@ -4,6 +4,7 @@ import {
   Link,
   createRootRouteWithContext,
   useRouter,
+  useRouterState,
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
@@ -17,6 +18,7 @@ import { SITE_URL, jsonLd, organizationSchema } from "../lib/seo";
 import { CartSheet } from "../components/cart/CartSheet";
 import { SignupDialog } from "../components/SignupDialog";
 import { BottomNav } from "../components/nav/BottomNav";
+import { SiteNav } from "../components/nav/SiteNav";
 import { useCartSync } from "../hooks/useCartSync";
 import { getStoredConsent } from "../components/CookieBanner";
 import { initClarity } from "../lib/analytics/clarity";
@@ -164,6 +166,8 @@ function RootShell({ children }: { children: ReactNode }) {
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   useCartSync();
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const isHome = pathname === "/" || pathname === "/en";
 
   useEffect(() => {
     if (getStoredConsent()?.analytics) initClarity();
@@ -172,6 +176,12 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <I18nProvider>
+        {/* SiteNav vive acá (no en cada página) para que no se desmonte y
+            vuelva a montar en cada navegación — antes cada página lo traía
+            por su cuenta y el remount reiniciaba los efectos de PillNav/
+            StaggeredMenu (GSAP) en cada click, sensación de "salto" al
+            entrar a About/FAQ. */}
+        <SiteNav isHome={isHome} />
         {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
         <Outlet />
         <CartSheet />

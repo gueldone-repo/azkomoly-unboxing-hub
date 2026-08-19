@@ -3,7 +3,6 @@ import { useState, type FormEvent } from "react";
 import { DripDivider } from "@/components/DripDivider";
 import { SiteBreadcrumb } from "@/components/SiteBreadcrumb";
 import { SiteFooter } from "@/components/SiteFooter";
-import { SiteNav } from "@/components/nav/SiteNav";
 import { useT, useI18n } from "@/lib/i18n";
 
 /** Cuerpo compartido de /faq y /en/faq — todo el copy sale del diccionario. */
@@ -71,7 +70,7 @@ function NeedHelp() {
   return (
     <>
       <DripDivider variant="organic" mainColor="#FFFFFF" bgColor="#5B2EA8" shadowColor="#0D0D0D" depth={4} height={34} />
-      <section className="bg-fire px-6 py-14 sm:py-20">
+      <section id="faq-help" className="bg-fire px-6 py-14 sm:py-20">
         <div className="mx-auto max-w-xl flex flex-col gap-6 text-center">
           <h2 className="text-white text-[clamp(2rem,9vw,3.5rem)] uppercase" style={TITLE_STYLE}>
             {t.faqPage.helpTitle}
@@ -135,10 +134,9 @@ export function FaqPageBody() {
 
   return (
     <main className="bg-background pt-16">
-      <SiteNav />
-      <SiteBreadcrumb trail={[{ name: "AZKOMOLY", path: "/" }, { name: t.faqPage.breadcrumb }]} />
+      <SiteBreadcrumb trail={[{ name: "AZKOMOLY" }, { name: t.faqPage.breadcrumb }]} />
 
-      <section className="bg-background px-6 pt-14 pb-10 sm:pt-20 sm:pb-14 flex flex-col items-center text-center gap-6">
+      <section id="faq-intro" className="bg-background px-6 pt-14 pb-10 sm:pt-20 sm:pb-14 flex flex-col items-center text-center gap-6">
         <a href={homeHref} aria-label="AZKOMOLY">
           <img src="/azkomoly_new_logo.webp" alt="AZKOMOLY" className="h-24 sm:h-32 w-auto" />
         </a>
@@ -151,7 +149,7 @@ export function FaqPageBody() {
         </p>
       </section>
 
-      <section className="bg-background px-6 pb-16">
+      <section id="faq-list" className="bg-background px-6 pb-16">
         <div className="mx-auto max-w-3xl flex flex-col gap-2">
           {t.faq.items.map((f) => (
             <FAQItem key={f.q} q={f.q} a={f.a} />

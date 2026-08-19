@@ -2,7 +2,6 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Link } from "@tanstack/react-router";
 import { BlogCard } from "@/components/blog/BlogCard";
 import { SiteFooter } from "@/components/SiteFooter";
-import { SiteNav } from "@/components/nav/SiteNav";
 import { BLOG_POSTS } from "@/content/blog/posts";
 import { useT, useI18n, readLangCookie } from "@/lib/i18n";
 import { DICTIONARIES } from "@/lib/i18n/dictionary";
@@ -44,7 +43,7 @@ export function BlogIndexPage() {
   const { lang } = useI18n();
   return (
     <main className="bg-background pt-16">
-      <SiteNav />
+      {/* SiteNav vive ahora en __root.tsx */}
       <BlogHero />
       <BlogGrid />
       <SiteFooter productsHref={lang === "hu" ? "/#termekek" : "/en#termekek"} />

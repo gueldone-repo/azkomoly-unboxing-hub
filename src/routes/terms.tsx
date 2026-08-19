@@ -1,5 +1,4 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { SiteNav } from "@/components/nav/SiteNav";
 import { seoLinksHuOnly } from "@/lib/seo";
 
 export const Route = createFileRoute("/terms")({
@@ -20,7 +19,7 @@ export const Route = createFileRoute("/terms")({
 export function TermsPage() {
   return (
     <main className="min-h-screen bg-background text-foreground px-6 pt-28 pb-12">
-      <SiteNav />
+      {/* SiteNav vive ahora en __root.tsx */}
       <article className="mx-auto max-w-3xl flex flex-col gap-6">
         <h1 className="font-display text-fire text-4xl sm:text-5xl">
           ÁLTALÁNOS SZERZŐDÉSI FELTÉTELEK (ÁSZF)

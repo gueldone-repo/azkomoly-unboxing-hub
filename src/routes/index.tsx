@@ -4,8 +4,7 @@ import { motion, useReducedMotion } from "motion/react";
 import { getUrgencyDeadline } from "@/lib/urgency.functions";
 import { MousePointer2, ChevronLeft, ChevronRight } from "lucide-react";
 import { SiteFooter } from "@/components/SiteFooter";
-import { SOCIAL_REVIEWS } from "@/components/SocialProofMarquee";
-import { SiteNav } from "@/components/nav/SiteNav";
+import { SOCIAL_REVIEWS } from "@/lib/social-reviews";
 import { useSignupDialogStore } from "@/lib/state/signup-dialog-store";
 
 import { HeroV2 } from "@/components/HeroV2";
@@ -26,9 +25,13 @@ import { seoLinks } from "@/lib/seo";
  * chunk aparte para que el JS inicial (hero + productos) sea más chico y la
  * página pinte antes. Antes venían todos en el bundle de la landing.
  */
-const DiscountWidget = lazy(() =>
-  import("@/components/DiscountWidget").then((m) => ({ default: m.DiscountWidget })),
-);
+// DiscountWidget (popup del 10%) apagado por ahora: prometía un descuento
+// que hoy no está conectado a ningún código real de Shopify. Código intacto
+// para reactivarlo en cuanto haya un código real — mismo criterio que
+// BoxSpinner (ver comentario en Landing()).
+// const DiscountWidget = lazy(() =>
+//   import("@/components/DiscountWidget").then((m) => ({ default: m.DiscountWidget })),
+// );
 const IntroVideoModal = lazy(() =>
   import("@/components/IntroVideoModal").then((m) => ({ default: m.IntroVideoModal })),
 );
@@ -91,8 +94,6 @@ export function Landing() {
   // la altura, no hace falta forzarla.
   return (
     <main className="relative bg-background text-foreground">
-      <SiteNav isHome />
-
       <UrgencyClock />
       <HeroV2 />
       {/* Pedido de George: que se pueda seguir a AZKOMOLY sin buscar. Columna
@@ -111,7 +112,7 @@ export function Landing() {
       {/* Reusa el mismo SignupDialog global (`__root.tsx`): el widget es
           sólo el anzuelo, abre el mismo formulario que la navbar. */}
       <Suspense fallback={null}>
-        <DiscountWidget />
+        {/* <DiscountWidget /> — ver comentario junto al lazy() de arriba */}
         <IntroVideoModal />
         <CookieBanner />
       </Suspense>
@@ -326,7 +327,7 @@ function ProductsSection() {
           /* Móvil y tablet: más chico y pegado arriba a la derecha, fuera del
              carril de tarjetas — antes tapaba el precio de la primera caja.
              Desde `lg` queda exactamente como estaba. */
-          className="pointer-events-none absolute right-0 top-1 z-10 w-[26vw] max-w-[150px] -rotate-6 opacity-90 drop-shadow-[0_18px_30px_rgba(13,13,13,0.28)] sm:right-[3vw] sm:w-[22vw] sm:max-w-[190px] lg:right-[10vw] lg:top-[2vw] lg:w-[30vw] lg:max-w-[360px] lg:opacity-100"
+          className="pointer-events-none absolute right-0 top-1 z-10 w-[30vw] max-w-[172px] -rotate-6 opacity-90 drop-shadow-[0_18px_30px_rgba(13,13,13,0.28)] sm:right-[3vw] sm:w-[26vw] sm:max-w-[220px] lg:right-[2vw] lg:top-0 lg:w-[30vw] lg:max-w-[360px] lg:opacity-100"
         />
       {/* El colchón sólo hace falta en escritorio, que es donde la caja del
           hero desborda sobre esta sección. Por debajo de lg el hero apila sin
@@ -631,6 +632,23 @@ function FollowUsRow() {
     // `top-8` (en vez de `top-0`) baja toda la imagen un poco más, así la
     // caja cuelga más adentro de la sección blanca.
     <div className="relative">
+      {/* Capa "sombra": copia oscurecida/desenfocada del mismo asset, corrida
+          un poco atrás — mismo truco que `DripDivider` (relieve = copias
+          offset), aplicado acá a una imagen en vez de un path SVG. Da
+          profundidad real (dos capas moviéndose por separado) en vez del
+          recorte plano de antes, sin depender de un asset nuevo en capas. */}
+      <motion.img
+        aria-hidden="true"
+        src="/decor/claw-decor.webp"
+        width={1434}
+        height={1672}
+        loading="lazy"
+        draggable={false}
+        className="pointer-events-none absolute right-[4%] sm:right-[10%] top-8 sm:top-10 z-0 w-[150px] sm:w-[220px] scale-[1.06] translate-x-1.5 translate-y-2 opacity-40 blur-[2px] brightness-0"
+        animate={reduceMotion ? undefined : { rotate: [3, -3, 3] }}
+        transition={reduceMotion ? undefined : { duration: 4, repeat: Infinity, ease: "easeInOut" }}
+        style={{ transformOrigin: "top center" }}
+      />
       <motion.img
         src="/decor/claw-decor.webp"
         alt=""
@@ -639,7 +657,7 @@ function FollowUsRow() {
         height={1672}
         loading="lazy"
         draggable={false}
-        className="pointer-events-none absolute right-[4%] sm:right-[10%] top-8 sm:top-10 z-0 w-[150px] sm:w-[220px] drop-shadow-[0_20px_28px_rgba(13,13,13,0.35)]"
+        className="pointer-events-none absolute right-[4%] sm:right-[10%] top-8 sm:top-10 z-[1] w-[150px] sm:w-[220px] drop-shadow-[0_20px_28px_rgba(13,13,13,0.35)]"
         animate={reduceMotion ? undefined : { rotate: [-3, 3, -3] }}
         transition={reduceMotion ? undefined : { duration: 4, repeat: Infinity, ease: "easeInOut" }}
         style={{ transformOrigin: "top center" }}
@@ -737,7 +755,13 @@ function HowItWorks() {
   return (
     <section id="hogyan" className="bg-background">
       <div className="mx-auto max-w-7xl px-6 py-12 sm:py-16">
-        <div data-reveal className="text-center mb-8">
+        {/* `relative z-10`: el decorado de la garra (`FollowUsRow`, arriba)
+            usa posición absoluta con z-index propio, y sin esto el texto —
+            al no estar posicionado — pintaba por DEBAJO del decorado
+            (regla de stacking de CSS: lo posicionado siempre gana aunque
+            venga antes en el DOM). Diego lo vio tapado, esto lo pasa
+            adelante. */}
+        <div data-reveal className="relative z-10 text-center mb-8">
           <p className="font-sans text-xs tracking-[0.4em] text-fire mb-3">
             {t.how.kicker}
           </p>
@@ -779,7 +803,7 @@ function HowItWorks() {
                    como un flujo y no como 4 tarjetas sueltas. */
                 <motion.span
                   aria-hidden="true"
-                  className="sm:hidden absolute left-1/2 top-full h-8 w-[3px] -translate-x-1/2 origin-top overflow-hidden rounded-full bg-gradient-to-b from-fire to-fire/20"
+                  className="lg:hidden absolute left-1/2 top-full h-8 w-[3px] -translate-x-1/2 origin-top overflow-hidden rounded-full bg-gradient-to-b from-fire to-fire/20"
                   initial={reduceMotion ? false : { scaleY: 0, opacity: 0 }}
                   whileInView={reduceMotion ? undefined : { scaleY: 1, opacity: 1 }}
                   viewport={{ once: true, amount: 0.6 }}
@@ -788,6 +812,33 @@ function HowItWorks() {
                   <motion.span
                     className="absolute left-1/2 h-2 w-2 -translate-x-1/2 rounded-full bg-fire"
                     animate={reduceMotion ? undefined : { top: ["-8px", "48px"], opacity: [0, 1, 0] }}
+                    transition={
+                      reduceMotion
+                        ? undefined
+                        : { duration: 1.6, repeat: Infinity, ease: "easeInOut", delay: i * 0.25 }
+                    }
+                  />
+                </motion.span>
+              )}
+              {/* Sólo desktop (`lg`, una sola fila de 4): línea horizontal
+                  que conecta el centro de este paso con el centro del
+                  siguiente (`left-1/2` + `w-[calc(100%+gap)]`, exacto sea
+                  cual sea el ancho de columna). En tablet (`sm:grid-cols-2`,
+                  2 filas) Diego pidió que la conexión siga siendo vertical,
+                  igual que en mobile — por eso la línea de arriba usa
+                  `lg:hidden` (mobile Y tablet) en vez de `sm:hidden`. */}
+              {i < steps.length - 1 && (
+                <motion.span
+                  aria-hidden="true"
+                  className="hidden lg:block absolute left-1/2 top-[45%] h-[3px] w-[calc(100%+1rem)] -translate-y-1/2 origin-left overflow-hidden rounded-full bg-gradient-to-r from-fire to-fire/20"
+                  initial={reduceMotion ? false : { scaleX: 0, opacity: 0 }}
+                  whileInView={reduceMotion ? undefined : { scaleX: 1, opacity: 1 }}
+                  viewport={{ once: true, amount: 0.6 }}
+                  transition={{ duration: 0.5, ease: "easeOut" }}
+                >
+                  <motion.span
+                    className="absolute top-1/2 h-2 w-2 -translate-y-1/2 rounded-full bg-fire"
+                    animate={reduceMotion ? undefined : { left: ["-8px", "calc(100% + 8px)"], opacity: [0, 1, 0] }}
                     transition={
                       reduceMotion
                         ? undefined

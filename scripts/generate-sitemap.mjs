@@ -25,6 +25,8 @@ const API = "2025-07";
  */
 const STATIC_ROUTES = [
   ["/", "1.0", "daily", true],
+  ["/about", "0.6", "monthly", true],
+  ["/faq", "0.6", "monthly", true],
   ["/blog", "0.7", "weekly", true],
   ["/privacy", "0.3", "yearly", false],
   ["/terms", "0.3", "yearly", false],

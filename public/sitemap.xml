@@ -3,7 +3,7 @@
         xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>https://azkomoly.hu/</loc>
-    <lastmod>2026-08-17</lastmod>
+    <lastmod>2026-08-19</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
     <xhtml:link rel="alternate" hreflang="hu" href="https://azkomoly.hu/"/>
@@ -11,8 +11,26 @@
     <xhtml:link rel="alternate" hreflang="x-default" href="https://azkomoly.hu/"/>
   </url>
   <url>
+    <loc>https://azkomoly.hu/about</loc>
+    <lastmod>2026-08-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+    <xhtml:link rel="alternate" hreflang="hu" href="https://azkomoly.hu/about"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://azkomoly.hu/en/about"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://azkomoly.hu/about"/>
+  </url>
+  <url>
+    <loc>https://azkomoly.hu/faq</loc>
+    <lastmod>2026-08-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+    <xhtml:link rel="alternate" hreflang="hu" href="https://azkomoly.hu/faq"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://azkomoly.hu/en/faq"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://azkomoly.hu/faq"/>
+  </url>
+  <url>
     <loc>https://azkomoly.hu/blog</loc>
-    <lastmod>2026-08-17</lastmod>
+    <lastmod>2026-08-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
     <xhtml:link rel="alternate" hreflang="hu" href="https://azkomoly.hu/blog"/>
@@ -21,25 +39,25 @@
   </url>
   <url>
     <loc>https://azkomoly.hu/privacy</loc>
-    <lastmod>2026-08-17</lastmod>
+    <lastmod>2026-08-19</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
   <url>
     <loc>https://azkomoly.hu/terms</loc>
-    <lastmod>2026-08-17</lastmod>
+    <lastmod>2026-08-19</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
   <url>
     <loc>https://azkomoly.hu/cookies</loc>
-    <lastmod>2026-08-17</lastmod>
+    <lastmod>2026-08-19</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
   <url>
     <loc>https://azkomoly.hu/shop/azkomoly-not-real-box-2-copy</loc>
-    <lastmod>2026-08-17</lastmod>
+    <lastmod>2026-08-18</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <xhtml:link rel="alternate" hreflang="hu" href="https://azkomoly.hu/shop/azkomoly-not-real-box-2-copy"/>
