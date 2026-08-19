@@ -13,7 +13,7 @@ const LANDING_SECTIONS = ["termekek", "hogyan", "gyik", "kapcsolat"] as const;
 // hacía un scroll genérico de "una pantalla", sin saber qué había abajo.
 // "kapcsolat" es el id del footer compartido (`SiteFooter.tsx`), así que
 // sirve de última parada en cualquier ruta.
-const ABOUT_SECTIONS = ["about-intro", "about-goal", "about-who", "about-follow", "kapcsolat"] as const;
+const ABOUT_SECTIONS = ["about-intro", "about-goal", "about-who", "about-reviews", "about-follow", "kapcsolat"] as const;
 const FAQ_SECTIONS = ["faq-intro", "faq-list", "faq-help", "kapcsolat"] as const;
 
 // "Después del hero": el hero mide ~1 pantalla, así que aparece pasado ese

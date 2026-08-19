@@ -3,6 +3,7 @@ import { Instagram, Facebook, Youtube } from "lucide-react";
 
 import { DripDivider } from "@/components/DripDivider";
 import { SiteFooter } from "@/components/SiteFooter";
+import { SocialProofMarquee } from "@/components/SocialProofMarquee";
 import { useT, useI18n } from "@/lib/i18n";
 
 /**
@@ -104,6 +105,14 @@ export function AboutPageBody() {
           </div>
         </div>
       </section>
+
+      {/* "Real unboxings": reels/TikToks reales. Estaba pensada para About
+          desde el 17/08 pero el commit que la creó nunca la conectó acá —
+          quedó huérfana, se veía como código muerto y se llegó a borrar por
+          error. Restaurada. */}
+      <div id="about-reviews">
+        <SocialProofMarquee />
+      </div>
 
       <DripDivider variant="organic" mainColor="#FFFFFF" bgColor="#5B2EA8" shadowColor="#0D0D0D" depth={4} height={34} />
       <section id="about-follow" className="bg-fire px-6 py-14 sm:py-20 flex flex-col items-center text-center gap-6">
