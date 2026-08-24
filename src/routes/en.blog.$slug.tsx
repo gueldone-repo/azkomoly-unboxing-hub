@@ -1,6 +1,6 @@
 import { createFileRoute, notFound } from "@tanstack/react-router";
 import { BlogPostPage } from "./blog.$slug";
-import { getBlogPost } from "@/content/blog/posts";
+import { getBlogPost, type BlogPost } from "@/content/blog/posts";
 import { DICTIONARIES } from "@/lib/i18n/dictionary";
 import {
   SITE_URL,
