@@ -67,7 +67,7 @@ export const Route = createFileRoute("/blog/$slug")({
 });
 
 function HuBlogPostPage() {
-  const { post } = Route.useLoaderData();
+  const { post } = Route.useLoaderData() as { post: BlogPost };
   return <BlogPostPage post={post} />;
 }
 

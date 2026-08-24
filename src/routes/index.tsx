@@ -644,7 +644,7 @@ function FollowUsRow() {
         height={1672}
         loading="lazy"
         draggable={false}
-        className="pointer-events-none absolute right-[4%] sm:right-[10%] top-8 sm:top-10 z-0 w-[150px] sm:w-[220px] scale-[1.06] translate-x-1.5 translate-y-2 opacity-40 blur-[2px] brightness-0"
+        className="pointer-events-none absolute right-[2%] sm:right-[10%] top-6 sm:top-10 z-0 w-[180px] sm:w-[220px] scale-[1.06] translate-x-1.5 translate-y-2 opacity-30 blur-[1px] brightness-0"
         animate={reduceMotion ? undefined : { rotate: [3, -3, 3] }}
         transition={reduceMotion ? undefined : { duration: 4, repeat: Infinity, ease: "easeInOut" }}
         style={{ transformOrigin: "top center" }}
@@ -657,7 +657,7 @@ function FollowUsRow() {
         height={1672}
         loading="lazy"
         draggable={false}
-        className="pointer-events-none absolute right-[4%] sm:right-[10%] top-8 sm:top-10 z-[1] w-[150px] sm:w-[220px] drop-shadow-[0_20px_28px_rgba(13,13,13,0.35)]"
+        className="pointer-events-none absolute right-[2%] sm:right-[10%] top-6 sm:top-10 z-[1] w-[180px] sm:w-[220px] drop-shadow-[0_20px_28px_rgba(13,13,13,0.35)]"
         animate={reduceMotion ? undefined : { rotate: [-3, 3, -3] }}
         transition={reduceMotion ? undefined : { duration: 4, repeat: Infinity, ease: "easeInOut" }}
         style={{ transformOrigin: "top center" }}
@@ -761,7 +761,7 @@ function HowItWorks() {
             (regla de stacking de CSS: lo posicionado siempre gana aunque
             venga antes en el DOM). Diego lo vio tapado, esto lo pasa
             adelante. */}
-        <div data-reveal className="relative z-10 text-center mb-6">
+        <div data-reveal className="relative z-10 text-left sm:text-center mb-6 pr-[34%] sm:pr-0">
           <p className="font-sans text-xs tracking-[0.4em] text-fire mb-3">
             {t.how.kicker}
           </p>
