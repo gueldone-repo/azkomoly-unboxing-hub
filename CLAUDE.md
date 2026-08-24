@@ -120,7 +120,6 @@ código muerto, se pierde la señal SEO más fuerte de la home.
 | API version | `2025-07` |
 | Admin token | `SHOPIFY_ADMIN_TOKEN` en `.env` — **pendiente** (necesita `read_price_rules` scope) |
 | Envíos | PeakShip / Kvikk — pendiente de instalar |
-| Pagos | Pendiente: Stripe o SimplePay (Shopify Payments no disponible en HU) |
 | Impuestos | ÁFA 27% — pendiente de configurar en Shopify Settings |
 
 ### Empresa (datos legales en /privacy, /terms, /cookies)

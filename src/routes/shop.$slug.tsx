@@ -1,5 +1,5 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { useState, useEffect } from "react";
+import { useState, useEffect, lazy, Suspense } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { ShieldCheck, Truck, Sparkles, ZoomIn, ChevronLeft, ChevronRight, Check } from "lucide-react";
 import { useT, useI18n, readLangCookie } from "@/lib/i18n";
@@ -8,6 +8,13 @@ import { fetchProductByHandle, formatShopifyPrice, type ShopifyProduct } from "@
 import { useShopifyCart } from "@/lib/shopify/cart-store";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { seoLinks, canonicalUrl, jsonLd, productSchema, breadcrumbSchema } from "@/lib/seo";
+
+// Mismo widget/código real (AZKOMOLY5) que en la home — aquí es el segundo
+// punto del funnel: dispara al abrir la ficha de producto, más cerca del
+// momento de decisión de compra (pedido de Diego).
+const DiscountWidget = lazy(() =>
+  import("@/components/DiscountWidget").then((m) => ({ default: m.DiscountWidget })),
+);
 
 export const Route = createFileRoute("/shop/$slug")({
   head: (ctx) => {
@@ -464,6 +471,10 @@ export function ProductPage({
           </div>
         </div>
       </div>
+
+      <Suspense fallback={null}>
+        <DiscountWidget />
+      </Suspense>
     </main>
   );
 }

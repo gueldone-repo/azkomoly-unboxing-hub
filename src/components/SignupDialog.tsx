@@ -19,6 +19,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { appendLeadToSheet } from "@/lib/leads.functions";
 import { useT } from "@/lib/i18n";
 import { useSignupDialogStore } from "@/lib/state/signup-dialog-store";
+import { useShopifyCart } from "@/lib/shopify/cart-store";
+
+// Código real, activo en Shopify (AZKOMOLY5 — Signup funnel, 5%, appliesOncePerCustomer).
+// Reutiliza el mismo mecanismo que BoxSpinner: setDiscountCode() ya hace que
+// getCheckoutUrl() lo pegue solo al checkout, sin llamadas de red nuevas.
+const SIGNUP_DISCOUNT_CODE = "AZKOMOLY5";
 
 const COUNTRY_CODES: { code: string; label: string; flag: string }[] = [
   { code: "+36", label: "Magyarország", flag: "🇭🇺" },
@@ -69,6 +75,7 @@ export function SignupDialog() {
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [message, setMessage] = useState("");
   const appendToSheet = useServerFn(appendLeadToSheet);
+  const setDiscountCode = useShopifyCart((s) => s.setDiscountCode);
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
@@ -110,6 +117,10 @@ export function SignupDialog() {
         phone: phoneTrim || null,
       },
     }).catch((err) => console.error("Sheet append error", err));
+
+    // Se aplica en ambos casos (lead nuevo o repetido) — el objetivo es que
+    // compre ahora, no solo la primera vez que deja sus datos.
+    setDiscountCode(SIGNUP_DISCOUNT_CODE);
 
     if (error?.code === "23505") {
       setStatus("success");
