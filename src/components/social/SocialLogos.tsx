@@ -129,6 +129,12 @@ const RAIL_HIDE_DELAY_TOUCH = 2600;
  * Ahora se esconde detrás de una lengüeta — mismo patrón que el dock de
  * navegación inferior (`BottomNav.tsx`): la lengüeta es lo único visible en
  * reposo, y el hover/click/foco la revela con un timer de cierre al alejarse.
+ *
+ * `position: absolute` (no `fixed`, 2026-08-24): se pidió que la lengüeta
+ * viva SOLO dentro del Hero, no sobrepuesta sobre el resto de la página al
+ * scrollear. Por eso este componente se monta dentro del `<section>` del
+ * Hero (`HeroV2.tsx`), que ya es `position: relative` — el `absolute` de acá
+ * se ancla a ese contenedor y desaparece con él al bajar de sección.
  */
 export function SocialRail() {
   const prefersReducedMotion = useReducedMotion();
@@ -169,7 +175,7 @@ export function SocialRail() {
 
   return (
     <>
-      <div className="flex fixed left-0 top-1/2 z-30 -translate-y-1/2">
+      <div className="flex absolute left-0 top-1/2 z-30 -translate-y-1/2">
         <motion.button
           type="button"
           aria-label="Kövess minket"
@@ -193,7 +199,7 @@ export function SocialRail() {
       </div>
 
       <div
-        className="flex fixed left-3 top-1/2 z-30 -translate-y-1/2 flex-col items-center gap-1"
+        className="flex absolute left-3 top-1/2 z-30 -translate-y-1/2 flex-col items-center gap-1"
         onMouseEnter={() => {
           if (isTouch) return;
           clearHideTimer();

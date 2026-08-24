@@ -1,14 +1,14 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, useEffect, useRef, lazy, Suspense } from "react";
 import { motion, useReducedMotion } from "motion/react";
-import { MousePointer2, ChevronLeft, ChevronRight } from "lucide-react";
+import { MousePointer2, ChevronLeft, ChevronRight, ChevronDown } from "lucide-react";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SOCIAL_REVIEWS } from "@/lib/social-reviews";
 import { useSignupDialogStore } from "@/lib/state/signup-dialog-store";
 
 import { HeroV2 } from "@/components/HeroV2";
 import TextLoop from "@/components/TextLoop";
-import { SOCIAL_LINKS, SocialGlyph, SocialRail } from "@/components/social/SocialLogos";
+import { SOCIAL_LINKS, SocialGlyph } from "@/components/social/SocialLogos";
 import { ProductTiltCard } from "@/components/shop/ProductTiltCard";
 import { SlidingNumber } from "@/components/core/sliding-number";
 import { ScrollFloat } from "@/components/text/ScrollFloat";
@@ -24,13 +24,12 @@ import { seoLinks } from "@/lib/seo";
  * chunk aparte para que el JS inicial (hero + productos) sea más chico y la
  * página pinte antes. Antes venían todos en el bundle de la landing.
  */
-// DiscountWidget (popup del 10%) apagado por ahora: prometía un descuento
-// que hoy no está conectado a ningún código real de Shopify. Código intacto
-// para reactivarlo en cuanto haya un código real — mismo criterio que
-// BoxSpinner (ver comentario en Landing()).
-// const DiscountWidget = lazy(() =>
-//   import("@/components/DiscountWidget").then((m) => ({ default: m.DiscountWidget })),
-// );
+// DiscountWidget (popup del 5%) — reactivado: ahora sí dispara el código
+// real AZKOMOLY5 (activo en Shopify, appliesOncePerCustomer) vía
+// SignupDialog → cart-store.setDiscountCode(), mismo mecanismo que BoxSpinner.
+const DiscountWidget = lazy(() =>
+  import("@/components/DiscountWidget").then((m) => ({ default: m.DiscountWidget })),
+);
 const IntroVideoModal = lazy(() =>
   import("@/components/IntroVideoModal").then((m) => ({ default: m.IntroVideoModal })),
 );
@@ -93,11 +92,11 @@ export function Landing() {
   // la altura, no hace falta forzarla.
   return (
     <main className="relative bg-background text-foreground">
-      <UrgencyClock />
+      {/* Contador "Flash launch" deshabilitado a pedido de Diego (2026-08-24):
+          fuera de la vista aunque el descuento automático siga activo en
+          Shopify. Componente `UrgencyClock` intacto abajo por si se
+          reactiva más adelante — no borrar. */}
       <HeroV2 />
-      {/* Pedido de George: que se pueda seguir a AZKOMOLY sin buscar. Columna
-          pegada al borde izquierdo, fuera del camino del CTA de compra. */}
-      <SocialRail />
       <ProductsSection />
       <VelocityBand />
       <LifestyleStrip />
@@ -111,7 +110,7 @@ export function Landing() {
       {/* Reusa el mismo SignupDialog global (`__root.tsx`): el widget es
           sólo el anzuelo, abre el mismo formulario que la navbar. */}
       <Suspense fallback={null}>
-        {/* <DiscountWidget /> — ver comentario junto al lazy() de arriba */}
+        <DiscountWidget />
         <IntroVideoModal />
         <CookieBanner />
       </Suspense>
@@ -755,14 +754,14 @@ function HowItWorks() {
   const steps = t.how.steps;
   return (
     <section id="hogyan" className="bg-background">
-      <div className="mx-auto max-w-7xl px-6 py-12 sm:py-16">
+      <div className="mx-auto max-w-7xl px-6 py-10 sm:py-12">
         {/* `relative z-10`: el decorado de la garra (`FollowUsRow`, arriba)
             usa posición absoluta con z-index propio, y sin esto el texto —
             al no estar posicionado — pintaba por DEBAJO del decorado
             (regla de stacking de CSS: lo posicionado siempre gana aunque
             venga antes en el DOM). Diego lo vio tapado, esto lo pasa
             adelante. */}
-        <div data-reveal className="relative z-10 text-center mb-8">
+        <div data-reveal className="relative z-10 text-center mb-6">
           <p className="font-sans text-xs tracking-[0.4em] text-fire mb-3">
             {t.how.kicker}
           </p>
@@ -771,15 +770,18 @@ function HowItWorks() {
           </h2>
         </div>
 
-        <div data-reveal className="mb-8">
+        <div data-reveal className="mb-6">
           <HowItWorksVideo />
         </div>
 
         {/* Mobile: columna vertical con línea que conecta los pasos —
             pedido explícito de Diego ("los pasos deben ser verticales con
-            una buena animación"). Desde `sm` vuelve a la grilla horizontal. */}
+            una buena animación"). Desde `sm` vuelve a la grilla horizontal.
+            Gaps reducidos (2026-08-24, pedido de Diego: "menos espaciado
+            entre pasos") — antes los 4 pasos se sentían como bloques
+            sueltos y lejanos entre sí. */}
         <motion.div
-          className="flex flex-col gap-6 sm:grid sm:grid-cols-2 lg:grid-cols-4 sm:gap-4 max-w-5xl mx-auto"
+          className="flex flex-col gap-3 sm:grid sm:grid-cols-2 lg:grid-cols-4 sm:gap-3 max-w-5xl mx-auto"
           initial={reduceMotion ? false : "hidden"}
           whileInView={reduceMotion ? undefined : "show"}
           viewport={{ once: true, amount: 0.2 }}
@@ -798,27 +800,31 @@ function HowItWorks() {
               }}
             >
               {i < steps.length - 1 && (
-                /* Línea morada que une los pasos en mobile: se "dibuja"
-                   sola al entrar en pantalla (scaleY desde arriba) y lleva
-                   un punto que baja en loop, para que el recorrido se lea
-                   como un flujo y no como 4 tarjetas sueltas. */
+                /* Línea morada que une los pasos en mobile/tablet: se
+                   "dibuja" sola al entrar en pantalla (scaleY desde arriba)
+                   y lleva una flechita que baja en loop, para que el
+                   recorrido se lea como un flujo y no como tarjetas sueltas.
+                   Altura reducida junto con el gap del grid (2026-08-24)
+                   para que la conexión se sienta pegada al paso siguiente. */
                 <motion.span
                   aria-hidden="true"
-                  className="lg:hidden absolute left-1/2 top-full h-8 w-[3px] -translate-x-1/2 origin-top overflow-hidden rounded-full bg-gradient-to-b from-fire to-fire/20"
+                  className="lg:hidden absolute left-1/2 top-full h-5 w-[3px] -translate-x-1/2 origin-top overflow-visible rounded-full bg-gradient-to-b from-fire to-fire/20"
                   initial={reduceMotion ? false : { scaleY: 0, opacity: 0 }}
                   whileInView={reduceMotion ? undefined : { scaleY: 1, opacity: 1 }}
                   viewport={{ once: true, amount: 0.6 }}
-                  transition={{ duration: 0.5, ease: "easeOut" }}
+                  transition={{ duration: 0.4, ease: "easeOut" }}
                 >
                   <motion.span
-                    className="absolute left-1/2 h-2 w-2 -translate-x-1/2 rounded-full bg-fire"
-                    animate={reduceMotion ? undefined : { top: ["-8px", "48px"], opacity: [0, 1, 0] }}
+                    className="absolute left-1/2 -translate-x-1/2 text-fire"
+                    animate={reduceMotion ? undefined : { top: ["-6px", "26px"], opacity: [0, 1, 0] }}
                     transition={
                       reduceMotion
                         ? undefined
-                        : { duration: 1.6, repeat: Infinity, ease: "easeInOut", delay: i * 0.25 }
+                        : { duration: 1.4, repeat: Infinity, ease: "easeInOut", delay: i * 0.25 }
                     }
-                  />
+                  >
+                    <ChevronDown className="h-4 w-4" strokeWidth={3} />
+                  </motion.span>
                 </motion.span>
               )}
               {/* Sólo desktop (`lg`, una sola fila de 4): línea horizontal
@@ -831,21 +837,23 @@ function HowItWorks() {
               {i < steps.length - 1 && (
                 <motion.span
                   aria-hidden="true"
-                  className="hidden lg:block absolute left-1/2 top-[45%] h-[3px] w-[calc(100%+1rem)] -translate-y-1/2 origin-left overflow-hidden rounded-full bg-gradient-to-r from-fire to-fire/20"
+                  className="hidden lg:block absolute left-1/2 top-[45%] h-[3px] w-[calc(100%+0.75rem)] -translate-y-1/2 origin-left overflow-visible rounded-full bg-gradient-to-r from-fire to-fire/20"
                   initial={reduceMotion ? false : { scaleX: 0, opacity: 0 }}
                   whileInView={reduceMotion ? undefined : { scaleX: 1, opacity: 1 }}
                   viewport={{ once: true, amount: 0.6 }}
-                  transition={{ duration: 0.5, ease: "easeOut" }}
+                  transition={{ duration: 0.4, ease: "easeOut" }}
                 >
                   <motion.span
-                    className="absolute top-1/2 h-2 w-2 -translate-y-1/2 rounded-full bg-fire"
-                    animate={reduceMotion ? undefined : { left: ["-8px", "calc(100% + 8px)"], opacity: [0, 1, 0] }}
+                    className="absolute top-1/2 -translate-y-1/2 text-fire"
+                    animate={reduceMotion ? undefined : { left: ["-6px", "calc(100% + 6px)"], opacity: [0, 1, 0] }}
                     transition={
                       reduceMotion
                         ? undefined
-                        : { duration: 1.6, repeat: Infinity, ease: "easeInOut", delay: i * 0.25 }
+                        : { duration: 1.4, repeat: Infinity, ease: "easeInOut", delay: i * 0.25 }
                     }
-                  />
+                  >
+                    <ChevronRight className="h-4 w-4" strokeWidth={3} />
+                  </motion.span>
                 </motion.span>
               )}
               <motion.div

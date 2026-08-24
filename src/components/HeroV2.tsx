@@ -3,6 +3,7 @@ import { motion, useReducedMotion } from "motion/react";
 
 import { useT } from "@/lib/i18n";
 import { WaveBackdrop } from "@/components/WaveBackdrop";
+import { SocialRail } from "@/components/social/SocialLogos";
 import { RotatingText } from "@/components/text/RotatingText";
 import { SplitText } from "@/components/text/SplitText";
 
@@ -154,6 +155,13 @@ export function HeroV2() {
           onda es lo único que hace de fondo y, además, es lo que conecta el
           hero con la sección morada de productos. */}
       <WaveBackdrop />
+
+      {/* Pedido de George: que se pueda seguir a AZKOMOLY sin buscar. Columna
+          pegada al borde izquierdo, fuera del camino del CTA de compra.
+          Vive acá (no como hermano suelto en index.tsx) para que quede
+          acotada al Hero — `SocialRail` usa `absolute`, así que se ancla a
+          este `<section>` y no queda flotando sobre el resto de la página. */}
+      <SocialRail />
 
       {seoTitle}
 
