@@ -87,7 +87,7 @@ export const Route = createFileRoute("/shop/$slug")({
 });
 
 function HuProductPage() {
-  const { product, lang } = Route.useLoaderData();
+  const { product, lang } = Route.useLoaderData() as { product: ShopifyProduct["node"]; lang: Lang };
   return <ProductPage product={product} lang={lang} />;
 }
 

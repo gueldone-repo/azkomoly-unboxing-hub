@@ -68,6 +68,6 @@ export const Route = createFileRoute("/en/blog/$slug")({
 });
 
 function EnBlogPostPage() {
-  const { post } = Route.useLoaderData();
+  const { post } = Route.useLoaderData() as { post: BlogPost };
   return <BlogPostPage post={post} />;
 }

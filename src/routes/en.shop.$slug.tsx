@@ -79,6 +79,6 @@ export const Route = createFileRoute("/en/shop/$slug")({
 });
 
 function EnProductPage() {
-  const { product, lang } = Route.useLoaderData();
+  const { product, lang } = Route.useLoaderData() as { product: ShopifyProduct["node"]; lang: "en" };
   return <ProductPage product={product} lang={lang} />;
 }
