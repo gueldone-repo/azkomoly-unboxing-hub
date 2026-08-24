@@ -761,7 +761,7 @@ function HowItWorks() {
             (regla de stacking de CSS: lo posicionado siempre gana aunque
             venga antes en el DOM). Diego lo vio tapado, esto lo pasa
             adelante. */}
-        <div data-reveal className="relative z-10 text-center mb-6">
+        <div data-reveal className="relative z-10 text-left sm:text-center mb-6 pr-[34%] sm:pr-0">
           <p className="font-sans text-xs tracking-[0.4em] text-fire mb-3">
             {t.how.kicker}
           </p>
