@@ -180,6 +180,16 @@ export function CartSheet() {
               >
                 {t.cart.checkout} →
               </button>
+              {/* "Seguir comprando": pedido explícito — antes la única salida
+                  del carril con productos era pagar o cerrar el drawer con la
+                  X. Cierra el sheet sin tocar el carrito, así se puede volver
+                  a "Our boxes" a agarrar más antes de pagar. */}
+              <button
+                onClick={() => setOpen(false)}
+                className="w-full font-sans text-sm text-foreground/60 py-1 hover:text-fire transition-colors"
+              >
+                ← {t.cart.continueShopping}
+              </button>
             </SheetFooter>
           </>
         )}

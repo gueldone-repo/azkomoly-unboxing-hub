@@ -228,7 +228,6 @@ export type Dict = {
     guaranteedValueShort: string;
     inStock: string;
     units: string;
-    trustBranded: string;
     trustShipping: string;
     trustValue: string;
     notFound: string;
@@ -259,6 +258,7 @@ export type Dict = {
     subtotal: string;
     shippingNote: string;
     checkout: string;
+    continueShopping: string;
     remove: string;
     clear: string;
     added: string;
@@ -544,7 +544,6 @@ const hu: Dict = {
     guaranteedValueShort: "Garantált érték",
     inStock: "Készleten",
     units: "db",
-    trustBranded: "100% márkás",
     trustShipping: "2–4 nap szállítás",
     trustValue: "Garantált érték",
     notFound: "Nincs ilyen doboz",
@@ -575,6 +574,7 @@ const hu: Dict = {
     subtotal: "Részösszeg",
     shippingNote: "A szállítást a pénztárnál számoljuk ki.",
     checkout: "Tovább a pénztárhoz",
+    continueShopping: "További dobozok",
     remove: "Törlés",
     clear: "Kosár ürítése",
     added: "Hozzáadva a kosárhoz",
@@ -859,7 +859,6 @@ const en: Dict = {
     guaranteedValueShort: "Guaranteed value",
     inStock: "In stock",
     units: "pcs",
-    trustBranded: "100% branded",
     trustShipping: "2–4 day shipping",
     trustValue: "Guaranteed value",
     notFound: "No such box",
@@ -890,6 +889,7 @@ const en: Dict = {
     subtotal: "Subtotal",
     shippingNote: "Shipping calculated at checkout.",
     checkout: "Checkout",
+    continueShopping: "More boxes",
     remove: "Remove",
     clear: "Clear cart",
     added: "Added to cart",

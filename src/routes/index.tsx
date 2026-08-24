@@ -399,7 +399,14 @@ function ProductsSection() {
               {visible.map((p) => (
                 <div
                   key={p.node.id}
-                  className="w-[82vw] max-w-[340px] shrink-0 snap-center sm:w-auto sm:max-w-none sm:shrink"
+                  // `relative z-20`: el sticker decorativo de arriba (línea
+                  // ~314) es `absolute z-10` y, en desktop, alto de sobra
+                  // (hasta 360px) para pisar visualmente la primera caja de
+                  // la fila — como las tarjetas no tenían posición propia,
+                  // el sticker pintaba encima aunque viniera antes en el
+                  // DOM (regla de stacking: lo posicionado siempre gana).
+                  // Con esto la tarjeta queda por encima del sticker.
+                  className="relative z-20 w-[82vw] max-w-[340px] shrink-0 snap-center sm:w-auto sm:max-w-none sm:shrink"
                 >
                   <ProductTiltCard p={p} />
                 </div>
@@ -777,11 +784,12 @@ function HowItWorks() {
         {/* Mobile: columna vertical con línea que conecta los pasos —
             pedido explícito de Diego ("los pasos deben ser verticales con
             una buena animación"). Desde `sm` vuelve a la grilla horizontal.
-            Gaps reducidos (2026-08-24, pedido de Diego: "menos espaciado
-            entre pasos") — antes los 4 pasos se sentían como bloques
-            sueltos y lejanos entre sí. */}
+            Gap casi nulo (2026-08-24, segundo ajuste — el primer recorte de
+            gap no alcanzó: la imagen en sí ocupaba casi todo el ancho de
+            pantalla en mobile, `aspect-square` de hasta 420px, así que igual
+            se leía como 4 bloques lejanos con mucho scroll entre medio). */}
         <motion.div
-          className="flex flex-col gap-3 sm:grid sm:grid-cols-2 lg:grid-cols-4 sm:gap-3 max-w-5xl mx-auto"
+          className="flex flex-col gap-1 sm:grid sm:grid-cols-2 lg:grid-cols-4 sm:gap-3 max-w-5xl mx-auto"
           initial={reduceMotion ? false : "hidden"}
           whileInView={reduceMotion ? undefined : "show"}
           viewport={{ once: true, amount: 0.2 }}
@@ -808,7 +816,7 @@ function HowItWorks() {
                    para que la conexión se sienta pegada al paso siguiente. */
                 <motion.span
                   aria-hidden="true"
-                  className="lg:hidden absolute left-1/2 top-full h-5 w-[3px] -translate-x-1/2 origin-top overflow-visible rounded-full bg-gradient-to-b from-fire to-fire/20"
+                  className="lg:hidden absolute left-1/2 top-full h-4 w-[3px] -translate-x-1/2 origin-top overflow-visible rounded-full bg-gradient-to-b from-fire to-fire/20"
                   initial={reduceMotion ? false : { scaleY: 0, opacity: 0 }}
                   whileInView={reduceMotion ? undefined : { scaleY: 1, opacity: 1 }}
                   viewport={{ once: true, amount: 0.6 }}
@@ -816,7 +824,7 @@ function HowItWorks() {
                 >
                   <motion.span
                     className="absolute left-1/2 -translate-x-1/2 text-fire"
-                    animate={reduceMotion ? undefined : { top: ["-6px", "26px"], opacity: [0, 1, 0] }}
+                    animate={reduceMotion ? undefined : { top: ["-6px", "20px"], opacity: [0, 1, 0] }}
                     transition={
                       reduceMotion
                         ? undefined
@@ -856,8 +864,13 @@ function HowItWorks() {
                   </motion.span>
                 </motion.span>
               )}
+              {/* Caja de imagen: antes hasta 420px de ancho en mobile (casi
+                  la pantalla entera) — el ícono real ocupaba una fracción de
+                  eso, así que el "espacio en blanco" que se veía entre pasos
+                  no era el gap del grid, era el aire sobrante dentro de cada
+                  caja. Achicada (2026-08-24) a un tamaño de ícono real. */}
               <motion.div
-                className="aspect-square w-full max-w-[420px] sm:max-w-[320px] grid place-items-center"
+                className="aspect-square w-[42vw] max-w-[168px] sm:w-full sm:max-w-[240px] lg:max-w-[260px] grid place-items-center"
 
                 variants={{
                   hidden: { opacity: 0, scale: 0.7 },

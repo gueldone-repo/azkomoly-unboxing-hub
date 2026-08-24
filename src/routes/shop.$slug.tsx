@@ -1,7 +1,7 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useState, useEffect, lazy, Suspense } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { ShieldCheck, Truck, Sparkles, ZoomIn, ChevronLeft, ChevronRight, Check } from "lucide-react";
+import { Truck, Sparkles, ZoomIn, ChevronLeft, ChevronRight, Check, ArrowLeft } from "lucide-react";
 import { useT, useI18n, readLangCookie } from "@/lib/i18n";
 import { DICTIONARIES, type Lang } from "@/lib/i18n/dictionary";
 import { fetchProductByHandle, formatShopifyPrice, type ShopifyProduct } from "@/lib/shopify/client";
@@ -221,19 +221,32 @@ export function ProductPage({
       {/* SiteNav vive ahora en __root.tsx */}
       {/* Mismos 2 niveles que `breadcrumbSchema` (JSON-LD) más abajo — sin
           apuntar al ancla #termekek, que TanStack Link no resuelve como ruta. */}
-      {/* Sin breadcrumb: se leía como una barra de "volver" redundante —
-          el navbar ya cubre esa navegación (pedido de Diego). El JSON-LD
-          `breadcrumbSchema` de arriba (head()) no depende de esto, se queda
-          intacto para SEO. */}
       <div className="mx-auto max-w-7xl px-6 pt-8 pb-20 grid lg:grid-cols-2 gap-10">
         {/* Visual */}
         <div>
+          {/* Volver: Diego lo había sacado (se leía como barra de "volver"
+              redundante con el navbar) y lo volvió a pedir el 2026-08-24 —
+              por eso va chico y ligero (sólo texto + ícono, sin barra ni
+              fondo propio) en vez del breadcrumb completo que se sacó antes.
+              `history.back()` conserva scroll/filtros del carril de "Our
+              boxes"; si no hay historial (entrada directa a la URL), cae al
+              ancla de la sección de productos. */}
+          <button
+            type="button"
+            onClick={() => {
+              if (window.history.length > 1) window.history.back();
+              else window.location.href = lang === "hu" ? "/#termekek" : "/en#termekek";
+            }}
+            className="mb-4 inline-flex items-center gap-1.5 font-sans text-sm text-foreground/60 transition-colors hover:text-fire"
+          >
+            <ArrowLeft className="h-4 w-4" /> {t.product.backToShop}
+          </button>
           <button
             type="button"
             onClick={() => image && setLightboxOpen(true)}
             disabled={!image}
             aria-label={t.product.zoom}
-            className="group relative aspect-square w-full rounded-2xl bg-dark-bg overflow-hidden border-2 border-cardboard/40 shadow-[8px_8px_0_0_#0D0D0D] cursor-zoom-in disabled:cursor-default"
+            className="group relative aspect-square w-full rounded-2xl bg-gradient-to-br from-dark-bg to-cardboard/15 overflow-hidden border-2 border-cardboard/40 shadow-[8px_8px_0_0_#0D0D0D] cursor-zoom-in disabled:cursor-default"
           >
             <AnimatePresence mode="wait" initial={false}>
               {image ? (
@@ -241,7 +254,12 @@ export function ProductPage({
                   key={image.url}
                   src={image.url}
                   alt={image.altText ?? product.title}
-                  className="absolute inset-0 w-full h-full object-cover"
+                  // `object-contain` + padding (antes `object-cover` a
+                  // sangre): con fotos que no son 1:1, `cover` recortaba
+                  // partes del producto para llenar el cuadro. Con `contain`
+                  // se ve la foto entera, y el padding evita que toque los
+                  // bordes redondeados.
+                  className="absolute inset-0 h-full w-full object-contain p-6"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
@@ -458,10 +476,10 @@ export function ProductPage({
 
           {/* Trust — antes íconos sueltos sin tarjeta; ahora con la misma
               sombra dura que ya usan `ReviewCard`/`Footer` en el resto del sitio. */}
-          <div className="mt-8 grid grid-cols-3 gap-3 text-center font-sans text-xs text-foreground/70">
-            <div className="flex flex-col items-center gap-1.5 rounded-2xl border-2 border-cardboard/30 bg-dark-bg py-4 shadow-[4px_4px_0_0_#0D0D0D]">
-              <ShieldCheck className="h-5 w-5 text-fire" /> {t.product.trustBranded}
-            </div>
+          {/* Antes 3 columnas con "100% márkás" primero — esa promesa no
+              aplica al surtido real (pedido de Diego, 2026-08-24: "quitar
+              100% márkás eso no va"). Quedan las 2 que sí son ciertas. */}
+          <div className="mt-8 grid grid-cols-2 gap-3 text-center font-sans text-xs text-foreground/70">
             <div className="flex flex-col items-center gap-1.5 rounded-2xl border-2 border-cardboard/30 bg-dark-bg py-4 shadow-[4px_4px_0_0_#0D0D0D]">
               <Truck className="h-5 w-5 text-fire" /> {t.product.trustShipping}
             </div>
